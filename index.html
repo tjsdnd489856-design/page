@@ -18,7 +18,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
 
-    <div class="bg-white w-full max-w-xl rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white w-full max-w-xl rounded-xl shadow-lg overflow-hidden mt-8 mb-8">
         
         <!-- 헤더 -->
         <header class="bg-blue-600 text-white p-6 text-center">
@@ -27,17 +27,14 @@
         </header>
 
         <main class="p-6">
-            <!-- 메인 카테고리 탭 (현재는 비즈니스만 활성화) -->
-            <div class="flex flex-wrap gap-2 mb-6 border-b pb-4">
-                <button class="px-4 py-2 text-sm font-semibold rounded-t-lg bg-blue-100 text-blue-700 border-b-2 border-blue-600">🏢 비즈니스/이메일</button>
-                <button class="px-4 py-2 text-sm font-semibold text-gray-400 cursor-not-allowed" disabled>🏫 과제/요약 (준비중)</button>
-                <button class="px-4 py-2 text-sm font-semibold text-gray-400 cursor-not-allowed" disabled>💌 인간관계 (준비중)</button>
-                <button class="px-4 py-2 text-sm font-semibold text-gray-400 cursor-not-allowed" disabled>🏪 중고거래 (준비중)</button>
+            <!-- 메인 카테고리 탭 (동적 렌더링) -->
+            <div id="mainTabs" class="flex flex-wrap gap-2 mb-6 border-b pb-4 justify-center">
+                <!-- app.js에서 4개의 탭이 동적으로 생성됨 -->
             </div>
 
-            <!-- 서브 기능(무기) 선택 버튼 영역 -->
+            <!-- 서브 기능(무기) 선택 버튼 영역 (동적 렌더링) -->
             <div id="subFeatures" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                <!-- app.js에서 동적으로 생성됨 -->
+                <!-- app.js에서 선택된 메인 탭에 맞춰 3개의 카드가 생성됨 -->
             </div>
 
             <!-- 동적 입력 폼 -->
