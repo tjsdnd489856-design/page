@@ -4,6 +4,13 @@ const appData = [
         categoryId: 'business',
         categoryName: '🏢 비즈니스/이메일',
         subFeatures: [
+            // [수정] 메모 심폐소생기를 첫 번째로, 분노조절 이메일을 두 번째로 순서 변경
+            {
+                id: 'memoRevive', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로',
+                input1: { label: '어떤 형태의 문서로 만들까요?', placeholder: '예: 주간업무보고, 회의록, 기획서 초안', type: 'text' },
+                input2: { label: '날것의 메모 또는 녹음 변환 텍스트 복붙', placeholder: '예: 클로바노트 회의 녹음 텍스트 복붙, 또는 "회의결과 1. 예산 삭감됨..."', type: 'textarea' },
+                input3: { label: '가장 강조해야 할 포인트', type: 'text', placeholder: '예: 일정이 연기된 사유를 부드럽게 강조' }
+            },
             {
                 id: 'angryEmail', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는',
                 input1: { label: '누구에게 보내나요?', placeholder: '예: 영업팀 김팀장님', type: 'text' },
@@ -16,12 +23,6 @@ const appData = [
                         { value: '🗡️웃으면서 뼈 때리기 (부드럽게 압박)', text: '🗡️웃으면서 뼈 때리기 (부드럽게 압박)' }
                     ] 
                 }
-            },
-            {
-                id: 'memoRevive', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로',
-                input1: { label: '어떤 형태의 문서로 만들까요?', placeholder: '예: 주간업무보고, 회의록, 기획서 초안', type: 'text' },
-                input2: { label: '날것의 메모 또는 녹음 변환 텍스트 복붙', placeholder: '예: 클로바노트 회의 녹음 텍스트 복붙, 또는 "회의결과 1. 예산 삭감됨..."', type: 'textarea' },
-                input3: { label: '가장 강조해야 할 포인트', type: 'text', placeholder: '예: 일정이 연기된 사유를 부드럽게 강조' }
             },
             {
                 id: 'apology', icon: '🚨', title: '프로 사과문', desc: '핑계 없이 깔끔한 수습의 정석',
