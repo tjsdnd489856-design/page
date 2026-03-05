@@ -43,8 +43,8 @@
 
         <main class="p-6">
             <!-- 메인 카테고리 탭 (동적 렌더링) -->
-            <!-- 2줄로 꺾이는 현상 방지를 위해 flex-wrap 제거, 가로 스크롤(overflow-x-auto) 및 스크롤바 숨김 적용 -->
-            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start sm:justify-center scrollbar-hide">
+            <!-- cursor-grab과 select-none을 추가하여 드래그 친화적으로 변경 -->
+            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start sm:justify-center scrollbar-hide cursor-grab select-none">
                 <!-- app.js에서 5개의 탭이 동적으로 생성됨 -->
             </div>
 

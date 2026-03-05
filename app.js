@@ -228,6 +228,12 @@ const toast = document.getElementById('toast');
 let currentCategory = appData[0]; // 기본값
 let currentFeature = currentCategory.subFeatures[0]; // 기본값
 
+// --- 3.1. 메인 탭 마우스 드래그 상태 변수 ---
+let isDragging = false;
+let hasDragged = false;
+let startX;
+let scrollLeft;
+
 // --- 4. 화면 그리기 (렌더링 로직) ---
 
 function renderMainTabs() {
@@ -237,7 +243,7 @@ function renderMainTabs() {
         const btn = document.createElement('button');
         const isSelected = currentCategory.categoryId === category.categoryId;
         
-        // [수정] 버튼들이 찌그러지지 않고 한 줄로 스크롤되도록 whitespace-nowrap, flex-shrink-0 추가
+        // 버튼들이 찌그러지지 않고 한 줄로 스크롤되도록 설정
         btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
             isSelected 
             ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-600' 
@@ -245,7 +251,14 @@ function renderMainTabs() {
         }`;
         btn.textContent = category.categoryName;
 
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            // [추가] 드래그 중이었다면 클릭 이벤트를 무시 (탭 전환 방지)
+            if (hasDragged) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
             currentCategory = category;
             currentFeature = category.subFeatures[0]; 
             renderMainTabs(); 
@@ -256,6 +269,48 @@ function renderMainTabs() {
         mainTabsContainer.appendChild(btn);
     });
 }
+
+// --- 4.1. 메인 탭 마우스 드래그 이벤트 연결 ---
+mainTabsContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    hasDragged = false; // 드래그 시작 시 상태 초기화
+    
+    // 마우스 커서 모양을 잡는 모양(grabbing)으로 변경
+    mainTabsContainer.classList.remove('cursor-grab');
+    mainTabsContainer.classList.add('cursor-grabbing');
+    
+    startX = e.pageX - mainTabsContainer.offsetLeft;
+    scrollLeft = mainTabsContainer.scrollLeft;
+});
+
+mainTabsContainer.addEventListener('mouseleave', () => {
+    isDragging = false;
+    mainTabsContainer.classList.add('cursor-grab');
+    mainTabsContainer.classList.remove('cursor-grabbing');
+});
+
+mainTabsContainer.addEventListener('mouseup', () => {
+    isDragging = false;
+    mainTabsContainer.classList.add('cursor-grab');
+    mainTabsContainer.classList.remove('cursor-grabbing');
+});
+
+mainTabsContainer.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    e.preventDefault(); // 글씨가 파랗게 선택되는 기본 동작 방지
+    
+    const x = e.pageX - mainTabsContainer.offsetLeft;
+    const walk = x - startX;
+    
+    // 마우스가 5픽셀 이상 움직였다면 이건 '클릭'이 아니라 '드래그'라고 판단
+    if (Math.abs(walk) > 5) {
+        hasDragged = true; 
+    }
+    
+    mainTabsContainer.scrollLeft = scrollLeft - walk;
+});
+
 
 function renderSubFeatures() {
     subFeaturesContainer.innerHTML = ''; 
