@@ -174,15 +174,15 @@ aiForm.addEventListener('submit', async (e) => {
     aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
-        // 백엔드로 데이터 전송 (이름, 1번값, 2번값, 3번값 전송)
+        // 백엔드로 데이터 전송
         const response = await fetch('http://localhost:3000/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                category: currentFeature.title, // '분노조절 이메일' 등
-                target: currentInput1,          // 서버 코드와 호환을 위해 변수명 유지
-                message: currentInput2,
-                tone: currentInput3             // 어조 혹은 강조포인트
+                subCategory: currentFeature.title,
+                input1: currentInput1,
+                input2: currentInput2,
+                input3: currentInput3
             })
         });
 
