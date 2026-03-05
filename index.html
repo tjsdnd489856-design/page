@@ -14,6 +14,21 @@
     <style>
         .prose p { margin-bottom: 0.5rem; }
         .prose ul { list-style-type: disc; margin-left: 1.5rem; }
+        
+        /* 스크롤바 숨기기 (가로 스크롤을 위해) */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
@@ -28,8 +43,9 @@
 
         <main class="p-6">
             <!-- 메인 카테고리 탭 (동적 렌더링) -->
-            <div id="mainTabs" class="flex flex-wrap gap-2 mb-6 border-b pb-4 justify-center">
-                <!-- app.js에서 4개의 탭이 동적으로 생성됨 -->
+            <!-- 2줄로 꺾이는 현상 방지를 위해 flex-wrap 제거, 가로 스크롤(overflow-x-auto) 및 스크롤바 숨김 적용 -->
+            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start sm:justify-center scrollbar-hide">
+                <!-- app.js에서 5개의 탭이 동적으로 생성됨 -->
             </div>
 
             <!-- 서브 기능(무기) 선택 버튼 영역 (동적 렌더링) -->
@@ -101,12 +117,5 @@
 
     <!-- 스크립트 연결 -->
     <script src="app.js"></script>
-    <style>
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
-    </style>
 </body>
 </html>

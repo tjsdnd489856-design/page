@@ -237,7 +237,8 @@ function renderMainTabs() {
         const btn = document.createElement('button');
         const isSelected = currentCategory.categoryId === category.categoryId;
         
-        btn.className = `px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
+        // [수정] 버튼들이 찌그러지지 않고 한 줄로 스크롤되도록 whitespace-nowrap, flex-shrink-0 추가
+        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
             isSelected 
             ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-600' 
             : 'bg-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
