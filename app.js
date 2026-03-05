@@ -20,7 +20,7 @@ const appData = [
             {
                 id: 'memoRevive', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로',
                 input1: { label: '어떤 형태의 문서로 만들까요?', placeholder: '예: 주간업무보고, 회의록, 기획서 초안', type: 'text' },
-                input2: { label: '날것의 메모 텍스트 복붙', placeholder: '예: 회의결과 1. 예산 삭감됨 2. 일정 1주일 연기 3. 김대리가 업체 연락하기로함...', type: 'textarea' },
+                input2: { label: '날것의 메모 또는 녹음 변환 텍스트 복붙', placeholder: '예: 클로바노트 회의 녹음 텍스트 복붙, 또는 "회의결과 1. 예산 삭감됨..."', type: 'textarea' },
                 input3: { label: '가장 강조해야 할 포인트', type: 'text', placeholder: '예: 일정이 연기된 사유를 부드럽게 강조' }
             },
             {
