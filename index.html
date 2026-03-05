@@ -43,8 +43,8 @@
 
         <main class="p-6">
             <!-- 메인 카테고리 탭 (동적 렌더링) -->
-            <!-- cursor-grab과 select-none을 추가하여 드래그 친화적으로 변경 -->
-            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start sm:justify-center scrollbar-hide cursor-grab select-none">
+            <!-- sm:justify-center 제거: 가로 스크롤 시 왼쪽 앞부분이 잘리는 현상 방지. 항상 왼쪽 정렬 유지 -->
+            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start scrollbar-hide cursor-grab select-none">
                 <!-- app.js에서 5개의 탭이 동적으로 생성됨 -->
             </div>
 
