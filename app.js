@@ -1,4 +1,4 @@
-// --- 1. 전체 설정 데이터 (카테고리 및 서브 기능 12종) ---
+// --- 1. 전체 설정 데이터 (카테고리 5개 및 서브 기능 총 15종) ---
 const appData = [
     {
         categoryId: 'business',
@@ -162,6 +162,49 @@ const appData = [
                 }
             }
         ]
+    },
+    // --- [신규 추가] 5번째 탭: 엑셀/시트 ---
+    {
+        categoryId: 'excel',
+        categoryName: '📊 엑셀/시트',
+        subFeatures: [
+            {
+                id: 'excelFormula', icon: '🧮', title: '함수 수식 뚝딱이', desc: '말로 하면 수식으로 변환',
+                input1: { label: '내 데이터 상황', placeholder: '예: A열은 이름, B열은 실적', type: 'text' },
+                input2: { label: '원하는 결과', placeholder: '예: 실적이 80점 이상인 사람 수 구하기', type: 'textarea' },
+                input3: { 
+                    label: '사용 프로그램', type: 'select', 
+                    options: [
+                        { value: '🟢MS 엑셀', text: '🟢MS 엑셀' },
+                        { value: '🟡구글 스프레드시트', text: '🟡구글 스프레드시트' }
+                    ] 
+                }
+            },
+            {
+                id: 'excelDecode', icon: '🔍', title: '외계어 수식 해독기', desc: '복잡한 수식과 에러 분석',
+                input1: { label: '해석할 수식/에러', placeholder: '예: =VLOOKUP(...) 또는 #N/A 에러', type: 'text' },
+                input2: { label: '궁금한 점', placeholder: '예: 무슨 뜻인지 설명해줘, 혹은 왜 에러가 나?', type: 'textarea' },
+                input3: { 
+                    label: '이해 수준', type: 'select', 
+                    options: [
+                        { value: '👶초보자용(친절한 비유)', text: '👶초보자용(친절한 비유)' },
+                        { value: '🧑‍💻실무자용(핵심만 간결히)', text: '🧑‍💻실무자용(핵심만 간결히)' }
+                    ] 
+                }
+            },
+            {
+                id: 'excelMacro', icon: '🤖', title: '반복작업 매크로', desc: 'VBA / Apps Script 코드 생성',
+                input1: { label: '사용 환경', placeholder: '예: 🔵엑셀 VBA 또는 🟡구글 Apps Script', type: 'text' },
+                input2: { label: '자동화할 작업 설명', placeholder: '예: 부서별로 시트를 쪼개서 각각 저장해줘', type: 'textarea' },
+                input3: { 
+                    label: '코드 스타일', type: 'select', 
+                    options: [
+                        { value: '📝친절한 주석 포함', text: '📝친절한 주석 포함' },
+                        { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' }
+                    ] 
+                }
+            }
+        ]
     }
 ];
 
@@ -183,20 +226,19 @@ const copyBtn = document.getElementById('copyBtn');
 const toast = document.getElementById('toast');
 
 // --- 3. 전역 상태 변수 ---
-let currentCategory = appData[0]; // 기본값: 첫 번째 탭 (비즈니스)
+let currentCategory = appData[0]; // 기본값: 첫 번째 탭
 let currentFeature = currentCategory.subFeatures[0]; // 기본값: 첫 번째 서브 기능
 
 // --- 4. 화면 그리기 (렌더링 로직) ---
 
 // (1) 메인 카테고리 탭 렌더링
 function renderMainTabs() {
-    mainTabsContainer.innerHTML = ''; // 초기화
+    mainTabsContainer.innerHTML = ''; 
 
     appData.forEach(category => {
         const btn = document.createElement('button');
         const isSelected = currentCategory.categoryId === category.categoryId;
         
-        // 탭 스타일: 선택된 탭은 진한 파란색, 나머지는 회색 바탕
         btn.className = `px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
             isSelected 
             ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-600' 
@@ -204,22 +246,21 @@ function renderMainTabs() {
         }`;
         btn.textContent = category.categoryName;
 
-        // 메인 탭 클릭 이벤트
         btn.addEventListener('click', () => {
             currentCategory = category;
-            currentFeature = category.subFeatures[0]; // 탭을 바꾸면 첫 번째 서브 기능으로 자동 선택
-            renderMainTabs(); // 탭 색상 갱신
-            renderSubFeatures(); // 서브 기능 카드 갱신
-            updateFormFields(); // 입력 폼 갱신
+            currentFeature = category.subFeatures[0]; 
+            renderMainTabs(); 
+            renderSubFeatures(); 
+            updateFormFields(); 
         });
 
         mainTabsContainer.appendChild(btn);
     });
 }
 
-// (2) 선택된 메인 탭에 속한 3개의 서브 기능 버튼(카드) 렌더링
+// (2) 선택된 메인 탭에 속한 3개의 서브 기능 버튼 렌더링
 function renderSubFeatures() {
-    subFeaturesContainer.innerHTML = ''; // 초기화
+    subFeaturesContainer.innerHTML = ''; 
 
     currentCategory.subFeatures.forEach(feature => {
         const btn = document.createElement('button');
@@ -240,15 +281,15 @@ function renderSubFeatures() {
 
         btn.addEventListener('click', () => {
             currentFeature = feature;
-            renderSubFeatures(); // 버튼 선택 상태 갱신
-            updateFormFields();  // 입력 폼 갱신
+            renderSubFeatures(); 
+            updateFormFields();  
         });
 
         subFeaturesContainer.appendChild(btn);
     });
 }
 
-// (3) 선택된 서브 기능에 맞게 폼(Input) 동적 변경
+// (3) 폼(Input) 동적 변경
 function updateFormFields() {
     // Input 1
     input1Label.textContent = currentFeature.input1.label;
@@ -357,9 +398,9 @@ copyBtn.addEventListener('click', async () => {
 
 // --- 7. 최초 실행 ---
 function init() {
-    renderMainTabs();     // 상단 4개 탭 생성
-    renderSubFeatures();  // 첫 번째 탭의 서브 기능 3개 생성
-    updateFormFields();   // 첫 번째 기능 폼 세팅
+    renderMainTabs();
+    renderSubFeatures(); 
+    updateFormFields();  
 }
 
 init();
