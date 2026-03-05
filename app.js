@@ -163,7 +163,6 @@ const appData = [
             }
         ]
     },
-    // --- [신규 추가] 5번째 탭: 엑셀/시트 ---
     {
         categoryId: 'excel',
         categoryName: '📊 엑셀/시트',
@@ -226,12 +225,11 @@ const copyBtn = document.getElementById('copyBtn');
 const toast = document.getElementById('toast');
 
 // --- 3. 전역 상태 변수 ---
-let currentCategory = appData[0]; // 기본값: 첫 번째 탭
-let currentFeature = currentCategory.subFeatures[0]; // 기본값: 첫 번째 서브 기능
+let currentCategory = appData[0]; // 기본값
+let currentFeature = currentCategory.subFeatures[0]; // 기본값
 
 // --- 4. 화면 그리기 (렌더링 로직) ---
 
-// (1) 메인 카테고리 탭 렌더링
 function renderMainTabs() {
     mainTabsContainer.innerHTML = ''; 
 
@@ -258,7 +256,6 @@ function renderMainTabs() {
     });
 }
 
-// (2) 선택된 메인 탭에 속한 3개의 서브 기능 버튼 렌더링
 function renderSubFeatures() {
     subFeaturesContainer.innerHTML = ''; 
 
@@ -289,19 +286,15 @@ function renderSubFeatures() {
     });
 }
 
-// (3) 폼(Input) 동적 변경
 function updateFormFields() {
-    // Input 1
     input1Label.textContent = currentFeature.input1.label;
     input1.placeholder = currentFeature.input1.placeholder;
     input1.value = '';
 
-    // Input 2 (Textarea)
     input2Label.textContent = currentFeature.input2.label;
     input2.placeholder = currentFeature.input2.placeholder;
     input2.value = '';
 
-    // Input 3 (Select or Input)
     input3Container.innerHTML = '';
     
     const label = document.createElement('label');
@@ -346,7 +339,6 @@ aiForm.addEventListener('submit', async (e) => {
 
     if (!currentInput1 || !currentInput2 || !currentInput3) return;
 
-    // UI 상태 변경
     loadingArea.classList.remove('hidden');
     resultArea.classList.add('hidden');
     aiForm.classList.add('opacity-50', 'pointer-events-none');
@@ -396,11 +388,36 @@ copyBtn.addEventListener('click', async () => {
     }
 });
 
-// --- 7. 최초 실행 ---
+// --- 7. URL 파라미터 처리 (랜딩페이지 연동) ---
+function handleUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    const subParam = urlParams.get('sub');
+
+    if (tabParam) {
+        // 'tab' 파라미터와 일치하는 카테고리 찾기
+        const targetCategory = appData.find(cat => cat.categoryId === tabParam);
+        if (targetCategory) {
+            currentCategory = targetCategory;
+            currentFeature = targetCategory.subFeatures[0]; // 기본적으로 첫 번째 서브 기능 선택
+            
+            // 만약 'sub' 파라미터가 있다면 해당 서브 기능 찾아서 선택
+            if (subParam) {
+                const targetSubFeature = targetCategory.subFeatures.find(sub => sub.id === subParam);
+                if (targetSubFeature) {
+                    currentFeature = targetSubFeature;
+                }
+            }
+        }
+    }
+}
+
+// --- 8. 최초 실행 ---
 function init() {
-    renderMainTabs();
-    renderSubFeatures(); 
-    updateFormFields();  
+    handleUrlParams();    // 랜딩페이지에서 넘어온 URL 분석 및 상태 셋팅
+    renderMainTabs();     // 상단 탭 생성
+    renderSubFeatures();  // 서브 기능 생성
+    updateFormFields();   // 입력 폼 셋팅
 }
 
 init();
