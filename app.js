@@ -18,13 +18,13 @@ const appData = [
                 }
             },
             {
-                id: 'memoRevive', icon: '📝', title: '개떡 메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로',
+                id: 'memoRevive', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로',
                 input1: { label: '어떤 형태의 문서로 만들까요?', placeholder: '예: 주간업무보고, 회의록, 기획서 초안', type: 'text' },
                 input2: { label: '날것의 메모 텍스트 복붙', placeholder: '예: 회의결과 1. 예산 삭감됨 2. 일정 1주일 연기 3. 김대리가 업체 연락하기로함...', type: 'textarea' },
                 input3: { label: '가장 강조해야 할 포인트', type: 'text', placeholder: '예: 일정이 연기된 사유를 부드럽게 강조' }
             },
             {
-                id: 'apology', icon: '🚨', title: '프로페셔널 사과문', desc: '핑계 없이 깔끔한 수습의 정석',
+                id: 'apology', icon: '🚨', title: '프로 사과문', desc: '핑계 없이 깔끔한 수습의 정석',
                 input1: { label: '어떤 사고가 발생했나요?', placeholder: '예: 어제 발송한 대량 이메일에 첨부파일 누락됨', type: 'text' },
                 input2: { label: '나의 수습 대안 (해결책)', placeholder: '예: 오늘 오전 중으로 파일 첨부하여 재발송하고 사과 메일 따로 보내겠습니다.', type: 'textarea' },
                 input3: { 
@@ -42,7 +42,7 @@ const appData = [
         categoryName: '🏫 과제/요약',
         subFeatures: [
             {
-                id: 'reportReview', icon: '📄', title: 'A+ 리포트 심폐소생', desc: '초안을 완벽한 리포트로',
+                id: 'reportReview', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로',
                 input1: { label: '제출 대상', placeholder: '예: 깐깐한 전공 교수님', type: 'text' },
                 input2: { label: '날것의 초안 복붙', placeholder: '예: 서론은 대충 이렇게 쓰고... 본론1은 이거임...', type: 'textarea' },
                 input3: { 
@@ -54,7 +54,7 @@ const appData = [
                 }
             },
             {
-                id: 'speechConvert', icon: '🗣️', title: '찰떡 발표 대본 변환', desc: '자료를 자연스러운 대본으로',
+                id: 'speechConvert', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로',
                 input1: { label: '발표 시간 및 타겟', placeholder: '예: 5분, 대학생', type: 'text' },
                 input2: { label: '발표 자료 텍스트', placeholder: '예: PPT에 들어갈 내용들 복붙...', type: 'textarea' },
                 input3: { 
@@ -320,7 +320,8 @@ function renderSubFeatures() {
         btn.type = 'button';
         const isSelected = currentFeature.id === feature.id;
         
-        btn.className = `p-4 text-left rounded-xl border-2 transition-all duration-200 group flex flex-col items-center sm:items-start text-center sm:text-left ${
+        // [수정] 모바일(sm 이전)과 PC(sm 이후) 모두 가운데 정렬이 되도록 설정 (items-center, text-center 적용)
+        btn.className = `p-4 text-center rounded-xl border-2 transition-all duration-200 group flex flex-col items-center justify-center ${
             isSelected 
             ? 'border-blue-600 bg-blue-50 shadow-md transform scale-[1.02]' 
             : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50'
