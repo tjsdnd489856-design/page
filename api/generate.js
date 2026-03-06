@@ -1,6 +1,4 @@
-// Vercel Serverless Function - 400 에러 및 모델 에러 원천 봉쇄 버전
-// app.js의 apiId와 100% 일치하는 명령어 세트
-
+// Vercel Serverless Function - 모델 인식 최적화 버전
 const SYSTEM_PROMPTS = {
     ko: {
         '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].`,
@@ -16,7 +14,6 @@ const SYSTEM_PROMPTS = {
         '정규식(Regex) 설명': (i1, i2, i3) => `너는 시니어 개발자야. [상황/패턴:${i1}], [요청사항:${i2}], [이해수준:${i3}].`,
         '인스타그램 해시태그': (i1, i2, i3) => `너는 SNS 마케터야. [주제/사진설명:${i1}], [타겟고객:${i2}], [분위기:${i3}].`,
         '광고 카피라이팅': (i1, i2, i3) => `너는 광고 카피라이터야. [제품/서비스:${i1}], [소구포인트:${i2}], [광고매체:${i3}].`,
-        // 추가 기능들 (필요시 확장)
         '철벽 방어 거절문': (i1, i2, i3) => `너는 커뮤니케이션 전문가야. [대상:${i1}], [사유:${i2}], [어조:${i3}].`,
         '센스있는 인사/축하': (i1, i2, i3) => `너는 카피라이터야. [상황:${i1}], [내용:${i2}], [어조:${i3}].`,
         '진심 어린 사과문': (i1, i2, i3) => `너는 심리상담사야. [대상:${i1}], [잘못:${i2}], [어조:${i3}].`,
@@ -31,7 +28,6 @@ const SYSTEM_PROMPTS = {
 };
 
 module.exports = async (req, res) => {
-    // CORS 및 기본 설정
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -41,38 +37,26 @@ module.exports = async (req, res) => {
         const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
-        if (!apiKey) return res.status(500).json({ success: false, message: 'API_KEY가 설정되지 않았습니다.' });
+        if (!apiKey) return res.status(500).json({ success: false, message: 'API_KEY 미설정' });
 
-        // 1. 명령어 함수 찾기 (안전장치 추가)
         const promptFunc = SYSTEM_PROMPTS[lang]?.[subCategory];
-        
-        if (!promptFunc) {
-            return res.status(400).json({ success: false, message: `명령어를 찾을 수 없습니다: ${subCategory}` });
-        }
+        if (!promptFunc) return res.status(400).json({ success: false, message: `명령어 오류: ${subCategory}` });
 
-        // 2. 최종 프롬프트 생성 (지시사항 반영)
         const finalPrompt = promptFunc(input1, input2, input3) + "\n\n[필수] 불필요한 인사말 없이 결과물만 출력해.";
 
-        // 3. 구글 API 호출 (v1beta 모델 에러 방지 주소)
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // [정밀 수정] gemini-1.5-flash-latest와 v1beta 주소로 404 에러를 차단합니다.
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: finalPrompt }] 
-                }]
-            })
+            body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
         });
 
         const data = await response.json();
+        if (!response.ok) return res.status(response.status).json({ success: false, message: data.error?.message || 'API 통신 오류' });
 
-        if (!response.ok) {
-            return res.status(response.status).json({ success: false, message: data.error?.message || 'API 오류 발생' });
-        }
-
-        const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '답변을 생성하지 못했습니다.';
+        const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '답변 생성 실패';
         res.status(200).json({ success: true, result: resultText });
 
     } catch (error) {
