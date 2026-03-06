@@ -135,7 +135,7 @@ const GLOBAL_RULES = {
 // ----------------------------------------------------------------------
 // 6. AI 생성 엔드포인트 (단일 응답 방식으로 롤백)
 // ----------------------------------------------------------------------
-app.post('/api/generate', async (req, res) => {
+app.post('/api/generate:generateContent', async (req, res) => {
   try {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
 
