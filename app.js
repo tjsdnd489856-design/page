@@ -438,9 +438,8 @@ aiForm.addEventListener('submit', async (e) => {
     try {
         // 더 이상 프론트엔드에 API 키나 프롬프트를 두지 않습니다.
         // Vercel이 제공하는 안전한 서버리스 라우트('/api/generate')로 요청을 보냅니다.
-        // 만약 로컬(내 컴퓨터)에서 테스트 중이라면 로컬호스트 주소를 쓰고, 배포되면 자동으로 /api 경로를 찾습니다.
         const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:3000/api/generate' // (참고) 로컬 테스트 시에는 별도 설정이 필요할 수 있습니다.
+            ? 'http://localhost:3000/api/generate' 
             : '/api/generate';
 
         const response = await fetch(apiUrl, {
