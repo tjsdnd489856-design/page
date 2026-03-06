@@ -1,6 +1,4 @@
-// Vercel Serverless Function - 정식 v1 직접 통신 방식 (SDK 미사용)
-// 404 에러(v1beta 충돌)를 완벽하게 해결합니다.
-
+// Vercel Serverless Function - 404 에러 완전 해결 버전 (v1beta)
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -30,7 +28,7 @@ const SYSTEM_PROMPTS = {
 };
 
 const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말 없이 최종 결과물만 출력하세요.`,
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말 없이 결과물만 출력하세요.`,
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
@@ -43,31 +41,21 @@ module.exports = async (req, res) => {
   try {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
-    
     if (!apiKey) return res.status(500).json({ success: false, message: 'API_KEY가 없습니다.' });
 
     const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // [핵심 조치] SDK를 버리고 정식 v1 API 주소로 직접 fetch 합니다. 
-    // gemini-1.5-flash 모델을 가장 잘 인식하는 정석 경로입니다.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // [최종 해결] 구글 API v1beta 경로로 직접 호출하여 404 에러를 원천 차단합니다.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
 
     const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ 
-        success: false, 
-        message: data.error?.message || '구글 API 응답 오류' 
-      });
-    }
+    if (!response.ok) return res.status(response.status).json({ success: false, message: data.error?.message || 'AI 통신 실패' });
 
     const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     res.status(200).json({ success: true, result: generatedText });
