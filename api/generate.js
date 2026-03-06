@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// AI 명령어 (보안을 위해 서버쪽 함수 안에 유지)
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -50,53 +51,41 @@ const GLOBAL_RULES = {
   en: `\n\n[GLOBAL RULE]\n- Absolutely NO conversational fillers like "Sure, here is..." or "I hope this helps".\n- Output ONLY the final result.`
 };
 
-// Vercel Serverless Function 엔트리 포인트
+// Vercel Serverless Function
 module.exports = async (req, res) => {
-  // CORS 설정 (프론트엔드와 원활한 통신을 위해)
+  // CORS & OPTIONS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // 사전 요청(OPTIONS) 처리
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'POST 메서드만 허용됩니다.' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    // 1. 요청 데이터 추출
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
 
-    if (!SYSTEM_PROMPTS[lang] || !SYSTEM_PROMPTS[lang][subCategory]) {
-      return res.status(400).json({ success: false, message: '유효하지 않은 카테고리입니다.' });
-    }
-
-    // 2. 환경변수(.env)에서 안전하게 API 키 불러오기
+    // [환경 변수 확인] Vercel 설정에서 불러오기
     const apiKey = process.env.GEMINI_API_KEY;
+    
+    // 만약 키가 없다면 아주 명확한 에러 메시지 반환
     if (!apiKey) {
-      console.error("API Key is missing in environment variables.");
-      return res.status(500).json({ success: false, message: '서버에 API 키가 설정되지 않았습니다.' });
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Vercel 설정(Environment Variables)에서 GEMINI_API_KEY를 찾을 수 없습니다. 대시보드 설정을 확인해주세요.' 
+      });
     }
 
-    // 3. 프롬프트 조립
     const promptGenerator = SYSTEM_PROMPTS[lang][subCategory];
     const finalPrompt = promptGenerator(input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // 4. 구글 제미나이 API 호출
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const result = await model.generateContent(finalPrompt);
     const responseText = result.response.text();
 
-    // 5. 결과 반환
     res.status(200).json({ success: true, result: responseText });
 
   } catch (error) {
-    console.error('[Vercel API Error]', error);
-    res.status(500).json({ success: false, message: '서버에서 AI 응답을 생성하는 중 오류가 발생했습니다. (Timeout or API Error)' });
+    console.error('[Gemini API Error]', error);
+    res.status(500).json({ success: false, message: 'AI 생성 중 오류가 발생했습니다: ' + error.message });
   }
 };
