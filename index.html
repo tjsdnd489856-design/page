@@ -6,20 +6,25 @@
     <title>✨ AI 뚝딱 - 직장인 생존 텍스트 생성기</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // html 태그에 'dark' 클래스가 있으면 다크모드 발동
+            theme: {
+                extend: {
+                    colors: { primary: '#4F46E5', secondary: '#10B981' }
+                }
+            }
+        }
+    </script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- marked.js -->
+    <!-- marked.js (Markdown Parser) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
         /* 스크롤바 숨기기 (가로 스크롤을 위해) */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
@@ -27,116 +32,151 @@
         }
         .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
 
-        /* 결과창 커스텀 디자인 (앱 전체 디자인과 통일감 부여) */
-        .result-markdown { line-height: 1.7; word-break: keep-all; color: #374151; }
+        /* 커스텀 마크다운 렌더링 + 다크모드 대응 */
+        .result-markdown { line-height: 1.7; word-break: keep-all; }
         .result-markdown p { margin-bottom: 0.75rem; }
-        .result-markdown p:last-child { margin-bottom: 0; }
-        
-        /* 제목 스타일 */
-        .result-markdown h1, .result-markdown h2, .result-markdown h3 { font-size: 1.125rem; font-weight: 800; color: #1e3a8a; margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem; }
-        
-        /* 목록(리스트) 스타일 */
+        .result-markdown h1, .result-markdown h2, .result-markdown h3 { 
+            font-size: 1.125rem; font-weight: 800; color: #1e3a8a; 
+            margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem; 
+        }
+        .dark .result-markdown h1, .dark .result-markdown h2, .dark .result-markdown h3 {
+            color: #60a5fa; border-color: #374151;
+        }
         .result-markdown ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .result-markdown ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .result-markdown li { margin-bottom: 0.25rem; }
-        
-        /* 강조(굵은 글씨) - 형광펜 효과 */
         .result-markdown strong { font-weight: 800; color: #111827; background-color: rgba(253, 224, 71, 0.5); padding: 0 4px; border-radius: 4px; }
+        .dark .result-markdown strong { color: #f9fafb; background-color: rgba(202, 138, 4, 0.5); }
+        .result-markdown code { background-color: #f3f4f6; color: #ef4444; padding: 0.125rem 0.375rem; border-radius: 0.375rem; font-family: monospace; }
+        .dark .result-markdown code { background-color: #374151; color: #fca5a5; }
+        .result-markdown pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75rem; }
+        .result-markdown blockquote { border-left: 4px solid #3b82f6; background-color: #eff6ff; padding: 0.75rem 1rem; color: #4b5563; }
+        .dark .result-markdown blockquote { background-color: #1e3a8a; border-left-color: #60a5fa; color: #d1d5db; }
         
-        /* 인용구 스타일 */
-        .result-markdown blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; color: #4b5563; background-color: #eff6ff; padding: 0.75rem 1rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 0.75rem; font-style: normal; }
-        
-        /* 인라인 코드 및 코드 블록 스타일 (엑셀, 매크로 용) */
-        .result-markdown code { background-color: #f3f4f6; color: #ef4444; padding: 0.125rem 0.375rem; border-radius: 0.375rem; font-family: monospace; font-size: 0.875rem; font-weight: 600;}
-        .result-markdown pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75rem; font-family: monospace; font-size: 0.875rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .result-markdown pre code { background-color: transparent; color: inherit; padding: 0; font-weight: normal; }
+        /* contenteditable 포커스 아웃라인 제거 */
+        [contenteditable]:focus { outline: none; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-gray-800 flex items-center justify-center p-4">
+<body class="bg-gray-50 text-gray-800 dark:bg-slate-900 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
 
-    <!-- 상단 언어 전환 토글 버튼 (메인 앱 우측 상단 고정) -->
-    <div class="fixed top-4 right-4 z-50 flex bg-white rounded-full shadow border border-gray-200 p-1">
-        <button onclick="location.href='index.html'" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 transition-colors">KO</button>
-        <button onclick="location.href='index.html?lang=en'" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors">EN</button>
+    <!-- 상단 플로팅 컨트롤 바 (언어 토글, 다크모드, 히스토리) -->
+    <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
+        <!-- 언어 토글 -->
+        <div class="flex bg-white dark:bg-slate-800 rounded-full shadow border border-gray-200 dark:border-slate-700 p-1">
+            <button onclick="location.href='index.html'" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 transition-colors">KO</button>
+            <button onclick="location.href='index.html?lang=en'" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors">EN</button>
+        </div>
+        <!-- 다크모드 토글 버튼 -->
+        <button id="darkModeToggle" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-yellow-400 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:block"></i>
+        </button>
+        <!-- 히스토리 열기 버튼 -->
+        <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="최근 기록 보기">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
     </div>
 
-    <div class="bg-white w-full max-w-xl rounded-xl shadow-lg overflow-hidden mt-8 mb-8">
+    <!-- 우측 슬라이드 오프캔버스 (히스토리) -->
+    <div id="historySidebar" class="fixed top-0 right-0 w-80 h-full bg-white dark:bg-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200 dark:border-slate-700 flex flex-col">
+        <div class="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-900">
+            <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-slate-200"><i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록</h2>
+            <button id="closeHistoryBtn" class="text-gray-500 hover:text-red-500 dark:text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="historyList" class="p-4 flex-1 overflow-y-auto space-y-3">
+            <!-- app.js에서 로컬 스토리지 데이터를 읽어 동적으로 생성됨 -->
+            <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">최근 생성된 텍스트가 없습니다.</p>
+        </div>
+    </div>
+
+    <!-- 메인 앱 컨테이너 -->
+    <div class="bg-white dark:bg-slate-800 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300">
         
         <!-- 헤더 -->
-        <header class="bg-blue-600 text-white p-6 text-center">
+        <header class="bg-blue-600 dark:bg-indigo-700 text-white p-6 text-center transition-colors">
             <h1 class="text-3xl font-bold mb-2 cursor-pointer transition-transform hover:scale-105 inline-block" onclick="location.href='landing.html'"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>AI 뚝딱</h1>
-            <p class="text-blue-100 text-sm">빈칸만 채우면 일잘러의 텍스트가 완성됩니다.</p>
+            <p id="appSubtitle" class="text-blue-100 text-sm">빈칸만 채우면 일잘러의 텍스트가 완성됩니다.</p>
         </header>
 
         <main class="p-6">
             <!-- 메인 카테고리 탭 (동적 렌더링) -->
-            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b pb-4 justify-start scrollbar-hide cursor-grab select-none">
-                <!-- app.js에서 5개의 탭이 동적으로 생성됨 -->
+            <div id="mainTabs" class="flex overflow-x-auto gap-2 mb-6 border-b dark:border-slate-700 pb-4 justify-start scrollbar-hide cursor-grab select-none">
+                <!-- app.js에서 탭이 동적으로 생성됨 -->
             </div>
 
-            <!-- 서브 기능(무기) 선택 버튼 영역 (동적 렌더링) -->
+            <!-- 서브 기능 버튼 영역 (동적 렌더링) -->
             <div id="subFeatures" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                <!-- app.js에서 선택된 메인 탭에 맞춰 3개의 카드가 생성됨 -->
+                <!-- app.js에서 동적으로 생성됨 -->
             </div>
 
             <!-- 동적 입력 폼 -->
             <form id="aiForm" class="space-y-5">
-                
                 <!-- Input 1 -->
                 <div>
-                    <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 mb-1"></label>
+                    <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
                     <input type="text" id="input1" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50 focus:bg-white"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white"
                            placeholder="">
                 </div>
 
                 <!-- Input 2 (Textarea) -->
                 <div>
-                    <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 mb-1"></label>
+                    <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
                     <textarea id="input2" rows="4" required
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition resize-none bg-gray-50 focus:bg-white"
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition resize-none bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white"
                               placeholder=""></textarea>
                 </div>
 
-                <!-- Input 3 (Select or Input - 동적 변경을 위해 컨테이너 사용) -->
+                <!-- Input 3 (Select or Input - 동적 컨테이너) -->
                 <div id="input3Container">
-                    <label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 mb-1"></label>
-                    <!-- 내부는 app.js에서 select 또는 input으로 교체됨 -->
+                    <label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
+                    <!-- 내부는 app.js에서 동적 생성됨 -->
                 </div>
 
                 <!-- 생성 버튼 -->
                 <button type="submit" id="submitBtn"
-                        class="w-full mt-4 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center text-lg">
+                        class="w-full mt-4 bg-gray-800 dark:bg-indigo-600 hover:bg-gray-900 dark:hover:bg-indigo-500 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center text-lg transform hover:-translate-y-1">
                     <i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ 3초 만에 텍스트 뽑기
                 </button>
             </form>
 
             <!-- 로딩 영역 -->
-            <div id="loadingArea" class="hidden mt-8 text-center py-6">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
-                <p class="text-gray-600 font-medium animate-pulse">상황에 맞는 최적의 단어를 고르고 있습니다...</p>
+            <div id="loadingArea" class="hidden mt-8 text-center py-8">
+                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+                <p id="loadingText" class="text-gray-600 dark:text-slate-400 font-medium animate-pulse">상황에 맞는 최적의 단어를 고르고 있습니다...</p>
             </div>
 
             <!-- 결과창 영역 -->
-            <div id="resultArea" class="hidden mt-8 animate-fade-in-up">
-                <div class="flex items-center justify-between mb-3 border-b pb-2">
-                    <h3 class="text-sm font-bold text-blue-600"><i class="fa-solid fa-check-double mr-1"></i>완성된 결과물</h3>
+            <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t dark:border-slate-700 pt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 id="resultTitle" class="text-sm font-bold text-primary"><i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 수정 가능)</h3>
                 </div>
                 
-                <!-- 기존 prose 스타일 제거하고 커스텀 result-markdown 스타일 적용 -->
-                <div id="resultContent" class="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-sm overflow-x-auto text-sm sm:text-base result-markdown">
-                    <!-- 결과가 여기에 표시됨 -->
+                <!-- 에디터 기능을 위한 contenteditable 영역 -->
+                <div id="resultContent" contenteditable="true" 
+                     class="bg-white dark:bg-slate-700 p-6 rounded-xl border-2 border-primary border-opacity-30 dark:border-slate-500 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
+                    <!-- 실시간 스트리밍 결과가 여기에 표시됨 -->
                 </div>
                 
-                <!-- 복사 버튼 (아이콘 제거, 이모티콘만 남김) -->
-                <button type="button" id="copyBtn" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition shadow-sm flex items-center justify-center">
-                    📋 바로 복사해서 쓰기
-                </button>
+                <!-- 하단 액션 버튼 그룹 (복사 & 피드백) -->
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button type="button" id="copyBtn" class="flex-1 bg-primary hover:bg-indigo-700 text-white py-3 rounded-xl font-bold transition shadow flex items-center justify-center">
+                        <i class="fa-regular fa-copy mr-2"></i> 복사하기
+                    </button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button type="button" id="btnLike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-green-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-600" title="좋아요">
+                            👍
+                        </button>
+                        <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-700 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-600" title="아쉬워요">
+                            👎
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- 토스트 알림 -->
-            <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
-                <i class="fa-solid fa-circle-check text-green-400 mr-2 text-lg"></i> <span class="font-medium">복사 완료! Ctrl+V로 붙여넣으세요.</span>
+            <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-slate-100 text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
+                <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 mr-2 text-lg"></i> 
+                <span id="toastMsg" class="font-medium">복사 완료! Ctrl+V로 붙여넣으세요.</span>
             </div>
 
         </main>
@@ -145,7 +185,7 @@
     <!-- 스크립트 연결 -->
     <script src="app.js"></script>
     <script>
-        // 메인 앱의 언어 토글 버튼 활성화 상태 업데이트
+        // 메인 앱의 언어 토글 상태 업데이트 (초기 렌더링 시 시각적 표시)
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const lang = urlParams.get('lang');
@@ -153,10 +193,8 @@
             const btnEn = document.getElementById('btn-en');
 
             if (lang === 'en') {
-                btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 transition-colors';
-                btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors';
-                
-                // 앱 상단 로고 클릭 시 영어 랜딩페이지로 가도록 변경
+                btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 transition-colors';
+                btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
                 const headerLogo = document.querySelector('header h1');
                 if(headerLogo) {
                     headerLogo.setAttribute('onclick', "location.href='landing_en.html'");
