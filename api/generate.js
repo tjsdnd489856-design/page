@@ -1,6 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+// Vercel Serverless Function - 초경량 Native Fetch 버전
+// SDK 라이브러리 없이 직접 구글 API v1 호출하여 500 에러를 원천 차단합니다.
 
-// AI 명령어 설정
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -30,12 +30,11 @@ const SYSTEM_PROMPTS = {
 };
 
 const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 최종 결과물만 출력하세요.`,
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말 없이 최종 결과물만 출력하세요.`,
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
 module.exports = async (req, res) => {
-  // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -45,35 +44,34 @@ module.exports = async (req, res) => {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
     
-    if (!apiKey) {
-      return res.status(500).json({ success: false, message: 'Vercel 설정에서 GEMINI_API_KEY를 찾을 수 없습니다.' });
+    if (!apiKey) return res.status(500).json({ success: false, message: 'API_KEY가 없습니다.' });
+
+    const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
+
+    // [최종 해결] 구글 API v1 정식 Endpoint에 직접 fetch 요청
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(response.status).json({ 
+        success: false, 
+        message: data.error?.message || '구글 API 응답 오류' 
+      });
     }
 
-    const categoryPrompts = SYSTEM_PROMPTS[lang] || SYSTEM_PROMPTS['ko'];
-    const promptFunc = categoryPrompts[subCategory];
-    if (!promptFunc) {
-      return res.status(400).json({ success: false, message: '유효하지 않은 카테고리입니다.' });
-    }
-    
-    const finalPrompt = promptFunc(input1, input2, input3) + GLOBAL_RULES[lang];
-
-    // 구글 AI 초기화 및 호출
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    
-    const result = await model.generateContent(finalPrompt);
-    const response = await result.response;
-    const text = response.text();
-
-    if (!text) throw new Error('AI가 빈 답변을 반환했습니다.');
-
-    res.status(200).json({ success: true, result: text });
+    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.status(200).json({ success: true, result: generatedText });
 
   } catch (error) {
-    console.error('[Vercel API Error]', error);
-    res.status(500).json({ 
-      success: false, 
-      message: '서버 오류 발생: ' + error.message 
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
