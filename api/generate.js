@@ -1,4 +1,6 @@
-// Vercel Serverless Function - 정석 v1 규격 적용
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+// AI 명령어 설정
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -46,8 +48,8 @@ module.exports = async (req, res) => {
 
     const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // [최종 수정] 가장 안정적인 v1 경로와 정석 모델 명칭 사용
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // [최종 수정] 404 에러 해결을 위해 v1 -> v1beta로 경로 변경
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
