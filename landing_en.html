@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦊 ChattyFox - Smart AI Text Assistant</title>
+    <title>🦊 ChattyFox - Your Smart AI Text Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class', 
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Inter"', 'sans-serif'] },
                     colors: { 
                         primary: '#f97316', 
                         secondary: '#fbbf24',
@@ -40,12 +39,10 @@
 </head>
 <body class="bg-orange-50/30 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased overflow-x-hidden transition-colors duration-300">
 
-    <div class="hidden text-slate-800 text-white dark:text-white text-orange-500 bg-white dark:bg-slate-900 from-white dark:from-slate-900 to-transparent"></div>
-
     <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 border-b border-orange-100 dark:border-slate-800 transition-all">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- 로고 영역 (인라인 SVG) -->
+                <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="window.scrollTo(0,0)">
                     <svg width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:-rotate-6 mr-2 drop-shadow-sm">
                         <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
@@ -59,14 +56,11 @@
                     </span>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#features" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">Key Features</a>
+                    <a href="#features" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">Features</a>
                     <a href="#how-it-works" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">How it works</a>
                     <a href="#reviews" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">Reviews</a>
                     <a href="index.html" class="text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold text-sm bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full transition-colors"><i class="fa-solid fa-globe mr-1"></i> KO</a>
-                    <!-- 앱으로 이동하는 버튼 (app.html?lang=en) -->
-                    <a href="app.html?lang=en" class="bg-primary hover:bg-orange-600 text-white px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-105 shadow-md">
-                        Get Started
-                    </a>
+                    <a href="app.html?lang=en" class="bg-primary hover:bg-orange-600 text-white px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-105 shadow-md">Get Started</a>
                 </div>
             </div>
         </div>
@@ -74,157 +68,180 @@
 
     <!-- 1. Hero Section -->
     <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative">
-        <div class="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmOTczMTYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50 -z-10"></div>
-        
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center max-w-3xl mx-auto">
-                <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
-                    <span class="flex h-2 w-2 relative mr-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                    </span>
-                    No sign-up required. Free to use forever.
-                </div>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
-                    Master Your Professional<br>
-                    <span class="text-gradient">Voice with ChattyFox</span>
-                </h1>
-                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed font-medium">
-                    From polished emails to complex spreadsheets and coding,<br class="hidden md:block">
-                    let the smart fox handle your daily tasks with style.
-                </p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="app.html?lang=en" class="bg-primary hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:-translate-y-1 shadow-lg shadow-orange-200 dark:shadow-none flex items-center justify-center">
-                        Try it now (Free) <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
+        <div class="max-w-6xl mx-auto px-4 text-center relative z-10">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
+                <span class="flex h-2 w-2 relative mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                Generate Professional Text in 3 Seconds
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
+                Master Professional Writing<br>
+                <span class="text-gradient">with ChattyFox AI</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed font-medium max-w-3xl mx-auto">
+                Transform raw notes into polite emails and complex problems into clear Excel formulas.<br class="hidden md:block">
+                Your smart AI assistant finds the perfect words for every situation.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+                <a href="app.html?lang=en" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all hover:-translate-y-1 shadow-2xl shadow-orange-200 dark:shadow-none flex items-center justify-center">
+                    Start for Free <i class="fa-solid fa-rocket ml-2"></i>
+                </a>
             </div>
 
-            <!-- Dashboard Mockup Image -->
-            <div class="mt-16 relative max-w-4xl mx-auto animate-float">
-                <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-yellow-400 transform skew-y-3 sm:skew-y-0 sm:-rotate-3 sm:rounded-3xl opacity-20 blur-xl"></div>
-                <div class="relative bg-white dark:bg-slate-900 shadow-2xl rounded-2xl border border-orange-100 dark:border-slate-800 overflow-hidden">
-                    <div class="bg-slate-100 dark:bg-slate-800 px-4 py-3 border-b dark:border-slate-700 flex items-center space-x-2">
-                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                    </div>
-                    <div class="p-6 md:p-8 bg-orange-50/30 dark:bg-slate-900 flex flex-col md:flex-row gap-6">
-                        <div class="flex-1 bg-white dark:bg-slate-800 p-5 rounded-xl border border-orange-100 dark:border-slate-700 shadow-sm cursor-pointer" onclick="location.href='app.html?lang=en&tab=business&sub=angryEmail'">
-                            <h3 class="font-bold text-slate-800 dark:text-white mb-4 border-b dark:border-slate-700 pb-2">🦊 Smart Email Generator</h3>
-                            <div class="space-y-3">
-                                <div class="h-8 bg-slate-50 dark:bg-slate-900 rounded w-full flex items-center px-3 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">To: Marketing Manager</div>
-                                <div class="h-16 bg-slate-50 dark:bg-slate-900 rounded w-full flex px-3 py-2 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">Context: You missed the deadline. I need the report by tomorrow.</div>
-                                <div class="h-8 bg-slate-50 dark:bg-slate-900 rounded w-full flex items-center justify-between px-3 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">
-                                    <span>Tone: Polite but Firm</span> <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <div class="h-10 bg-primary rounded w-full flex items-center justify-center text-white font-bold text-sm shadow-md mt-2">✨ Generate</div>
-                            </div>
-                        </div>
-                        <div class="flex-1 bg-white dark:bg-slate-800 p-5 rounded-xl border border-orange-100 dark:border-slate-700 shadow-sm relative">
-                            <h3 class="font-bold text-slate-800 dark:text-white mb-4 border-b dark:border-slate-700 pb-2 text-primary"><i class="fa-solid fa-check-circle mr-1"></i> Fox Assistant Done!</h3>
-                            <div class="space-y-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                <p><strong class="dark:text-white">Subject: Urgent: Project Report Required by Tomorrow</strong></p>
-                                <p>Hi Team,</p>
-                                <p>I am writing to follow up on the status of the project report, which is currently past its deadline.</p>
-                                <p>To ensure the project stays on track and avoids critical delays, it is imperative that we receive the completed report by tomorrow morning.</p>
-                            </div>
-                            <button class="absolute bottom-4 right-4 bg-slate-800 dark:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors">
-                                <i class="fa-regular fa-copy mr-1"></i> Copy
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Mockup -->
+            <div class="relative max-w-5xl mx-auto animate-float">
+                <div class="absolute -inset-4 bg-gradient-to-r from-orange-500 to-yellow-400 opacity-20 blur-2xl rounded-[2rem]"></div>
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80" alt="Dashboard Mockup" class="relative rounded-2xl shadow-2xl border border-white/20 dark:border-slate-800">
             </div>
         </div>
     </section>
 
-    <!-- 3. Features -->
-    <section id="features" class="py-24 bg-white dark:bg-slate-900">
+    <!-- 2. Features -->
+    <section id="features" class="py-24 bg-white dark:bg-slate-900 transition-colors">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-4">The Fox's 5 Key Features</h2>
-                <p class="text-xl text-slate-600 dark:text-slate-400">From professional emails and Excel macros to coding helpers.</p>
+            <div class="text-center mb-20">
+                <h2 class="text-base font-bold text-primary tracking-widest uppercase mb-3">Professional Tools</h2>
+                <h3 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white">A Fox with Many Talents</h3>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?lang=en&tab=business'">
-                    <div class="w-14 h-14 bg-orange-100 dark:bg-slate-700 text-primary rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-envelope"></i>
+                <!-- Feature 1 -->
+                <div class="p-8 rounded-3xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-primary rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-envelope-open-text"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Business & Emails</h3>
-                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Transform rough notes into perfectly formatted executive reports, or write firm but polite emails.</p>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">Business Emails</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Turn frustrated thoughts into professional requests. Our 'Firm but Polite' filter keeps your relationships intact while getting things done.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?lang=en&tab=excel'">
-                    <div class="w-14 h-14 bg-green-100 dark:bg-slate-700 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-file-excel"></i>
+                <!-- Feature 2 -->
+                <div class="p-8 rounded-3xl bg-green-50/50 dark:bg-slate-800 border border-green-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-green-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-green-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-table"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Excel & Macros</h3>
-                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Describe what you want to do in plain English, and get ready-to-use formulas or VBA code instantly.</p>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">Excel / Sheet Formulas</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Just describe what you need in plain English. From VLOOKUPs to complex VBA macros, get copy-paste ready results instantly.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?lang=en&tab=dev'">
-                    <div class="w-14 h-14 bg-blue-100 dark:bg-slate-700 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <!-- Feature 3 -->
+                <div class="p-8 rounded-3xl bg-blue-50/50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <i class="fa-solid fa-code"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Dev Helper</h3>
-                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">From writing complex SQL queries to explaining mind-boggling Regex patterns, act like a senior developer.</p>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">Dev / SQL / Regex</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Stop wasting hours on Stack Overflow. Generate SQL queries and decode messy Regex patterns like a senior developer.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?lang=en&tab=marketing'">
-                    <div class="w-14 h-14 bg-pink-100 dark:bg-slate-700 text-pink-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                <!-- Feature 4 -->
+                <div class="p-8 rounded-3xl bg-pink-50/50 dark:bg-slate-800 border border-pink-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-pink-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-pink-600 group-hover:text-white transition-colors">
                         <i class="fa-solid fa-hashtag"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Marketing & SNS</h3>
-                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Generate catchy Ad copywriting and viral Instagram hashtags that grab your target audience's attention.</p>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">Marketing / SNS Copy</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Viral Instagram hashtags and click-worthy ad copy. Give your products the irresistible appeal they deserve.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?lang=en&tab=relationship'">
-                    <div class="w-14 h-14 bg-red-100 dark:bg-slate-700 text-red-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-hand-holding-heart"></i>
+                <!-- Feature 5 -->
+                <div class="p-8 rounded-3xl bg-purple-50/50 dark:bg-slate-800 border border-purple-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-heart"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Relationships</h3>
-                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">Set boundaries without ruining relationships. Generate tactful rejections and sincere apologies.</p>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">Social Boundaries</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Need to say 'NO' without the guilt? Or a sincere apology? We find the right words to protect your time and your heart.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-gradient-to-br from-orange-100 to-yellow-100 dark:from-slate-800 dark:to-slate-700 border border-orange-200 dark:border-slate-600 flex flex-col justify-center items-center text-center cursor-pointer" onclick="location.href='app.html?lang=en'">
-                    <h3 class="text-xl font-bold text-primary dark:text-orange-400 mb-3">All these features<br>in one simple page.</h3>
-                    <a href="app.html?lang=en" class="text-orange-700 dark:text-orange-300 font-bold hover:underline flex items-center">
-                        Experience it yourself <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </a>
+                <!-- More -->
+                <div class="p-8 rounded-3xl bg-slate-100/50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                    <p class="text-slate-400 font-bold mb-2 italic">Coming Soon</p>
+                    <h4 class="text-xl font-bold dark:text-slate-300">More Tools Are<br>On The Way.</h4>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 6. Bottom CTA -->
-    <section class="py-20 bg-primary dark:bg-orange-600 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
-        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Stop wasting time on words.</h2>
-            <p class="text-orange-100 text-xl mb-10">Let the smart fox handle the writing, so you can focus on what matters.</p>
-            <a href="app.html?lang=en" class="inline-block bg-white text-primary dark:text-orange-600 font-bold text-xl px-10 py-5 rounded-full shadow-2xl hover:bg-orange-50 hover:scale-105 transition-all">
-                Get Started for Free <i class="fa-solid fa-rocket ml-2"></i>
+    <!-- 3. How It Works -->
+    <section id="how-it-works" class="py-24 bg-orange-50/50 dark:bg-slate-950">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black dark:text-white">Simple as 1-2-3</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-12 relative">
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-orange-200 dark:bg-slate-800 -z-10"></div>
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">1</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">Pick a Category</h4>
+                    <p class="text-slate-600 dark:text-slate-400">Choose from Email, Excel, Dev, and more.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">2</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">Input Keywords</h4>
+                    <p class="text-slate-600 dark:text-slate-400">Briefly describe your situation or raw thoughts.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">3</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">Copy & Use</h4>
+                    <p class="text-slate-600 dark:text-slate-400">Get your professional text instantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Reviews -->
+    <section id="reviews" class="py-24 bg-white dark:bg-slate-900">
+        <div class="max-w-6xl mx-auto px-4">
+            <h3 class="text-3xl md:text-5xl font-black text-center mb-16 dark:text-white">Loved by Professionals</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"I used to spend so much time overthinking emails. ChattyFox does it better in 3 seconds. Game changer!"</p>
+                    <p class="text-sm font-bold text-slate-500">- Sarah, Project Manager</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"The Excel formula generator is scary accurate. It understands exactly what I want even when I explain it poorly."</p>
+                    <p class="text-sm font-bold text-slate-500">- Mark, Operations Lead</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"Perfect for setting boundaries without being a jerk. Highly recommended for freelancers."</p>
+                    <p class="text-sm font-bold text-slate-500">- Alex, Digital Creator</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Final CTA -->
+    <section class="py-24 bg-primary text-center relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 relative z-10">
+            <h2 class="text-3xl md:text-5xl font-black text-white mb-8">Stop overthinking. Start writing.</h2>
+            <a href="app.html?lang=en" class="inline-block bg-white text-primary font-bold text-2xl px-12 py-6 rounded-full shadow-2xl hover:scale-105 transition-all">
+                Try It Free Now <i class="fa-solid fa-rocket ml-2"></i>
             </a>
-            <p class="text-orange-200 text-sm mt-6">No credit card or sign-up required.</p>
+            <p class="text-orange-100 mt-8 font-medium">No credit card or sign-up required.</p>
         </div>
     </section>
 
     <!-- 7. Footer -->
-    <footer class="bg-slate-900 dark:bg-slate-950 py-12 border-t border-slate-800">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm gap-4">
-            <div class="flex items-center group cursor-pointer" onclick="window.scrollTo(0,0)">
-                <svg width="24" height="24" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="mr-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
-                    <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
-                    <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
-                    <circle cx="28" cy="65" r="3" fill="#4A3022"/>
-                    <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                </svg>
-                <span class="font-bold text-white text-lg">ChattyFox</span>
+    <footer class="bg-slate-900 dark:bg-slate-950 py-16 border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-8">
+            <div>
+                <div class="flex items-center justify-center md:justify-start mb-4 text-white">
+                    <svg width="32" height="32" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                        <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
+                        <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
+                        <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
+                        <circle cx="28" cy="65" r="3" fill="#4A3022"/>
+                        <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </svg>
+                    <span class="text-xl font-bold">ChattyFox</span>
+                </div>
+                <p class="text-slate-500 text-sm">Smart AI text assistant for busy professionals.</p>
             </div>
-            <p>© 2026 ChattyFox. All rights reserved.</p>
-            <div class="flex space-x-6">
-                <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-                <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-white transition-colors">Contact Us</a>
+            <div class="flex space-x-6 text-slate-400 text-sm">
+                <a href="#" class="hover:text-white transition-colors">Terms</a>
+                <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                <a href="mailto:support@chattyfox.ai" class="hover:text-white transition-colors">Contact</a>
             </div>
+        </div>
+        <div class="mt-12 text-center text-slate-600 text-xs">
+            © 2026 ChattyFox. All rights reserved.
         </div>
     </footer>
 
