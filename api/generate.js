@@ -1,6 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// AI 명령어 (보안을 위해 서버쪽 함수 안에 유지)
+// AI 명령어 설정
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -53,7 +53,6 @@ const GLOBAL_RULES = {
 
 // Vercel Serverless Function
 module.exports = async (req, res) => {
-  // CORS & OPTIONS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -61,21 +60,16 @@ module.exports = async (req, res) => {
 
   try {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
-
-    // [환경 변수 확인] Vercel 설정에서 불러오기
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // 만약 키가 없다면 아주 명확한 에러 메시지 반환
     if (!apiKey) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Vercel 설정(Environment Variables)에서 GEMINI_API_KEY를 찾을 수 없습니다. 대시보드 설정을 확인해주세요.' 
-      });
+      return res.status(500).json({ success: false, message: '서버에 API 키가 설정되지 않았습니다.' });
     }
 
     const promptGenerator = SYSTEM_PROMPTS[lang][subCategory];
     const finalPrompt = promptGenerator(input1, input2, input3) + GLOBAL_RULES[lang];
 
+    // [모델 이름 수정] 최신 모델 명칭인 gemini-1.5-flash 로 확실하게 지정
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
@@ -86,6 +80,10 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('[Gemini API Error]', error);
-    res.status(500).json({ success: false, message: 'AI 생성 중 오류가 발생했습니다: ' + error.message });
+    // 상세한 에러 메시지를 프론트엔드로 전달하여 원인 파악을 돕습니다.
+    res.status(500).json({ 
+      success: false, 
+      message: 'AI 생성 중 오류가 발생했습니다: ' + error.message 
+    });
   }
 };
