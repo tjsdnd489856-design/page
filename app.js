@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (기존 데이터 완벽 보존) ---
+// --- 1. AI 명령어 설정 (모든 19가지 기능 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -27,6 +27,12 @@ const SYSTEM_PROMPTS = {
   }
 };
 
+const GLOBAL_RULES = {
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 최종 결과물만 출력하세요.`,
+  en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
+};
+
+// --- 2. 다국어 번역 데이터 (전체 보존) ---
 const translations = {
     ko: {
         ui: {
@@ -88,7 +94,7 @@ const translations = {
         ui: {
             docTitle: '🦊 ChattyFox - AI Workspace',
             logoText: 'ChattyFox',
-            subtitle: 'AI assistant.',
+            subtitle: 'Professional AI assistant.',
             historyTitle: 'History',
             historyEmpty: 'Empty.',
             submitBtn: 'Generate',
@@ -109,14 +115,17 @@ const translations = {
     }
 };
 
+// --- 3. 전역 상태 및 드래그 변수 ---
 let currentLang = 'ko'; 
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
 let isDragging = false; let hasDragged = false; let startX; let scrollLeft;
 
+// --- DOM 요소 ---
 const mainTabsContainer = document.getElementById('mainTabs');
 const subFeaturesContainer = document.getElementById('subFeatures');
 const aiForm = document.getElementById('aiForm');
+const input3Container = document.getElementById('input3Container');
 const resultArea = document.getElementById('resultArea');
 const resultContent = document.getElementById('resultContent'); 
 const copyBtn = document.getElementById('copyBtn');
@@ -124,6 +133,7 @@ const toast = document.getElementById('toast');
 const historyList = document.getElementById('historyList');
 const historySidebar = document.getElementById('historySidebar');
 
+// --- 초기화 로직 ---
 function initDarkMode() {
     if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
     document.getElementById('darkModeToggle').onclick = () => {
@@ -132,10 +142,11 @@ function initDarkMode() {
     };
 }
 
-// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
+// [핵심 수정] innerHTML을 사용하여 아이콘 태그가 렌더링되도록 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
+    document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
@@ -251,11 +262,11 @@ aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    const v1 = document.getElementById('input1').value.trim();
-    const v2 = document.getElementById('input2').value.trim();
-    const v3 = document.getElementById('input3').value.trim();
+    const val1 = document.getElementById('input1').value.trim();
+    const val2 = document.getElementById('input2').value.trim();
+    const val3 = document.getElementById('input3').value.trim();
 
-    if (!v1 || !v2 || !v3) { alert(uiText.alertEmpty); return; }
+    if (!val1 || !val2 || !val3) { alert(uiText.alertEmpty); return; }
 
     resultArea.classList.remove('hidden');
     resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
@@ -265,7 +276,7 @@ aiForm.addEventListener('submit', async (e) => {
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subCategory: feature.apiId, input1: v1, input2: v2, input3: v3, lang: currentLang })
+            body: JSON.stringify({ subCategory: feature.apiId, input1: val1, input2: val2, input3: val3, lang: currentLang })
         });
 
         const data = await response.json();
