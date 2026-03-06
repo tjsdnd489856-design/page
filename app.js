@@ -5,7 +5,6 @@ const LANG_PACKAGE = {
             title: '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>AI 뚝딱',
             subtitle: '빈칸만 채우면 일잘러의 텍스트가 완성됩니다.',
             submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ 3초 만에 텍스트 뽑기',
-            loadingText: '상황에 맞는 최적의 단어를 고르고 있습니다...',
             resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 수정 가능)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
@@ -55,7 +54,7 @@ const LANG_PACKAGE = {
                     { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: '반복작업 매크로', desc: 'VBA/Apps Script 생성', input1: { label: '환경', placeholder: '예: 엑셀 VBA', type: 'text' }, input2: { label: '작업 설명', placeholder: '예: 부서별 시트 쪼개기', type: 'textarea' }, input3: { label: '스타일', type: 'select', options: [ { value: '📝주석 포함', text: '📝주석 포함' }, { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' } ] } }
                 ]
             },
-            // ⭐ [신규: 개발/코딩]
+            // ⭐ [개발/코딩]
             {
                 categoryId: 'dev', categoryName: '💻 개발/코딩',
                 subFeatures: [
@@ -63,7 +62,7 @@ const LANG_PACKAGE = {
                     { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '상황 또는 패턴', placeholder: '예: 이메일 추출하기, 또는 ^[a-z]+$', type: 'text' }, input2: { label: '요청사항', placeholder: '예: 정규식 만들어줘, 혹은 설명해줘', type: 'textarea' }, input3: { label: '이해 수준', type: 'select', options: [ { value: '👶 정규식 초보', text: '👶 정규식 초보' }, { value: '🧑‍💻 시니어 개발자', text: '🧑‍💻 시니어 개발자' } ] } }
                 ]
             },
-            // ⭐ [신규: 마케팅/SNS]
+            // ⭐ [마케팅/SNS]
             {
                 categoryId: 'marketing', categoryName: '📱 마케팅/SNS',
                 subFeatures: [
@@ -78,7 +77,6 @@ const LANG_PACKAGE = {
             title: '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>QuickFix AI',
             subtitle: 'Fill in the blanks, let AI write for you.',
             submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ Generate in 3s',
-            loadingText: 'Selecting perfect words...',
             resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>Result (Click to Edit)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> Copy',
             toastMsg: 'Copied! Ready to paste.',
@@ -169,8 +167,9 @@ const input2Label = document.getElementById('input2Label');
 const input2 = document.getElementById('input2');
 const input3Container = document.getElementById('input3Container');
 
-const loadingArea = document.getElementById('loadingArea');
+// 로딩 스피너 및 결과창 DOM
 const resultArea = document.getElementById('resultArea');
+const resultSpinner = document.getElementById('resultSpinner'); // 오버레이 스피너
 const resultContent = document.getElementById('resultContent'); // contenteditable div
 const copyBtn = document.getElementById('copyBtn');
 const toast = document.getElementById('toast');
@@ -274,13 +273,11 @@ function initLanguage() {
     const titleEl = document.querySelector('header h1');
     const subtitleEl = document.getElementById('appSubtitle');
     const submitBtnEl = document.getElementById('submitBtn');
-    const loadingTextEl = document.getElementById('loadingText');
     const resultTitleEl = document.getElementById('resultTitle');
     
     if (titleEl) titleEl.innerHTML = uiText.title;
     if (subtitleEl) subtitleEl.textContent = uiText.subtitle;
     if (submitBtnEl) submitBtnEl.innerHTML = uiText.submitBtn;
-    if (loadingTextEl) loadingTextEl.textContent = uiText.loadingText;
     if (resultTitleEl) resultTitleEl.innerHTML = uiText.resultTitle;
     if (copyBtn) copyBtn.innerHTML = uiText.copyBtn;
     if (toastMsg) toastMsg.textContent = uiText.toastMsg;
@@ -392,7 +389,7 @@ function updateFormFields() {
 }
 
 
-// --- 8. 스트리밍 서버 통신 (SSE / Fetch) ---
+// --- 8. 서버 통신 (단일 응답 방식 롤백 및 스피너 로직) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = LANG_PACKAGE[currentLang].ui;
@@ -404,12 +401,14 @@ aiForm.addEventListener('submit', async (e) => {
         alert(uiText.alertEmpty); return;
     }
 
-    loadingArea.classList.remove('hidden');
-    resultArea.classList.add('hidden');
-    aiForm.classList.add('opacity-50', 'pointer-events-none');
-    resultContent.innerHTML = ''; // 이전 결과 초기화
+    // 결과창을 표시하고, 기존 텍스트를 비운 후 스피너 오버레이 작동
+    resultArea.classList.remove('hidden');
+    resultContent.innerHTML = ''; 
+    if (resultSpinner) resultSpinner.classList.remove('hidden');
     
-    let completeMarkdown = ''; // 스트리밍 조각을 모을 변수
+    // 폼 비활성화 (중복 클릭 방지)
+    aiForm.classList.add('opacity-50', 'pointer-events-none');
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     try {
         const response = await fetch('http://localhost:3000/api/generate', {
@@ -422,54 +421,26 @@ aiForm.addEventListener('submit', async (e) => {
             })
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Server error');
-        }
+        // 한 번에 JSON으로 응답받기
+        const data = await response.json();
 
-        loadingArea.classList.add('hidden');
-        resultArea.classList.remove('hidden');
-        resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // 스피너 숨기기
+        if (resultSpinner) resultSpinner.classList.add('hidden');
 
-        // 스트림 읽기 시작
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n');
-
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const dataStr = line.slice(6);
-                    if (dataStr === '[DONE]') {
-                        // 스트리밍 종료 시 로컬 스토리지에 히스토리 저장
-                        saveHistory(completeMarkdown, currentFeature.title);
-                        break; 
-                    }
-                    try {
-                        const parsed = JSON.parse(dataStr);
-                        if (parsed.error) {
-                            alert(uiText.alertError + parsed.error);
-                            break;
-                        }
-                        if (parsed.text) {
-                            completeMarkdown += parsed.text;
-                            // 실시간 마크다운 렌더링
-                            resultContent.innerHTML = marked.parse(completeMarkdown);
-                        }
-                    } catch(e) { /* JSON 파싱 에러 무시 (짤린 청크) */ }
-                }
-            }
+        if (data.success) {
+            // 한 번에 마크다운 렌더링
+            resultContent.innerHTML = marked.parse(data.result);
+            
+            // 로컬 스토리지에 결과 저장
+            saveHistory(data.result, currentFeature.title);
+        } else {
+            alert(uiText.alertError + data.message);
         }
 
     } catch (error) {
-        console.error('Streaming Error:', error);
+        console.error('Fetch Error:', error);
+        if (resultSpinner) resultSpinner.classList.add('hidden');
         alert(uiText.alertError + error.message);
-        loadingArea.classList.add('hidden');
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }

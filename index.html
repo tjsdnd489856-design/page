@@ -139,22 +139,23 @@
                 </button>
             </form>
 
-            <!-- 로딩 영역 -->
-            <div id="loadingArea" class="hidden mt-8 text-center py-8">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
-                <p id="loadingText" class="text-gray-600 dark:text-slate-400 font-medium animate-pulse">상황에 맞는 최적의 단어를 고르고 있습니다...</p>
-            </div>
-
             <!-- 결과창 영역 -->
             <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t dark:border-slate-700 pt-6">
                 <div class="flex items-center justify-between mb-3">
                     <h3 id="resultTitle" class="text-sm font-bold text-primary"><i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 수정 가능)</h3>
                 </div>
                 
-                <!-- 에디터 기능을 위한 contenteditable 영역 -->
-                <div id="resultContent" contenteditable="true" 
-                     class="bg-white dark:bg-slate-700 p-6 rounded-xl border-2 border-primary border-opacity-30 dark:border-slate-500 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
-                    <!-- 실시간 스트리밍 결과가 여기에 표시됨 -->
+                <!-- 스피너와 결과창을 감싸는 상대적 컨테이너 -->
+                <div class="relative">
+                    <!-- 로딩 스피너 (결과창 위에 오버레이로 표시) -->
+                    <div id="resultSpinner" class="hidden absolute inset-0 flex justify-center items-center bg-white/80 dark:bg-slate-700/80 rounded-xl z-10 transition-opacity">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-slate-600 border-t-primary dark:border-t-primary"></div>
+                    </div>
+                    <!-- 에디터 기능을 위한 contenteditable 영역 -->
+                    <div id="resultContent" contenteditable="true" 
+                         class="bg-white dark:bg-slate-700 p-6 rounded-xl border-2 border-primary border-opacity-30 dark:border-slate-500 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
+                        <!-- JSON 결과가 한 번에 여기에 렌더링됨 -->
+                    </div>
                 </div>
                 
                 <!-- 하단 액션 버튼 그룹 (복사 & 피드백) -->
