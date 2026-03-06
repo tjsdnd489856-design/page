@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (모든 기능 보존) ---
+// --- 1. AI 명령어 설정 (기존 데이터 완벽 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -117,7 +117,7 @@ const translations = {
             {
                 categoryId: 'business', categoryName: '🏢 Business',
                 subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'e.g., Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'What to highlight' } }
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'e.g., Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'What to highlight' } }
                 ]
             }
         ]
@@ -159,15 +159,16 @@ function initDarkMode() {
     };
 }
 
+// [핵심 수정] textContent 대신 innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
     document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
-    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn;
-    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle;
-    document.getElementById('copyBtn').textContent = t.ui.copyBtn;
+    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; // innerHTML 적용
+    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle; // innerHTML 적용
+    document.getElementById('copyBtn').innerHTML = t.ui.copyBtn; // innerHTML 적용
     document.getElementById('toastMsg').textContent = t.ui.toastMsg;
     updateTabContent();
     renderHistory();
@@ -261,7 +262,7 @@ function renderHistory() {
     });
 }
 
-// --- API 호출 로직 (안정성 강화 버전) ---
+// --- API 호출 로직 (Gemini 2.0 규격 준수) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
