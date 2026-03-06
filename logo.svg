@@ -1,0 +1,43 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bubbleColor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5E6"/>
+      <stop offset="100%" stop-color="#FFE4C4"/>
+    </linearGradient>
+    
+    <linearGradient id="foxColor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A00"/>
+      <stop offset="100%" stop-color="#E64A19"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M 105 55 
+           C 105 80, 85 100, 60 100 
+           C 48 100, 38 95, 30 88 
+           L 12 95 
+           L 18 78 
+           C 12 69, 10 59, 10 48 
+           C 10 25, 32 10, 60 10 
+           C 88 10, 105 30, 105 55 Z" 
+        fill="url(#bubbleColor)"/>
+
+  <path d="M 28 65 
+           C 35 55, 45 42, 58 42 
+           L 68 20 
+           L 72 45 
+           C 85 50, 92 65, 88 80 
+           C 70 88, 45 85, 28 65 Z" 
+        fill="url(#foxColor)"/>
+
+  <path d="M 64 30 L 68 22 L 70 40 Z" fill="#FFB74D"/>
+
+  <path d="M 28 65
+           C 40 70, 55 75, 75 70
+           C 65 85, 45 82, 28 65 Z" 
+        fill="#FFFFFF" opacity="0.95"/>
+           
+  <path d="M 45 56 Q 50 52 55 56" 
+        fill="none" stroke="#4A3022" stroke-width="3" stroke-linecap="round"/>
+  
+  <circle cx="28" cy="65" r="4" fill="#4A3022"/>
+</svg>

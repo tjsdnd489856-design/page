@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="250" height="60" viewBox="0 0 250 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(5, 5) scale(0.42)">
+    <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
+    <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
+    <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
+    <circle cx="28" cy="65" r="3" fill="#4A3022"/>
+    <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <text x="65" y="40" font-family="Arial, sans-serif" font-weight="900" font-size="28" letter-spacing="-1">
+    <tspan fill="#1F2937">Chatty</tspan><tspan fill="#FF7A00">Fox</tspan>
+  </text>
+</svg>

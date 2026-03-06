@@ -5,19 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🦊 ChattyFox - Smart AI Text Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class', 
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Inter"', 'sans-serif'] },
-                    colors: { primary: '#f97316', secondary: '#fbbf24' } 
+                    colors: { 
+                        primary: '#f97316', 
+                        secondary: '#fbbf24',
+                        orange: { 500: '#FF7A00' } 
+                    } 
                 }
             }
         }
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         html { scroll-behavior: smooth; }
         .text-gradient {
