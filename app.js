@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (19가지 모든 기능 보존) ---
+// --- 1. AI 명령어 설정 (모든 19가지 기능 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -27,6 +27,12 @@ const SYSTEM_PROMPTS = {
   }
 };
 
+const GLOBAL_RULES = {
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 결과물만 출력하세요.`,
+  en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
+};
+
+// --- 2. 다국어 번역 데이터 (전체 보존) ---
 const translations = {
     ko: {
         ui: {
@@ -49,7 +55,7 @@ const translations = {
                 subFeatures: [
                     { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
                     { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
-                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
+                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
                 ]
             },
             {
@@ -136,11 +142,10 @@ function initDarkMode() {
     };
 }
 
-// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되도록 함
+// [핵심 수정] innerHTML을 사용하여 아이콘 태그가 렌더링되도록 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
-    document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
@@ -235,7 +240,7 @@ function updateFormFields() {
     }
 }
 
-// [문법 오류 해결] 정규식 내 백틱 충돌 방지를 위해 RegExp 객체 방식 사용
+// [문법 오류 해결] 정규식 내 백틱 충돌 방지 로직 적용
 function renderHistory() {
     const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
     if (!historyList) return;
@@ -246,6 +251,7 @@ function renderHistory() {
     history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 mb-2';
+        // RegExp를 사용하여 백틱 문자열 충돌 차단
         const cleanText = item.text.replace(new RegExp("[#*`]", "g"), '');
         div.innerHTML = `<span class="text-xs font-bold text-primary">${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">${cleanText}</p>`;
         div.onclick = () => { resultContent.innerHTML = marked.parse(item.text); resultArea.classList.remove('hidden'); historySidebar.classList.add('translate-x-full'); };
