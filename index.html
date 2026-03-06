@@ -97,13 +97,8 @@
             
             <!-- 로고 및 타이틀 래퍼 -->
             <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10" onclick="location.href='landing.html'">
-                <!-- 동적 SVG (다크모드 시 내부 흰색 턱선의 fill-opacity 조절을 CSS로 처리) -->
-                <svg id="foxLogoSvg" class="h-8 w-auto drop-shadow-md" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- 여우 머리 (오렌지) -->
-                    <path d="M12 2L19 21L5 21L12 2Z" fill="#f97316"/>
-                    <!-- 여우 턱/얼굴 포인트 (흰색, 다크모드 시 은은하게) -->
-                    <path class="fill-white dark:fill-slate-300 dark:opacity-90" d="M12 10L16 21H8L12 10Z"/>
-                </svg>
+                <!-- 실제 로고 이미지 파일 사용 (다크모드 시 이질감 완화를 위해 opacity 조절) -->
+                <img id="appLogoImg" src="logo_ko.svg" alt="ChattyFox Logo" class="h-8 w-auto drop-shadow-md dark:opacity-90" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZWE1ODBjIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDE5IDIxTDUgMjFMMTIgMloiLz48L3N2Zz4='">
                 
                 <!-- ChattyFox 글자 대비 극대화 (JS 렌더링 대비 하드코딩 + 클래스 주입) -->
                 <span id="appLogoText" class="tracking-tight">
