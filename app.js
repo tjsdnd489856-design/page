@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (19가지 모든 기능 완벽 보존) ---
+// --- 1. AI 명령어 설정 (기존 데이터 완벽 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -27,12 +27,6 @@ const SYSTEM_PROMPTS = {
   }
 };
 
-const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 최종 결과물만 출력하세요.`,
-  en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
-};
-
-// --- 2. 다국어 번역 데이터 (19가지 기능 정보 포함) ---
 const translations = {
     ko: {
         ui: {
@@ -47,22 +41,21 @@ const translations = {
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             generating: '🦊 여우 비서가 생성 중입니다...',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
-            feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.'
         },
         appData: [
             {
                 categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
                 subFeatures: [
                     { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️웃으면서 뼈 때리기', text: '🗡️웃으면서 뼈 때리기' } ] } },
-                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '발생한 사고', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부 상사용', text: '🏢내부 상사용' }, { value: '🤝외부 거래처용', text: '🤝외부 거래처용' } ] } }
+                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
+                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
                 ]
             },
             {
                 categoryId: 'school', categoryName: '🏫 과제/요약',
                 subFeatures: [
-                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적으로', text: '🎓학술적으로' }, { value: '📝핵심만 개조식으로', text: '📝핵심만 개조식으로' } ] } },
+                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적', text: '🎓학술적' }, { value: '📝개조식', text: '📝개조식' } ] } },
                     { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로', input1: { label: '발표 시간/타겟', placeholder: '예: 5분, 대학생', type: 'text' }, input2: { label: '발표 자료', placeholder: 'PPT 내용 복붙', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [ { value: '🎙️전문적', text: '🎙️전문적' }, { value: '💬청중 소통톤', text: '💬청중 소통톤' } ] } },
                     { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: '자소서 영혼 주입기', desc: '경험을 성과로', input1: { label: '지원 직무', placeholder: '예: 마케팅', type: 'text' }, input2: { label: '나의 경험', placeholder: '카페 알바 6개월...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🔥열정 가득', text: '🔥열정 가득' }, { value: '📊데이터 중심', text: '📊데이터 중심' } ] } }
                 ]
@@ -116,17 +109,14 @@ const translations = {
     }
 };
 
-// --- 3. 전역 상태 및 드래그 변수 ---
 let currentLang = 'ko'; 
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
 let isDragging = false; let hasDragged = false; let startX; let scrollLeft;
 
-// --- DOM 요소 ---
 const mainTabsContainer = document.getElementById('mainTabs');
 const subFeaturesContainer = document.getElementById('subFeatures');
 const aiForm = document.getElementById('aiForm');
-const input3Container = document.getElementById('input3Container');
 const resultArea = document.getElementById('resultArea');
 const resultContent = document.getElementById('resultContent'); 
 const copyBtn = document.getElementById('copyBtn');
@@ -134,7 +124,6 @@ const toast = document.getElementById('toast');
 const historyList = document.getElementById('historyList');
 const historySidebar = document.getElementById('historySidebar');
 
-// --- 초기화 로직 ---
 function initDarkMode() {
     if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
     document.getElementById('darkModeToggle').onclick = () => {
@@ -143,6 +132,7 @@ function initDarkMode() {
     };
 }
 
+// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
@@ -174,7 +164,7 @@ function renderMainTabs() {
     });
 }
 
-// 탭 드래그 스크롤
+// 탭 드래그 기능 (보존)
 if (mainTabsContainer) {
     mainTabsContainer.addEventListener('mousedown', (e) => {
         isDragging = true; hasDragged = false;
@@ -212,14 +202,15 @@ function updateFormFields() {
     const i1 = document.getElementById('input1');
     const l2 = document.getElementById('input2Label');
     const i2 = document.getElementById('input2');
+    const i3c = document.getElementById('input3Container');
     
     if(l1) l1.textContent = feature.input1.label;
     if(i1) i1.placeholder = feature.input1.placeholder;
     if(l2) l2.textContent = feature.input2.label;
     if(i2) i2.placeholder = feature.input2.placeholder;
     
-    if (input3Container) {
-        input3Container.innerHTML = `<label class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
+    if (i3c) {
+        i3c.innerHTML = `<label class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
         const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white';
         if (feature.input3.type === 'select') {
             const select = document.createElement('select');
@@ -229,12 +220,12 @@ function updateFormFields() {
                 option.value = opt.value; option.textContent = opt.text;
                 select.appendChild(option);
             });
-            input3Container.appendChild(select);
+            i3c.appendChild(select);
         } else {
             const input = document.createElement('input');
             input.type = 'text'; input.id = 'input3'; input.className = commonClasses;
             input.placeholder = feature.input3.placeholder;
-            input3Container.appendChild(input);
+            i3c.appendChild(input);
         }
     }
 }
@@ -256,16 +247,15 @@ function renderHistory() {
     });
 }
 
-// --- 5. 서버 경유 API 호출 (보안 유지) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    const val1 = document.getElementById('input1').value.trim();
-    const val2 = document.getElementById('input2').value.trim();
-    const val3 = document.getElementById('input3').value.trim();
+    const v1 = document.getElementById('input1').value.trim();
+    const v2 = document.getElementById('input2').value.trim();
+    const v3 = document.getElementById('input3').value.trim();
 
-    if (!val1 || !val2 || !val3) { alert(uiText.alertEmpty); return; }
+    if (!v1 || !v2 || !v3) { alert(uiText.alertEmpty); return; }
 
     resultArea.classList.remove('hidden');
     resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
@@ -275,7 +265,7 @@ aiForm.addEventListener('submit', async (e) => {
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subCategory: feature.apiId, input1: val1, input2: val2, input3: val3, lang: currentLang })
+            body: JSON.stringify({ subCategory: feature.apiId, input1: v1, input2: v2, input3: v3, lang: currentLang })
         });
 
         const data = await response.json();
@@ -289,7 +279,7 @@ aiForm.addEventListener('submit', async (e) => {
             renderHistory();
         }
     } catch (error) {
-        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border border-red-200 bg-red-50 rounded-lg">Error: ${error.message}</div>`;
+        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border rounded-lg">Error: ${error.message}</div>`;
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
