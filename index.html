@@ -3,180 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦊 ChattyFox - AI Workspace</title>
-    <!-- Tailwind CSS (CDN) -->
+    <title>🦊 채티폭스 - 센스 있는 AI 텍스트 비서</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 폰트어썸 (아이콘) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 구글 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class', 
             theme: {
                 extend: {
-                    colors: { primary: '#f97316', secondary: '#fbbf24' }
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: { primary: '#f97316', secondary: '#fbbf24' } 
                 }
             }
         }
     </script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- marked.js (Markdown Parser) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
     <style>
-        /* 스크롤바 숨기기 (가로 스크롤을 위해) */
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        html { scroll-behavior: smooth; }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #ea580c, #f59e0b);
         }
-        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
-
-        /* 커스텀 마크다운 렌더링 + 다크모드 대응 */
-        .result-markdown { line-height: 1.7; word-break: keep-all; }
-        .result-markdown p { margin-bottom: 0.75rem; }
-        .result-markdown h1, .result-markdown h2, .result-markdown h3 { 
-            font-size: 1.125rem; font-weight: 800; color: #c2410c;
-            margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem; 
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
         }
-        .dark .result-markdown h1, .dark .result-markdown h2, .dark .result-markdown h3 {
-            color: #fdba74; border-color: #374151;
-        }
-        .result-markdown ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .result-markdown ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
-        .result-markdown strong { font-weight: 800; color: #111827; background-color: rgba(253, 224, 71, 0.5); padding: 0 4px; border-radius: 4px; }
-        .dark .result-markdown strong { color: #f9fafb; background-color: rgba(245, 158, 11, 0.5); }
-        .result-markdown code { background-color: #f3f4f6; color: #ef4444; padding: 0.125rem 0.375rem; border-radius: 0.375rem; font-family: monospace; }
-        .dark .result-markdown code { background-color: #374151; color: #fca5a5; }
-        .result-markdown pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75rem; }
-        .result-markdown blockquote { border-left: 4px solid #f97316; background-color: #fff7ed; padding: 0.75rem 1rem; color: #4b5563; }
-        .dark .result-markdown blockquote { background-color: #7c2d12; border-left-color: #fdba74; color: #ffedd5; }
-        
-        [contenteditable]:focus { outline: none; }
     </style>
 </head>
-<body class="bg-orange-50 text-gray-800 dark:bg-slate-950 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
+<body class="bg-orange-50/30 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased overflow-x-hidden transition-colors duration-300">
 
-    <!-- Tailwind JIT 컴파일러가 동적 클래스를 놓치지 않도록 빈 div에 강제 주입 -->
+    <!-- Tailwind JIT 강제 인식용 숨김 태그 -->
     <div class="hidden text-slate-800 text-white dark:text-white text-orange-500 bg-white dark:bg-slate-900 from-white dark:from-slate-900 to-transparent"></div>
 
-    <!-- 상단 플로팅 컨트롤 바 -->
-    <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
-        <!-- 언어 토글 버튼 -->
-        <div class="flex bg-white dark:bg-slate-800 rounded-full shadow border border-gray-200 dark:border-slate-700 p-1">
-            <button onclick="setLanguage('ko')" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">KO</button>
-            <button onclick="setLanguage('en')" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">EN</button>
+    <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 border-b border-orange-100 dark:border-slate-800 transition-all">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- 로고 영역 (인라인 SVG) -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <svg class="h-10 w-auto mr-2 drop-shadow-md" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L19 21L5 21L12 2Z" fill="#f97316"/>
+                        <path class="fill-white dark:fill-slate-300 dark:opacity-90" d="M12 10L16 21H8L12 10Z"/>
+                    </svg>
+                    <span class="text-2xl font-black tracking-tight">
+                        <span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>
+                    </span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#features" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">주요 기능</a>
+                    <a href="#how-it-works" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">사용방법</a>
+                    <a href="#reviews" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">리뷰</a>
+                    <!-- 영문 페이지 이동 버튼 -->
+                    <a href="landing_en.html" class="text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold text-sm bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full transition-colors"><i class="fa-solid fa-globe mr-1"></i> EN</a>
+                    <!-- 앱으로 이동하는 버튼 -->
+                    <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-105 shadow-md">
+                        무료로 시작하기
+                    </a>
+                </div>
+            </div>
         </div>
-        <!-- 다크모드 토글 버튼 -->
-        <button id="darkModeToggle" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-yellow-400 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-            <i class="fa-solid fa-moon dark:hidden"></i>
-            <i class="fa-solid fa-sun hidden dark:block"></i>
-        </button>
-        <!-- 히스토리 열기 버튼 -->
-        <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="History">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-        </button>
-    </div>
+    </nav>
 
-    <!-- 우측 슬라이드 오프캔버스 (히스토리) -->
-    <div id="historySidebar" class="fixed top-0 right-0 w-80 h-full bg-white dark:bg-slate-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200 dark:border-slate-800 flex flex-col">
-        <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-950">
-            <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-history mr-2 text-primary"></i>History</h2>
-            <button id="closeHistoryBtn" class="text-gray-500 hover:text-red-500 dark:text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="historyList" class="p-4 flex-1 overflow-y-auto space-y-3">
-            <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">Empty</p>
-        </div>
-    </div>
-
-    <!-- 메인 앱 컨테이너 -->
-    <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-gray-200 dark:border-slate-800">
+    <!-- 1. 히어로 섹션 -->
+    <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative">
+        <div class="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmOTczMTYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50 -z-10"></div>
         
-        <!-- 헤더 (화이트 & 다크모드 차콜 bg-slate-900 완벽 적용) -->
-        <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 text-center transition-colors relative overflow-hidden flex flex-col items-center">
-            
-            <!-- 로고 및 타이틀 래퍼 -->
-            <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10" onclick="location.href='landing.html'">
-                <!-- 실제 로고 이미지 파일 사용 (다크모드 시 이질감 완화를 위해 opacity 조절) -->
-                <img id="appLogoImg" src="logo.svg" alt="ChattyFox Logo" class="h-12 w-auto drop-shadow-md dark:opacity-90" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZWE1ODBjIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDE5IDIxTDUgMjFMMTIgMloiLz48L3N2Zz4='">
-                
-                <!-- ChattyFox 글자 대비 극대화 (JS 렌더링 대비 하드코딩 + 클래스 주입) -->
-                <span id="appLogoText" class="tracking-tight">
-                    <span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>
-                </span>
-            </h1>
-            
-            <p id="appSubtitle" class="text-slate-500 dark:text-slate-400 font-medium text-sm relative z-10"></p>
-        </header>
-
-        <main class="p-6">
-            <!-- 가로 스크롤 + 그라데이션 페이드 탭 메뉴 래퍼 -->
-            <div class="relative w-full mb-6 border-b border-gray-200 dark:border-slate-800">
-                <!-- 탭 컨테이너 -->
-                <div id="mainTabs" class="flex overflow-x-auto flex-nowrap gap-2 justify-start scrollbar-hide cursor-grab select-none pb-0 relative z-0">
-                    <!-- app.js에서 탭이 동적으로 생성됨 -->
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
+                    <span class="flex h-2 w-2 relative mr-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    회원가입 없이 즉시 사용 가능한 AI 비서
                 </div>
-                <!-- 오른쪽 투명 그라데이션 레이어 (다크모드 배경 bg-slate-900과 완벽 매칭) -->
-                <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none z-10"></div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
+                    말 한마디로 완성되는<br>
+                    <span class="text-gradient">비즈니스의 센스, 채티폭스</span>
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed font-medium">
+                    이메일 작성부터 복잡한 엑셀 수식, 코딩 보조까지.<br class="hidden md:block">
+                    당신의 스마트한 여우 비서가 가장 세련된 정답을 찾아드립니다.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:-translate-y-1 shadow-lg shadow-orange-200 dark:shadow-none flex items-center justify-center">
+                        당장 써보기 (가입 불필요) <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
             </div>
 
-            <!-- 서브 기능 버튼 영역 -->
-            <div id="subFeatures" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-            </div>
-
-            <!-- 동적 입력 폼 -->
-            <form id="aiForm" class="space-y-5">
-                <div>
-                    <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-                    <input type="text" id="input1" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
-                </div>
-                <div>
-                    <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-                    <textarea id="input2" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition resize-none bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"></textarea>
-                </div>
-                <div id="input3Container">
-                    <label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full mt-4 bg-gray-800 dark:bg-orange-500 hover:bg-gray-900 dark:hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center text-lg transform hover:-translate-y-1">
-                    <!-- JS에서 교체 -->
-                </button>
-            </form>
-
-            <!-- 결과창 영역 -->
-            <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t border-gray-200 dark:border-slate-800 pt-6">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 id="resultTitle" class="text-sm font-bold text-primary"></h3>
-                </div>
-                
-                <div class="relative group">
-                    <!-- 로딩 스피너 (결과창 오버레이) -->
-                    <div id="resultSpinner" class="hidden absolute inset-0 flex justify-center items-center bg-white/80 dark:bg-slate-900/80 rounded-xl z-10 transition-opacity">
-                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 dark:border-slate-700 border-t-primary dark:border-t-primary"></div>
+            <!-- 대시보드 목업 이미지 -->
+            <div class="mt-16 relative max-w-4xl mx-auto animate-float">
+                <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-yellow-400 transform skew-y-3 sm:skew-y-0 sm:-rotate-3 sm:rounded-3xl opacity-20 blur-xl"></div>
+                <div class="relative bg-white dark:bg-slate-900 shadow-2xl rounded-2xl border border-orange-100 dark:border-slate-800 overflow-hidden">
+                    <div class="bg-slate-100 dark:bg-slate-800 px-4 py-3 border-b dark:border-slate-700 flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
                     </div>
-                    <!-- 에디터 기능을 위한 contenteditable 영역 -->
-                    <div id="resultContent" contenteditable="true" class="bg-white dark:bg-slate-800 p-6 rounded-xl border-2 border-orange-200 dark:border-slate-700 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
-                    </div>
-                </div>
-                
-                <!-- 하단 액션 버튼 그룹 -->
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <button type="button" id="copyBtn" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition shadow flex items-center justify-center"></button>
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <button type="button" id="btnLike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="좋아요">👍</button>
-                        <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="아쉬워요">👎</button>
+                    <div class="p-6 md:p-8 bg-orange-50/30 dark:bg-slate-900 flex flex-col md:flex-row gap-6">
+                        <div class="flex-1 bg-white dark:bg-slate-800 p-5 rounded-xl border border-orange-100 dark:border-slate-700 shadow-sm cursor-pointer" onclick="location.href='app.html?tab=business&sub=angryEmail'">
+                            <h3 class="font-bold text-slate-800 dark:text-white mb-4 border-b dark:border-slate-700 pb-2">🦊 스마트 비즈니스 이메일</h3>
+                            <div class="space-y-3">
+                                <div class="h-8 bg-slate-50 dark:bg-slate-900 rounded w-full flex items-center px-3 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">수신자: 타 부서 김팀장님</div>
+                                <div class="h-16 bg-slate-50 dark:bg-slate-900 rounded w-full flex px-3 py-2 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">핵심 내용: 기획서 내일까지 안 주면 일정 다 꼬입니다. 빨리 주세요.</div>
+                                <div class="h-8 bg-slate-50 dark:bg-slate-900 rounded w-full flex items-center justify-between px-3 text-xs text-slate-400 border border-slate-100 dark:border-slate-700">
+                                    <span>온도: 사무적이고 단호하게</span> <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="h-10 bg-primary rounded w-full flex items-center justify-center text-white font-bold text-sm shadow-md mt-2">✨ 생성하기</div>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-white dark:bg-slate-800 p-5 rounded-xl border border-orange-100 dark:border-slate-700 shadow-sm relative">
+                            <h3 class="font-bold text-slate-800 dark:text-white mb-4 border-b dark:border-slate-700 pb-2 text-primary"><i class="fa-solid fa-check-circle mr-1"></i> 여우 비서 작성 완료!</h3>
+                            <div class="space-y-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <p><strong class="dark:text-white">제목: [요청] 신규 프로젝트 기획서 송부의 건 (기한: 내일 오전)</strong></p>
+                                <p>김팀장님, 안녕하세요. 마케팅팀입니다.</p>
+                                <p>다름이 아니오라, 일전 요청드린 신규 프로젝트 기획서 관련하여 리마인드 차 연락드렸습니다.</p>
+                                <p>내일 오후부터는 저희 측 본 작업이 시작되어야 하는 관계로, 부득이하게 내일 오전까지는 해당 문서를 회신해 주셔야 정상적인 일정 소화가 가능합니다.</p>
+                            </div>
+                            <button class="absolute bottom-4 right-4 bg-slate-800 dark:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors">
+                                <i class="fa-regular fa-copy mr-1"></i> 복사하기
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-slate-100 text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
-                <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 mr-2 text-lg"></i> 
-                <span id="toastMsg" class="font-medium"></span>
+        </div>
+    </section>
+
+    <!-- 2. 해결책 및 핵심 기능 (Features) -->
+    <section id="features" class="py-24 bg-white dark:bg-slate-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-4">다방면으로 똑똑한 여우의 5가지 주요 기능</h2>
+                <p class="text-xl text-slate-600 dark:text-slate-400">이메일, 보고서, 엑셀, 코딩, 마케팅까지. 필요한 툴은 다 모았습니다.</p>
             </div>
 
-        </main>
-    </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?tab=business'">
+                    <div class="w-14 h-14 bg-orange-100 dark:bg-slate-700 text-primary rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">비즈니스 이메일 / 보고서</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">거칠게 쓴 메모도 정중한 이메일로, 두서없는 회의록도 깔끔한 임원 보고용 마크다운으로 완벽하게 포장해 드립니다.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?tab=excel'">
+                    <div class="w-14 h-14 bg-green-100 dark:bg-slate-700 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">엑셀 수식 / 매크로</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">말로 상황을 설명하면 복잡한 VLOOKUP 수식부터 매크로(VBA) 코드까지 복사 가능한 형태로 바로 짜줍니다.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?tab=dev'">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-slate-700 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">개발 / 코딩 보조</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">복잡한 SQL 쿼리 작성부터 머리 아픈 정규표현식(Regex) 해독까지, 시니어 개발자처럼 든든하게 도와줍니다.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?tab=marketing'">
+                    <div class="w-14 h-14 bg-pink-100 dark:bg-slate-700 text-pink-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-hashtag"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">마케팅 / SNS 카피</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">타겟 고객의 시선을 사로잡는 광고 카피라이팅과 조회수가 터지는 인스타그램 해시태그를 생성합니다.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-xl transition-all hover:-translate-y-2 group cursor-pointer" onclick="location.href='app.html?tab=relationship'">
+                    <div class="w-14 h-14 bg-red-100 dark:bg-slate-700 text-red-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-3">관계 (거절/사과문)</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">어려운 부탁 거절부터 진심을 전하는 사과문까지, 감정 소모를 줄여주는 센스 있는 메시지를 대신 고민합니다.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-gradient-to-br from-orange-100 to-yellow-100 dark:from-slate-800 dark:to-slate-700 border border-orange-200 dark:border-slate-600 flex flex-col justify-center items-center text-center cursor-pointer" onclick="location.href='app.html'">
+                    <h3 class="text-xl font-bold text-primary dark:text-orange-400 mb-3">채티폭스와 함께<br>칼퇴를 경험하세요.</h3>
+                    <a href="app.html" class="text-orange-700 dark:text-orange-300 font-bold hover:underline flex items-center">
+                        기능 직접 체험하러 가기 <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script src="app.js"></script>
+    <!-- 6. 최종 행동 유도 (Bottom CTA) -->
+    <section class="py-20 bg-primary dark:bg-orange-600 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl md:text-5xl font-black text-white mb-6">오늘부터 야근하지 마세요.</h2>
+            <p class="text-orange-100 text-xl mb-10">귀찮은 글쓰기는 똑똑한 채티폭스에게 맡기고, 커피 한 잔의 여유를 즐기세요.</p>
+            <a href="app.html" class="inline-block bg-white text-primary dark:text-orange-600 font-bold text-xl px-10 py-5 rounded-full shadow-2xl hover:bg-orange-50 hover:scale-105 transition-all">
+                지금 바로 빈칸 채우러 가기 <i class="fa-solid fa-rocket ml-2"></i>
+            </a>
+            <p class="text-orange-200 text-sm mt-6">가입이나 카드 등록 없이 즉시 무료로 사용 가능합니다.</p>
+        </div>
+    </section>
+
+    <!-- 7. 푸터 -->
+    <footer class="bg-slate-900 dark:bg-slate-950 py-12 border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm gap-4">
+            <div class="flex items-center">
+                <svg class="h-6 w-auto mr-2 opacity-80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L19 21L5 21L12 2Z" fill="#f97316"/>
+                    <path class="fill-white opacity-90" d="M12 10L16 21H8L12 10Z"/>
+                </svg>
+                <span class="font-bold text-white text-lg">채티폭스</span>
+            </div>
+            <p>© 2026 ChattyFox. All rights reserved.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-white transition-colors">이용약관</a>
+                <a href="#" class="hover:text-white transition-colors">개인정보처리방침</a>
+                <a href="#" class="hover:text-white transition-colors">문의하기</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>

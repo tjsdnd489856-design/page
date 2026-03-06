@@ -3,7 +3,7 @@ const translations = {
     ko: {
         ui: {
             docTitle: '🦊 채티폭스 - AI Workspace',
-            logoText: '<span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
+            logoText: '<span class="text-slate-800 dark:text-white tracking-tight">채티</span><span class="text-orange-500 tracking-tight">폭스</span>',
             subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
             historyEmpty: '최근 생성된 텍스트가 없습니다.',
@@ -75,7 +75,7 @@ const translations = {
     en: {
         ui: {
             docTitle: '🦊 ChattyFox - AI Workspace',
-            logoText: '<span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
+            logoText: '<span class="text-slate-800 dark:text-white tracking-tight">Chatty</span><span class="text-orange-500 tracking-tight">Fox</span>',
             subtitle: 'Let the smart fox handle your professional writing in seconds.',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>Recent History',
             historyEmpty: 'No recent generations found.',

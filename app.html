@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦊 ChattyFox - AI Workspace</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: { primary: '#f97316', secondary: '#fbbf24' }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+
+        .result-markdown { line-height: 1.7; word-break: keep-all; }
+        .result-markdown p { margin-bottom: 0.75rem; }
+        .result-markdown h1, .result-markdown h2, .result-markdown h3 { 
+            font-size: 1.125rem; font-weight: 800; color: #c2410c;
+            margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem; 
+        }
+        .dark .result-markdown h1, .dark .result-markdown h2, .dark .result-markdown h3 {
+            color: #fdba74; border-color: #374151;
+        }
+        .result-markdown ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .result-markdown ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .result-markdown strong { font-weight: 800; color: #111827; background-color: rgba(253, 224, 71, 0.5); padding: 0 4px; border-radius: 4px; }
+        .dark .result-markdown strong { color: #f9fafb; background-color: rgba(245, 158, 11, 0.5); }
+        .result-markdown code { background-color: #f3f4f6; color: #ef4444; padding: 0.125rem 0.375rem; border-radius: 0.375rem; font-family: monospace; }
+        .dark .result-markdown code { background-color: #374151; color: #fca5a5; }
+        .result-markdown pre { background-color: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75rem; }
+        .result-markdown blockquote { border-left: 4px solid #f97316; background-color: #fff7ed; padding: 0.75rem 1rem; color: #4b5563; }
+        .dark .result-markdown blockquote { background-color: #7c2d12; border-left-color: #fdba74; color: #ffedd5; }
+        
+        [contenteditable]:focus { outline: none; }
+    </style>
+</head>
+<body class="bg-orange-50 text-gray-800 dark:bg-slate-950 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
+
+    <!-- Tailwind JIT 컴파일러 강제 주입 -->
+    <div class="hidden text-slate-800 text-white dark:text-white text-orange-500 bg-white dark:bg-slate-900 from-white dark:from-slate-900 to-transparent"></div>
+
+    <!-- 상단 플로팅 컨트롤 바 -->
+    <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
+        <div class="flex bg-white dark:bg-slate-800 rounded-full shadow border border-gray-200 dark:border-slate-700 p-1">
+            <button onclick="setLanguage('ko')" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">KO</button>
+            <button onclick="setLanguage('en')" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">EN</button>
+        </div>
+        <button id="darkModeToggle" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-yellow-400 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:block"></i>
+        </button>
+        <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="History">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+    </div>
+
+    <!-- 우측 슬라이드 오프캔버스 (히스토리) -->
+    <div id="historySidebar" class="fixed top-0 right-0 w-80 h-full bg-white dark:bg-slate-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-950">
+            <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-history mr-2 text-primary"></i>History</h2>
+            <button id="closeHistoryBtn" class="text-gray-500 hover:text-red-500 dark:text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="historyList" class="p-4 flex-1 overflow-y-auto space-y-3">
+            <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">Empty</p>
+        </div>
+    </div>
+
+    <!-- 메인 앱 컨테이너 -->
+    <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-gray-200 dark:border-slate-800">
+        
+        <!-- 헤더 -->
+        <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 text-center transition-colors relative overflow-hidden flex flex-col items-center">
+            <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10" onclick="location.href='index.html'">
+                <!-- JS 대신 HTML에 안전한 인라인 SVG 직접 내장 -->
+                <svg class="h-12 w-auto drop-shadow-md" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L19 21L5 21L12 2Z" fill="#f97316"/>
+                    <path class="fill-white dark:fill-slate-300 dark:opacity-90" d="M12 10L16 21H8L12 10Z"/>
+                </svg>
+                <span id="appLogoText" class="tracking-tight">
+                    <!-- JS 렌더링 영역 -->
+                </span>
+            </h1>
+            <p id="appSubtitle" class="text-slate-500 dark:text-slate-400 font-medium text-sm relative z-10"></p>
+        </header>
+
+        <main class="p-6">
+            <!-- 가로 스크롤 탭 메뉴 래퍼 -->
+            <div class="relative w-full mb-6 border-b border-gray-200 dark:border-slate-800">
+                <div id="mainTabs" class="flex overflow-x-auto flex-nowrap gap-2 justify-start scrollbar-hide cursor-grab select-none pb-0 relative z-0">
+                    <!-- app.js 동적 생성 -->
+                </div>
+                <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none z-10"></div>
+            </div>
+
+            <!-- 서브 기능 버튼 영역 -->
+            <div id="subFeatures" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+            </div>
+
+            <!-- 폼 영역 -->
+            <form id="aiForm" class="space-y-5">
+                <div>
+                    <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
+                    <input type="text" id="input1" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
+                </div>
+                <div>
+                    <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
+                    <textarea id="input2" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition resize-none bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"></textarea>
+                </div>
+                <div id="input3Container">
+                    <label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full mt-4 bg-gray-800 dark:bg-orange-500 hover:bg-gray-900 dark:hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center text-lg transform hover:-translate-y-1">
+                </button>
+            </form>
+
+            <!-- 결과창 -->
+            <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t border-gray-200 dark:border-slate-800 pt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 id="resultTitle" class="text-sm font-bold text-primary"></h3>
+                </div>
+                <div class="relative group">
+                    <div id="resultSpinner" class="hidden absolute inset-0 flex justify-center items-center bg-white/80 dark:bg-slate-900/80 rounded-xl z-10 transition-opacity">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 dark:border-slate-700 border-t-primary dark:border-t-primary"></div>
+                    </div>
+                    <div id="resultContent" contenteditable="true" class="bg-white dark:bg-slate-800 p-6 rounded-xl border-2 border-orange-200 dark:border-slate-700 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button type="button" id="copyBtn" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition shadow flex items-center justify-center"></button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button type="button" id="btnLike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="좋아요">👍</button>
+                        <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="아쉬워요">👎</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-slate-100 text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
+                <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 mr-2 text-lg"></i> 
+                <span id="toastMsg" class="font-medium"></span>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
