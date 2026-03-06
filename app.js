@@ -457,7 +457,7 @@ aiForm.addEventListener('submit', async (e) => {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || \`HTTP Status \${response.status}\`);
+            throw new Error(errorData.message || `HTTP Status ${response.status}`);
         }
 
         const data = await response.json();
@@ -474,7 +474,7 @@ aiForm.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error('API Request Failed:', error);
         if (resultSpinner) resultSpinner.classList.add('hidden');
-        alert(uiText.fetchError + '\\n(' + error.message + ')');
+        alert(uiText.fetchError + '\n(' + error.message + ')');
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
@@ -497,7 +497,7 @@ async function sendFeedback(rating) {
     const text = resultContent.innerText;
     if(!text) return;
     
-    console.log(\`[피드백 기록] 평가: \${rating}, 내용: \${text.substring(0, 20)}...\`);
+    console.log(`[피드백 기록] 평가: ${rating}, 내용: ${text.substring(0, 20)}...`);
     alert(translations[currentLang].ui.feedbackThanks);
 }
 btnLike.addEventListener('click', () => sendFeedback('like'));
