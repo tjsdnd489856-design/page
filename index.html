@@ -35,6 +35,15 @@
             50% { transform: translateY(-20px); }
             100% { transform: translateY(0px); }
         }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
     </style>
 </head>
 <body class="bg-orange-50/30 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased overflow-x-hidden transition-colors duration-300">
@@ -42,6 +51,7 @@
     <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 border-b border-orange-100 dark:border-slate-800 transition-all">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
+                <!-- 로고 -->
                 <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="window.scrollTo(0,0)">
                     <svg width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:-rotate-6 mr-2 drop-shadow-sm">
                         <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
@@ -58,6 +68,7 @@
                     <a href="#features" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">주요 기능</a>
                     <a href="#how-it-works" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">사용방법</a>
                     <a href="#reviews" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">사용 후기</a>
+                    <a href="#faq" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">FAQ</a>
                     <a href="landing_en.html" class="text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold text-sm bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full transition-colors"><i class="fa-solid fa-globe mr-1"></i> EN</a>
                     <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-105 shadow-md">무료 시작</a>
                 </div>
@@ -66,32 +77,218 @@
     </nav>
 
     <!-- 1. 히어로 섹션 -->
-    <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative text-center">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
+                <span class="flex h-2 w-2 relative mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                회원가입 없이 3초 만에 끝내는 AI 글쓰기
+            </div>
             <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
                 비즈니스의 품격은<br>
                 <span class="text-gradient">한 끗 차이, 채티폭스</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-3xl mx-auto">
-                거친 메모는 정중한 이메일로, 복잡한 고민은 명쾌한 엑셀 수식으로.
+            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed font-medium max-w-3xl mx-auto">
+                거친 메모는 정중한 이메일로, 복잡한 고민은 명쾌한 엑셀 수식으로.<br class="hidden md:block">
+                당신의 스마트한 여우 비서가 가장 세련된 정답을 실시간으로 제안합니다.
             </p>
-            <div class="flex justify-center">
-                <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all shadow-xl">
-                    무료 체험하기 <i class="fa-solid fa-rocket ml-2"></i>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+                <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all hover:-translate-y-1 shadow-2xl shadow-orange-200 dark:shadow-none flex items-center justify-center">
+                    지금 무료로 시작하기 <i class="fa-solid fa-rocket ml-2"></i>
                 </a>
             </div>
-            <div class="mt-24 relative max-w-4xl mx-auto h-32 md:h-48 animate-float">
-                <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-3xl rounded-full"></div>
-                <div class="relative flex justify-center items-center gap-8 opacity-50">
-                    <i class="fa-solid fa-envelope-open-text text-6xl text-orange-400"></i>
-                    <i class="fa-solid fa-wand-magic-sparkles text-8xl text-orange-500"></i>
-                    <i class="fa-solid fa-table text-6xl text-orange-400"></i>
+
+            <!-- 목업 이미지 -->
+            <div class="relative max-w-5xl mx-auto animate-float">
+                <div class="absolute -inset-4 bg-gradient-to-r from-orange-500 to-yellow-400 opacity-20 blur-2xl rounded-[2rem]"></div>
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80" alt="Dashboard Mockup" class="relative rounded-2xl shadow-2xl border border-white/20 dark:border-slate-800">
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 상세 기능 섹션 -->
+    <section id="features" class="py-24 bg-white dark:bg-slate-900 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h2 class="text-base font-bold text-primary tracking-widest uppercase mb-3">Professional Tools</h2>
+                <h3 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white">똑똑한 여우의 5가지 필살기</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 기능 1 -->
+                <div class="p-8 rounded-3xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-primary rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">비즈니스 이메일</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">상대방의 기분은 상하지 않게, 하지만 할 말은 다 하는 마법의 필터링. '분노조절 이메일'이 당신의 사회생활을 지켜드립니다.</p>
+                </div>
+                <!-- 기능 2 -->
+                <div class="p-8 rounded-3xl bg-green-50/50 dark:bg-slate-800 border border-green-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-green-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-green-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-table"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">엑셀 수식 / 매크로</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">"이거랑 이거 합쳐서 보여줘"라고 말만 하세요. 복잡한 VLOOKUP부터 자동화 매크로까지 즉시 복사 가능한 코드로 짜드립니다.</p>
+                </div>
+                <!-- 기능 3 -->
+                <div class="p-8 rounded-3xl bg-blue-50/50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">개발 / SQL / 정규식</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">구글링에 1시간 쓰지 마세요. 시니어 개발자가 옆에서 알려주듯 SQL 쿼리와 머리 아픈 정규표현식을 한 번에 해결해 드립니다.</p>
+                </div>
+                <!-- 기능 4 -->
+                <div class="p-8 rounded-3xl bg-pink-50/50 dark:bg-slate-800 border border-pink-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-pink-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-hashtag"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">마케팅 / SNS 카피</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">조회수를 부르는 인스타그램 해시태그와 클릭을 부르는 광고 카피라이팅. 당신의 제품에 강력한 매력을 불어넣으세요.</p>
+                </div>
+                <!-- 기능 5 -->
+                <div class="p-8 rounded-3xl bg-purple-50/50 dark:bg-slate-800 border border-purple-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-700 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4 dark:text-white">인간관계 (거절/사과)</h4>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">어려운 부탁을 거절해야 할 때, 진심 어린 사과가 필요할 때. 감정 소모는 줄이고 관계는 지키는 최적의 문장을 찾아드립니다.</p>
+                </div>
+                <!-- 커밍순 -->
+                <div class="p-8 rounded-3xl bg-slate-100/50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                    <p class="text-slate-400 font-bold mb-2 italic">Coming Soon</p>
+                    <h4 class="text-xl font-bold dark:text-slate-300">더 많은 도구들이<br>준비 중입니다.</h4>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer 생략 (기존 구조 유지) -->
-    <script src="app.js"></script>
+    <!-- 3. 사용 방법 (How it works) -->
+    <section id="how-it-works" class="py-24 bg-orange-50/50 dark:bg-slate-950">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black dark:text-white">사용법은 단 3단계</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-12 relative">
+                <!-- 연결선 (데스크탑) -->
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-orange-200 dark:bg-slate-800 -z-10"></div>
+                
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">1</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">상황 선택</h4>
+                    <p class="text-slate-600 dark:text-slate-400">이메일, 엑셀 등 필요한 탭을 고르세요.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">2</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">키워드 입력</h4>
+                    <p class="text-slate-600 dark:text-slate-400">핵심 내용만 짧게 입력하세요.</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">3</div>
+                    <h4 class="text-xl font-bold mb-3 dark:text-white">무한 복사</h4>
+                    <p class="text-slate-600 dark:text-slate-400">완성된 텍스트를 바로 사용하세요!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 리뷰 섹션 -->
+    <section id="reviews" class="py-24 bg-white dark:bg-slate-900">
+        <div class="max-w-6xl mx-auto px-4">
+            <h3 class="text-3xl md:text-5xl font-black text-center mb-16 dark:text-white">실제 사용자들의 찐 후기</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"타 부서랑 일정 조율할 때 감정 소모가 너무 심했는데, 채티폭스 쓰고 나서 업무가 너무 평온해졌어요. 진짜 최고입니다!"</p>
+                    <p class="text-sm font-bold text-slate-500">- 마케팅팀 박과장님</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"엑셀 수식 짤 때마다 구글링하느라 시간 다 보냈는데, 말로 설명하면 바로 알려주니까 칼퇴가 가능해졌어요."</p>
+                    <p class="text-sm font-bold text-slate-500">- 스타트업 운영팀 김OO님</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-4">"중고거래 빌런들 만날 때마다 스트레스였는데, 단호한 거절문 덕분에 멘탈 지켰습니다. 판매글도 너무 잘 써줘요."</p>
+                    <p class="text-sm font-bold text-slate-500">- 당근마켓 헤비유저 이학생</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. FAQ 섹션 -->
+    <section id="faq" class="py-24 bg-orange-50/30 dark:bg-slate-950">
+        <div class="max-w-3xl mx-auto px-4">
+            <h3 class="text-3xl font-black text-center mb-12 dark:text-white">자주 묻는 질문</h3>
+            <div class="space-y-4">
+                <details class="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-orange-100 dark:border-slate-800 shadow-sm transition-all" open>
+                    <summary class="list-none flex justify-between items-center font-bold text-lg cursor-pointer dark:text-white">
+                        정말 무료인가요?
+                        <span class="transition-transform group-open:rotate-180 text-primary"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">네, 채티폭스의 모든 핵심 기능은 회원가입 없이 누구나 무료로 이용하실 수 있습니다.</p>
+                </details>
+                <details class="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-orange-100 dark:border-slate-800 shadow-sm transition-all">
+                    <summary class="list-none flex justify-between items-center font-bold text-lg cursor-pointer dark:text-white">
+                        제가 입력한 정보가 저장되나요?
+                        <span class="transition-transform group-open:rotate-180 text-primary"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">사용자가 생성한 텍스트 기록은 오직 사용자의 브라우저(LocalStorage)에만 임시 저장되며, 서버에는 어떠한 개인정보도 저장되지 않으니 안심하세요.</p>
+                </details>
+                <details class="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-orange-100 dark:border-slate-800 shadow-sm transition-all">
+                    <summary class="list-none flex justify-between items-center font-bold text-lg cursor-pointer dark:text-white">
+                        이메일 외에 다른 용도로도 가능한가요?
+                        <span class="transition-transform group-open:rotate-180 text-primary"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <p class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">네! 엑셀 수식 해독, 코딩 보조, SNS 해시태그 생성, 사과문 작성 등 다양한 일상 및 업무 상황에 맞춰 사용 가능합니다.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. 최종 CTA -->
+    <section class="py-24 bg-primary relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl md:text-5xl font-black text-white mb-8 leading-tight">글쓰기 고민은 채티폭스에게 맡기고,<br>당신은 더 가치 있는 일에 집중하세요.</h2>
+            <a href="app.html" class="inline-block bg-white text-primary font-bold text-2xl px-12 py-6 rounded-full shadow-2xl hover:scale-105 transition-all">
+                지금 무료 체험하기 <i class="fa-solid fa-rocket ml-2"></i>
+            </a>
+            <p class="text-orange-100 mt-8 font-medium">별도의 카드 등록이나 가입이 필요 없습니다.</p>
+        </div>
+    </section>
+
+    <!-- 7. 푸터 -->
+    <footer class="bg-slate-900 dark:bg-slate-950 py-16 border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 text-center md:text-left">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div>
+                    <div class="flex items-center justify-center md:justify-start mb-4">
+                        <svg width="32" height="32" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                            <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
+                            <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
+                            <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
+                            <circle cx="28" cy="65" r="3" fill="#4A3022"/>
+                            <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                        <span class="text-xl font-bold text-white">채티폭스 (ChattyFox)</span>
+                    </div>
+                    <p class="text-slate-500 text-sm">스마트한 직장인과 일반인을 위한 센스 있는 AI 텍스트 비서 서비스</p>
+                </div>
+                <div class="flex space-x-6 text-slate-400 text-sm">
+                    <a href="#" class="hover:text-white transition-colors">이용약관</a>
+                    <a href="#" class="hover:text-white transition-colors">개인정보처리방침</a>
+                    <a href="mailto:support@chattyfox.ai" class="hover:text-white transition-colors">문의하기</a>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-slate-800 text-center text-slate-600 text-xs">
+                © 2026 ChattyFox. All rights reserved. Powered by Google Gemini.
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
