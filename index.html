@@ -11,7 +11,6 @@
             darkMode: 'class', 
             theme: {
                 extend: {
-                    // ChattyFox 브랜드 테마 컬러 (Orange 500)
                     colors: { primary: '#f97316', secondary: '#fbbf24' }
                 }
             }
@@ -32,11 +31,10 @@
         }
         .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
 
-        /* 커스텀 마크다운 렌더링 + 다크모드 대응 */
         .result-markdown { line-height: 1.7; word-break: keep-all; }
         .result-markdown p { margin-bottom: 0.75rem; }
         .result-markdown h1, .result-markdown h2, .result-markdown h3 { 
-            font-size: 1.125rem; font-weight: 800; color: #c2410c; /* 오렌지 진하게 */
+            font-size: 1.125rem; font-weight: 800; color: #c2410c;
             margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.25rem; 
         }
         .dark .result-markdown h1, .dark .result-markdown h2, .dark .result-markdown h3 {
@@ -57,20 +55,17 @@
 </head>
 <body class="bg-orange-50 text-gray-800 dark:bg-slate-900 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
 
-    <!-- 상단 플로팅 컨트롤 바 (언어 토글, 다크모드, 히스토리) -->
+    <!-- 상단 플로팅 컨트롤 바 -->
     <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
-        <!-- 언어 토글 -->
         <div class="flex bg-white dark:bg-slate-800 rounded-full shadow border border-gray-200 dark:border-slate-700 p-1">
-            <button onclick="location.href='index.html'" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors">KO</button>
-            <button onclick="location.href='index.html?lang=en'" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors">EN</button>
+            <button onclick="location.href='index.html'" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">KO</button>
+            <button onclick="location.href='index.html?lang=en'" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">EN</button>
         </div>
-        <!-- 다크모드 토글 버튼 -->
         <button id="darkModeToggle" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-yellow-400 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
             <i class="fa-solid fa-moon dark:hidden"></i>
             <i class="fa-solid fa-sun hidden dark:block"></i>
         </button>
-        <!-- 히스토리 열기 버튼 -->
-        <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="최근 기록 보기">
+        <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="History">
             <i class="fa-solid fa-clock-rotate-left"></i>
         </button>
     </div>
@@ -78,26 +73,23 @@
     <!-- 우측 슬라이드 오프캔버스 (히스토리) -->
     <div id="historySidebar" class="fixed top-0 right-0 w-80 h-full bg-white dark:bg-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200 dark:border-slate-700 flex flex-col">
         <div class="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-900">
-            <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-slate-200"><i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록</h2>
+            <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-slate-200"><i class="fa-solid fa-history mr-2 text-primary"></i>History</h2>
             <button id="closeHistoryBtn" class="text-gray-500 hover:text-red-500 dark:text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="historyList" class="p-4 flex-1 overflow-y-auto space-y-3">
-            <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">최근 생성된 텍스트가 없습니다.</p>
+            <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">Empty</p>
         </div>
     </div>
 
     <!-- 메인 앱 컨테이너 -->
-    <div class="bg-white dark:bg-slate-800 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-orange-100 dark:border-slate-700">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-gray-200 dark:border-slate-700">
         
-        <!-- 헤더 (브랜드 컬러 반영) -->
-        <header class="bg-orange-500 dark:bg-orange-600 text-white p-6 text-center transition-colors relative overflow-hidden">
-            <!-- 배경 패턴 -->
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 2px, transparent 2px); background-size: 16px 16px;"></div>
-            
-            <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10" onclick="location.href='landing.html'">
-                <!-- 동적으로 언어팩에서 아이콘과 타이틀이 교체됩니다 -->
+        <!-- 헤더 (화이트 & 다크모드 차콜 적용) -->
+        <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 text-center transition-colors relative overflow-hidden">
+            <h1 id="appLogoTitle" class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10" onclick="location.href='landing.html'">
+                <!-- JS에서 언어에 맞게 삽입됨 (ChattyFox) -->
             </h1>
-            <p id="appSubtitle" class="text-orange-100 font-medium text-sm relative z-10">빈칸만 채우면 일잘러의 텍스트가 완성됩니다.</p>
+            <p id="appSubtitle" class="text-slate-500 dark:text-slate-400 font-medium text-sm relative z-10"></p>
         </header>
 
         <main class="p-6">
@@ -113,43 +105,37 @@
             <form id="aiForm" class="space-y-5">
                 <div>
                     <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-                    <input type="text" id="input1" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white" placeholder="">
+                    <input type="text" id="input1" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white">
                 </div>
                 <div>
                     <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-                    <textarea id="input2" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition resize-none bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white" placeholder=""></textarea>
+                    <textarea id="input2" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition resize-none bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white"></textarea>
                 </div>
                 <div id="input3Container">
                     <label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full mt-4 bg-gray-800 dark:bg-orange-500 hover:bg-gray-900 dark:hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center text-lg transform hover:-translate-y-1">
-                    <i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ 3초 만에 텍스트 뽑기
+                    <!-- JS에서 교체 -->
                 </button>
             </form>
 
             <!-- 결과창 영역 -->
             <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t dark:border-slate-700 pt-6">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 id="resultTitle" class="text-sm font-bold text-primary"><i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 수정 가능)</h3>
+                    <h3 id="resultTitle" class="text-sm font-bold text-primary"></h3>
                 </div>
                 
                 <div class="relative group">
-                    <!-- 로딩 스피너 (결과창 오버레이) -->
                     <div id="resultSpinner" class="hidden absolute inset-0 flex justify-center items-center bg-white/80 dark:bg-slate-700/80 rounded-xl z-10 transition-opacity">
                         <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 dark:border-slate-600 border-t-primary dark:border-t-primary"></div>
                     </div>
-                    <!-- 에디터 기능을 위한 contenteditable 영역 -->
-                    <div id="resultContent" contenteditable="true" 
-                         class="bg-white dark:bg-slate-700 p-6 rounded-xl border-2 border-orange-200 dark:border-slate-500 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
+                    <div id="resultContent" contenteditable="true" class="bg-white dark:bg-slate-700 p-6 rounded-xl border-2 border-orange-200 dark:border-slate-500 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-primary transition-colors cursor-text min-h-[150px]">
                     </div>
                 </div>
                 
-                <!-- 하단 액션 버튼 그룹 -->
                 <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <button type="button" id="copyBtn" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition shadow flex items-center justify-center">
-                        <i class="fa-regular fa-copy mr-2"></i> 복사하기
-                    </button>
+                    <button type="button" id="copyBtn" class="flex-1 bg-primary hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition shadow flex items-center justify-center"></button>
                     <div class="flex gap-2 w-full sm:w-auto">
                         <button type="button" id="btnLike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-700 hover:bg-green-100 dark:hover:bg-green-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-600" title="좋아요">👍</button>
                         <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-700 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-600" title="아쉬워요">👎</button>
@@ -157,32 +143,14 @@
                 </div>
             </div>
             
-            <!-- 토스트 알림 -->
             <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-slate-100 text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
                 <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 mr-2 text-lg"></i> 
-                <span id="toastMsg" class="font-medium">복사 완료! Ctrl+V로 붙여넣으세요.</span>
+                <span id="toastMsg" class="font-medium"></span>
             </div>
 
         </main>
     </div>
 
     <script src="app.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const lang = urlParams.get('lang');
-            const btnKo = document.getElementById('btn-ko');
-            const btnEn = document.getElementById('btn-en');
-
-            if (lang === 'en') {
-                btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
-                btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
-                const headerLogo = document.querySelector('header h1');
-                if(headerLogo) {
-                    headerLogo.setAttribute('onclick', "location.href='landing_en.html'");
-                }
-            }
-        });
-    </script>
 </body>
 </html>

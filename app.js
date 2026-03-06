@@ -1,17 +1,17 @@
-// --- 1. 다국어 언어 팩 (채티폭스 리브랜딩 반영) ---
-const LANG_PACKAGE = {
+// --- 1. 다국어 완벽 번역 객체 (translations) ---
+const translations = {
     ko: {
         ui: {
-            title: '<img src="logo_ko.svg" class="h-8 w-auto inline-block mr-2 drop-shadow-md" alt="ChattyFox Logo">채티폭스',
+            logoTitle: '<img src="logo_ko.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
             subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
+            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
+            historyEmpty: '최근 생성된 텍스트가 없습니다.',
             submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ 3초 만에 텍스트 뽑기',
-            loadingText: '상황에 맞는 최적의 단어를 고르고 있습니다...',
             resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 직접 수정 가능)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             alertError: '채티폭스 에러: ',
-            alertServer: '서버 응답이 없습니다. 서버가 켜져 있는지 확인해 주세요.',
             feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
@@ -73,15 +73,16 @@ const LANG_PACKAGE = {
     },
     en: {
         ui: {
-            title: '<img src="logo_en.svg" class="h-8 w-auto inline-block mr-2 drop-shadow-md" alt="ChattyFox Logo">ChattyFox',
+            logoTitle: '<img src="logo_en.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
             subtitle: 'Let the smart fox handle your professional writing in seconds.',
+            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>Recent History',
+            historyEmpty: 'No recent generations found.',
             submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ Generate in 3s',
             resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>Result (Click to Edit)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> Copy to Clipboard',
             toastMsg: 'Copied! Ready to paste.',
             alertEmpty: 'Please fill all fields.',
             alertError: 'ChattyFox Error: ',
-            alertServer: 'Server not responding. Please check your connection.',
             feedbackThanks: 'Feedback received. Thanks! 🦊'
         },
         appData: [
@@ -145,9 +146,9 @@ const LANG_PACKAGE = {
 
 // --- 2. 전역 상태 변수 ---
 let currentLang = 'ko'; 
-let appData = LANG_PACKAGE[currentLang].appData;
-let currentCategory = appData[0];
-let currentFeature = currentCategory.subFeatures[0];
+// 초기화 시엔 빈 객체로 두고 updateLanguageUI 함수를 통해 매핑합니다.
+let currentCategoryIndex = 0;
+let currentFeatureIndex = 0;
 
 // 드래그 상태
 let isDragging = false;
@@ -168,8 +169,8 @@ const input3Container = document.getElementById('input3Container');
 
 // 로딩 스피너 및 결과창 DOM
 const resultArea = document.getElementById('resultArea');
-const resultSpinner = document.getElementById('resultSpinner'); // 오버레이 스피너
-const resultContent = document.getElementById('resultContent'); // contenteditable div
+const resultSpinner = document.getElementById('resultSpinner');
+const resultContent = document.getElementById('resultContent'); 
 const copyBtn = document.getElementById('copyBtn');
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMsg');
@@ -181,6 +182,7 @@ const closeHistoryBtn = document.getElementById('closeHistoryBtn');
 const historySidebar = document.getElementById('historySidebar');
 const historyList = document.getElementById('historyList');
 const historyEmptyMsg = document.getElementById('historyEmptyMsg');
+const historyTitle = document.getElementById('historyTitle');
 
 // 피드백 DOM
 const btnLike = document.getElementById('btnLike');
@@ -199,95 +201,47 @@ function initDarkMode() {
     });
 }
 
-// --- 5. 히스토리 로직 (로컬 스토리지 최대 10개) ---
-function getHistory() {
-    const history = localStorage.getItem('quickfix_history');
-    return history ? JSON.parse(history) : [];
-}
-
-function saveHistory(text, featureTitle) {
-    let history = getHistory();
-    const newItem = {
-        id: Date.now(),
-        title: featureTitle,
-        text: text,
-        date: new Date().toLocaleString(currentLang === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-    };
-    history.unshift(newItem); // 배열 맨 앞에 추가
-    if (history.length > 10) history.pop(); // 10개 초과 시 마지막 삭제
-    localStorage.setItem('quickfix_history', JSON.stringify(history));
-    renderHistory();
-}
-
-function renderHistory() {
-    const history = getHistory();
-    historyList.innerHTML = '';
+// --- 5. 완벽한 다국어 동적 UI 업데이트 로직 ---
+function updateLanguageUI(lang) {
+    currentLang = lang;
+    const t = translations[lang];
     
-    if (history.length === 0) {
-        historyEmptyMsg.style.display = 'block';
-        return;
+    // 고정 UI 텍스트 갱신
+    document.getElementById('appLogoTitle').innerHTML = t.ui.logoTitle;
+    document.getElementById('appSubtitle').textContent = t.ui.subtitle;
+    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn;
+    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle;
+    document.getElementById('copyBtn').innerHTML = t.ui.copyBtn;
+    document.getElementById('toastMsg').textContent = t.ui.toastMsg;
+    historyTitle.innerHTML = t.ui.historyTitle;
+    historyEmptyMsg.textContent = t.ui.historyEmpty;
+
+    // 언어 버튼 스타일 활성화 상태
+    const btnKo = document.getElementById('btn-ko');
+    const btnEn = document.getElementById('btn-en');
+    if (lang === 'en') {
+        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
+        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
+    } else {
+        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
+        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
     }
-    historyEmptyMsg.style.display = 'none';
 
-    history.forEach(item => {
-        const div = document.createElement('div');
-        // 오렌지 테마 적용
-        div.className = 'p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-600 transition-colors';
-        div.innerHTML = `
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-bold text-primary">${item.title}</span>
-                <span class="text-[10px] text-gray-400">${item.date}</span>
-            </div>
-            <p class="text-xs text-gray-600 dark:text-slate-300 truncate">${item.text.replace(/[#*`]/g, '')}</p>
-        `;
-        div.addEventListener('click', () => {
-            historySidebar.classList.add('translate-x-full');
-            resultContent.innerHTML = marked.parse(item.text);
-            resultArea.classList.remove('hidden');
-            resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-        historyList.appendChild(div);
-    });
+    // 탭 및 폼 다시 그리기
+    renderMainTabs();
+    renderSubFeatures();
+    updateFormFields();
+    renderHistory(); // 히스토리 날짜 포맷 변경을 위해 재렌더링
 }
 
-openHistoryBtn.addEventListener('click', () => {
-    renderHistory();
-    historySidebar.classList.remove('translate-x-full');
-});
-closeHistoryBtn.addEventListener('click', () => {
-    historySidebar.classList.add('translate-x-full');
-});
-
-
-// --- 6. 초기 언어 셋팅 ---
-function initLanguage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const langParam = urlParams.get('lang');
-    currentLang = (langParam === 'en') ? 'en' : 'ko';
-
-    appData = LANG_PACKAGE[currentLang].appData;
-    const uiText = LANG_PACKAGE[currentLang].ui;
-
-    const titleEl = document.querySelector('header h1');
-    const subtitleEl = document.getElementById('appSubtitle');
-    const submitBtnEl = document.getElementById('submitBtn');
-    const resultTitleEl = document.getElementById('resultTitle');
-    
-    if (titleEl) titleEl.innerHTML = uiText.title;
-    if (subtitleEl) subtitleEl.textContent = uiText.subtitle;
-    if (submitBtnEl) submitBtnEl.innerHTML = uiText.submitBtn;
-    if (resultTitleEl) resultTitleEl.innerHTML = uiText.resultTitle;
-    if (copyBtn) copyBtn.innerHTML = uiText.copyBtn;
-    if (toastMsg) toastMsg.textContent = uiText.toastMsg;
-}
-
-
-// --- 7. 화면 그리기 (렌더링 - 오렌지 테마 반영) ---
+// --- 6. 화면 그리기 (렌더링) ---
 function renderMainTabs() {
     mainTabsContainer.innerHTML = ''; 
-    appData.forEach(category => {
+    const currentAppData = translations[currentLang].appData;
+    
+    currentAppData.forEach((category, index) => {
         const btn = document.createElement('button');
-        const isSelected = currentCategory.categoryId === category.categoryId;
+        const isSelected = currentCategoryIndex === index;
         btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
             isSelected 
             ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200 border-b-2 border-primary' 
@@ -296,8 +250,8 @@ function renderMainTabs() {
         btn.textContent = category.categoryName;
         btn.addEventListener('click', (e) => {
             if (hasDragged) { e.preventDefault(); e.stopPropagation(); return; }
-            currentCategory = category;
-            currentFeature = category.subFeatures[0]; 
+            currentCategoryIndex = index;
+            currentFeatureIndex = 0; 
             renderMainTabs(); renderSubFeatures(); updateFormFields(); 
         });
         mainTabsContainer.appendChild(btn);
@@ -325,10 +279,13 @@ mainTabsContainer.addEventListener('mousemove', (e) => {
 
 function renderSubFeatures() {
     subFeaturesContainer.innerHTML = ''; 
-    currentCategory.subFeatures.forEach(feature => {
+    const currentAppData = translations[currentLang].appData;
+    const features = currentAppData[currentCategoryIndex].subFeatures;
+
+    features.forEach((feature, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        const isSelected = currentFeature.id === feature.id;
+        const isSelected = currentFeatureIndex === index;
         
         btn.className = `p-4 text-center rounded-xl border-2 transition-all duration-200 group flex flex-col items-center justify-center ${
             isSelected 
@@ -342,7 +299,7 @@ function renderSubFeatures() {
             <span class="text-xs text-gray-500 dark:text-slate-400 break-keep">${feature.desc}</span>
         `;
         btn.addEventListener('click', () => {
-            currentFeature = feature;
+            currentFeatureIndex = index;
             renderSubFeatures(); updateFormFields();  
         });
         subFeaturesContainer.appendChild(btn);
@@ -350,28 +307,31 @@ function renderSubFeatures() {
 }
 
 function updateFormFields() {
-    input1Label.textContent = currentFeature.input1.label;
-    input1.placeholder = currentFeature.input1.placeholder;
+    const currentAppData = translations[currentLang].appData;
+    const feature = currentAppData[currentCategoryIndex].subFeatures[currentFeatureIndex];
+
+    input1Label.textContent = feature.input1.label;
+    input1.placeholder = feature.input1.placeholder;
     input1.value = '';
 
-    input2Label.textContent = currentFeature.input2.label;
-    input2.placeholder = currentFeature.input2.placeholder;
+    input2Label.textContent = feature.input2.label;
+    input2.placeholder = feature.input2.placeholder;
     input2.value = '';
 
     input3Container.innerHTML = '';
     const label = document.createElement('label');
     label.id = 'input3Label';
     label.className = 'block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1';
-    label.textContent = currentFeature.input3.label;
+    label.textContent = feature.input3.label;
     input3Container.appendChild(label);
 
     const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white';
 
-    if (currentFeature.input3.type === 'select') {
+    if (feature.input3.type === 'select') {
         const select = document.createElement('select');
         select.id = 'input3'; select.required = true;
         select.className = commonClasses + ' cursor-pointer';
-        currentFeature.input3.options.forEach(opt => {
+        feature.input3.options.forEach(opt => {
             const option = document.createElement('option');
             option.value = opt.value; option.textContent = opt.text;
             select.appendChild(option);
@@ -381,16 +341,77 @@ function updateFormFields() {
         const input = document.createElement('input');
         input.type = 'text'; input.id = 'input3'; input.required = true;
         input.className = commonClasses;
-        input.placeholder = currentFeature.input3.placeholder;
+        input.placeholder = feature.input3.placeholder;
         input3Container.appendChild(input);
     }
 }
 
 
-// --- 8. 서버 통신 (단일 응답 방식 롤백 및 스피너 로직) ---
+// --- 7. 히스토리 로컬 스토리지 ---
+function getHistory() {
+    const history = localStorage.getItem('quickfix_history');
+    return history ? JSON.parse(history) : [];
+}
+
+function saveHistory(text, featureTitle) {
+    let history = getHistory();
+    const newItem = {
+        id: Date.now(),
+        title: featureTitle,
+        text: text,
+        date: new Date().toLocaleString(currentLang === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    };
+    history.unshift(newItem); 
+    if (history.length > 10) history.pop(); 
+    localStorage.setItem('quickfix_history', JSON.stringify(history));
+    renderHistory();
+}
+
+function renderHistory() {
+    const history = getHistory();
+    historyList.innerHTML = '';
+    
+    if (history.length === 0) {
+        historyEmptyMsg.style.display = 'block';
+        return;
+    }
+    historyEmptyMsg.style.display = 'none';
+
+    history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-600 transition-colors';
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold text-primary">${item.title}</span>
+                <span class="text-[10px] text-gray-400">${item.date}</span>
+            </div>
+            <p class="text-xs text-gray-600 dark:text-slate-300 truncate">${item.text.replace(/[#*`]/g, '')}</p>
+        `;
+        div.addEventListener('click', () => {
+            historySidebar.classList.add('translate-x-full');
+            resultContent.innerHTML = marked.parse(item.text);
+            resultArea.classList.remove('hidden');
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+        historyList.appendChild(div);
+    });
+}
+
+openHistoryBtn.addEventListener('click', () => {
+    renderHistory();
+    historySidebar.classList.remove('translate-x-full');
+});
+closeHistoryBtn.addEventListener('click', () => {
+    historySidebar.classList.add('translate-x-full');
+});
+
+
+// --- 8. 서버 통신 (JSON 단일 응답) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const uiText = LANG_PACKAGE[currentLang].ui;
+    const uiText = translations[currentLang].ui;
+    const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
+    
     const currentInput1 = document.getElementById('input1').value.trim();
     const currentInput2 = document.getElementById('input2').value.trim();
     const currentInput3 = document.getElementById('input3').value.trim();
@@ -411,19 +432,18 @@ aiForm.addEventListener('submit', async (e) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                subCategory: currentFeature.apiId,
+                subCategory: feature.apiId, // 백엔드 매핑용 고유 ID
                 input1: currentInput1, input2: currentInput2, input3: currentInput3,
                 lang: currentLang
             })
         });
 
         const data = await response.json();
-
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
         if (data.success) {
             resultContent.innerHTML = marked.parse(data.result);
-            saveHistory(data.result, currentFeature.title);
+            saveHistory(data.result, feature.title);
         } else {
             alert(uiText.alertError + data.message);
         }
@@ -453,19 +473,20 @@ copyBtn.addEventListener('click', async () => {
 async function sendFeedback(rating) {
     const text = resultContent.innerText;
     if(!text) return;
+    const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
     
     try {
         await fetch('http://localhost:3000/api/feedback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                subCategory: currentFeature.apiId,
+                subCategory: feature.apiId,
                 rating: rating,
                 outputText: text,
                 lang: currentLang
             })
         });
-        alert(LANG_PACKAGE[currentLang].ui.feedbackThanks);
+        alert(translations[currentLang].ui.feedbackThanks);
     } catch(e) {
         console.error('Feedback error:', e);
     }
@@ -477,23 +498,24 @@ btnDislike.addEventListener('click', () => sendFeedback('dislike'));
 // --- 10. 초기화 ---
 function handleUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang');
+    const targetLang = (langParam === 'en') ? 'en' : 'ko';
+    
     const tabParam = urlParams.get('tab');
     if (tabParam) {
-        const targetCategory = appData.find(cat => cat.categoryId === tabParam);
-        if (targetCategory) {
-            currentCategory = targetCategory;
-            currentFeature = targetCategory.subFeatures[0]; 
+        const appData = translations[targetLang].appData;
+        const catIdx = appData.findIndex(cat => cat.categoryId === tabParam);
+        if (catIdx !== -1) {
+            currentCategoryIndex = catIdx;
         }
     }
+    
+    updateLanguageUI(targetLang); // 다국어 및 전체 UI 렌더링 시작
 }
 
 function init() {
     initDarkMode();
-    initLanguage();
-    handleUrlParams();
-    renderMainTabs();
-    renderSubFeatures();
-    updateFormFields();
+    handleUrlParams(); // URL 파싱 후 updateLanguageUI 실행 -> 탭/서브/폼 렌더링 완료됨
 }
 
 init();
