@@ -13,7 +13,11 @@ const translations = {
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             alertError: '채티폭스 에러: ',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다. (서버 통신 실패)',
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
+            generating: '🦊 여우 비서가 생성 중입니다...',
+            err404: '모델을 찾을 수 없습니다. (v1 규격 확인 필요)',
+            err403: 'API 키 권한을 확인하세요. (금고 설정 오류)',
+            err429: '사용량이 초과되었습니다. 잠시 후 시도해 주세요.',
             feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
@@ -86,7 +90,11 @@ const translations = {
             toastMsg: 'Copied! Ready to paste.',
             alertEmpty: 'Please fill all fields.',
             alertError: 'ChattyFox Error: ',
-            fetchError: 'An error occurred while fetching data. (Server communication failed)',
+            fetchError: 'An error occurred while fetching data.',
+            generating: '🦊 Fox assistant is generating...',
+            err404: 'Model not found. (Check v1 specification)',
+            err403: 'Check API key permissions.',
+            err429: 'Usage limit exceeded. Please try again later.',
             feedbackThanks: 'Feedback received. Thanks! 🦊'
         },
         appData: [
@@ -170,7 +178,6 @@ const input2Label = document.getElementById('input2Label');
 const input2 = document.getElementById('input2');
 const input3Container = document.getElementById('input3Container');
 
-// 로딩 스피너 및 결과창 DOM
 const resultArea = document.getElementById('resultArea');
 const resultSpinner = document.getElementById('resultSpinner');
 const resultContent = document.getElementById('resultContent'); 
@@ -178,7 +185,6 @@ const copyBtn = document.getElementById('copyBtn');
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMsg');
 
-// 다크모드 및 히스토리 DOM
 const darkModeToggle = document.getElementById('darkModeToggle');
 const openHistoryBtn = document.getElementById('openHistoryBtn');
 const closeHistoryBtn = document.getElementById('closeHistoryBtn');
@@ -187,7 +193,6 @@ const historyList = document.getElementById('historyList');
 const historyEmptyMsg = document.getElementById('historyEmptyMsg');
 const historyTitle = document.getElementById('historyTitle');
 
-// 피드백 DOM
 const btnLike = document.getElementById('btnLike');
 const btnDislike = document.getElementById('btnDislike');
 
@@ -414,7 +419,7 @@ closeHistoryBtn.addEventListener('click', () => {
 });
 
 
-// --- [중요] Vercel 서버리스 함수 호출 (안전한 방식) ---
+// --- [최종 해결] API 호출 로직 (v1 규격 및 에러 상세화) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
@@ -428,21 +433,19 @@ aiForm.addEventListener('submit', async (e) => {
         alert(uiText.alertEmpty); return;
     }
 
+    // 결과 영역 보이기 및 "생성 중..." 상태 표시
     resultArea.classList.remove('hidden');
-    resultContent.innerHTML = ''; 
+    resultContent.innerHTML = `<div class="flex flex-col items-center justify-center py-4 text-orange-500 font-bold animate-pulse">
+        <i class="fa-solid fa-wand-magic-sparkles text-2xl mb-2"></i>
+        <span>${uiText.generating}</span>
+    </div>`; 
     if (resultSpinner) resultSpinner.classList.remove('hidden');
     
     aiForm.classList.add('opacity-50', 'pointer-events-none');
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     try {
-        // 더 이상 프론트엔드에 API 키나 프롬프트를 두지 않습니다.
-        // Vercel이 제공하는 안전한 서버리스 라우트('/api/generate')로 요청을 보냅니다.
-        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:3000/api/generate' 
-            : '/api/generate';
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -454,7 +457,12 @@ aiForm.addEventListener('submit', async (e) => {
             })
         });
 
+        // 규격에 따른 에러 메시지 상세화 (404, 403, 429)
         if (!response.ok) {
+            if (response.status === 404) throw new Error(uiText.err404);
+            if (response.status === 403) throw new Error(uiText.err403);
+            if (response.status === 429) throw new Error(uiText.err429);
+            
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP Status ${response.status}`);
         }
@@ -463,17 +471,25 @@ aiForm.addEventListener('submit', async (e) => {
 
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
-        if (data.success && data.result) {
-            resultContent.innerHTML = marked.parse(data.result);
-            saveHistory(data.result, feature.title);
+        // [응답 데이터 파싱 교정] data.candidates[0].content.parts[0].text 안전 참조
+        // 서버리스 함수가 원본 데이터를 반환하므로 여기서 최종 파싱합니다.
+        const generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text 
+                              || data?.result // 하위호환성 유지
+                              || '';
+
+        if (generatedText) {
+            resultContent.innerHTML = marked.parse(generatedText);
+            saveHistory(generatedText, feature.title);
         } else {
-            alert(uiText.alertError + (data.message || 'AI가 빈 답변을 반환했습니다.'));
+            throw new Error('AI가 답변을 생성하지 못했습니다. (빈 응답)');
         }
 
     } catch (error) {
         console.error('API Request Failed:', error);
         if (resultSpinner) resultSpinner.classList.add('hidden');
-        alert(uiText.fetchError + '\n(' + error.message + ')');
+        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border border-red-200 bg-red-50 rounded-lg">
+            <i class="fa-solid fa-circle-exclamation mr-2"></i>${error.message}
+        </div>`;
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
@@ -495,7 +511,6 @@ copyBtn.addEventListener('click', async () => {
 async function sendFeedback(rating) {
     const text = resultContent.innerText;
     if(!text) return;
-    
     console.log(`[피드백 기록] 평가: ${rating}, 내용: ${text.substring(0, 20)}...`);
     alert(translations[currentLang].ui.feedbackThanks);
 }
@@ -506,19 +521,15 @@ btnDislike.addEventListener('click', () => sendFeedback('dislike'));
 // --- 초기화 ---
 function init() {
     initDarkMode();
-    
-    // URL에서 파라미터 감지
     const urlParams = new URLSearchParams(window.location.search);
     const langParam = urlParams.get('lang');
     const targetLang = (langParam === 'en') ? 'en' : 'ko';
-    
     const tabParam = urlParams.get('tab');
     if (tabParam) {
         const appData = translations[targetLang].appData;
         const catIdx = appData.findIndex(cat => cat.categoryId === tabParam);
         if (catIdx !== -1) {
             currentCategoryIndex = catIdx;
-            
             const subParam = urlParams.get('sub');
             if(subParam) {
                 const subIdx = appData[catIdx].subFeatures.findIndex(sub => sub.id === subParam);
@@ -526,8 +537,6 @@ function init() {
             }
         }
     }
-    
-    // UI 및 다국어 렌더링 시작
     setLanguage(targetLang); 
 }
 

@@ -1,6 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+// Vercel Serverless Function (규격 수정 버전)
+// Endpoint: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}
 
-// AI 명령어 설정
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -51,7 +51,7 @@ const GLOBAL_RULES = {
   en: `\n\n[GLOBAL RULE]\n- Absolutely NO conversational fillers like "Sure, here is..." or "I hope this helps".\n- Output ONLY the final result.`
 };
 
-// Vercel Serverless Function
+// Vercel Serverless Function (Direct Proxy with v1)
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -62,28 +62,36 @@ module.exports = async (req, res) => {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
     
-    if (!apiKey) {
-      return res.status(500).json({ success: false, message: '서버에 API 키가 설정되지 않았습니다.' });
-    }
+    if (!apiKey) return res.status(403).json({ success: false, message: '서버에 API 키가 설정되지 않았습니다.' });
 
     const promptGenerator = SYSTEM_PROMPTS[lang][subCategory];
     const finalPrompt = promptGenerator(input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // [모델 이름 수정] 최신 모델 명칭인 gemini-1.5-flash 로 확실하게 지정
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    const result = await model.generateContent(finalPrompt);
-    const responseText = result.response.text();
+    // [규격 교정 1] v1 정식 버전 Endpoint 사용
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    res.status(200).json({ success: true, result: responseText });
+    // [규격 교정 2] 정확한 JSON 본문(Request Body) 형식 준수
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: finalPrompt }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+
+    // 구글 API 응답 코드를 그대로 전달하여 app.js에서 처리하도록 함
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    // [규격 교정 3] 원본 데이터 반환 (app.js에서 안전 참조)
+    res.status(200).json(data);
 
   } catch (error) {
-    console.error('[Gemini API Error]', error);
-    // 상세한 에러 메시지를 프론트엔드로 전달하여 원인 파악을 돕습니다.
-    res.status(500).json({ 
-      success: false, 
-      message: 'AI 생성 중 오류가 발생했습니다: ' + error.message 
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
