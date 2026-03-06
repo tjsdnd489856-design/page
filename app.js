@@ -1,62 +1,4 @@
-// --- [보안 경고: API 키 관리 주의] ---
-// 현재 코드는 백엔드 서버 없이 브라우저(프론트엔드)에서 직접 Google Gemini API를 호출합니다.
-// GitHub 등 공개된 장소에 이 파일이 올라가면 API 키가 유출될 위험이 있습니다!
-// 나중에 Vercel 등으로 정식 배포하실 때는 Vercel Serverless Function 등을 통해 환경변수로 숨기는 것을 권장합니다.
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE'; // 🚨 TODO: 여기에 발급받은 실제 API 키를 넣으세요! (테스트용으로만 사용)
-
-
-// --- 1. AI 프롬프트 (기존 백엔드 서버에서 프론트엔드로 이동) ---
-const SYSTEM_PROMPTS = {
-  ko: {
-    '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
-    '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].\n[예시] 입력: 주간보고/버그수정함/빠른해결 -> 출력: "## 주간 업무 보고\n- **버그 수정 완료 (빠른 이슈 해결)**"\n이제 조건에 맞춰 작성해.`,
-    '프로 사과문': (i1, i2, i3) => `너는 위기관리 전문가야. [사고:${i1}], [대안:${i2}], [대상:${i3}].\n[예시] 입력: 파일누락/재발송/외부고객 -> 출력: "메일 확인 중 첨부파일 누락을 발견하여 즉시 재발송해 드립니다. 번거롭게 해드려 대단히 죄송합니다."\n이제 조건에 맞춰 작성해.`,
-    '리포트 심폐소생': (i1, i2, i3) => `너는 논문 전문가야. [대상:${i1}], [초안:${i2}], [어조:${i3}].\n[예시] 입력: 교수님/서론 대충/학술적 -> 출력: "본 연구의 서론에서는 해당 주제가 지니는 학술적 의의를 탐구하고자 합니다."\n이제 조건에 맞춰 작성해.`,
-    '발표 대본 변환': (i1, i2, i3) => `너는 프레젠테이션 코치야. [타겟/시간:${i1}], [자료:${i2}], [어조:${i3}].\n[예시] 입력: 5분 대학생/AI소개/친근하게 -> 출력: "여러분, 요즘 AI가 대세죠? 오늘은 AI에 대해 쉽고 재밌게 알아볼게요."\n이제 조건에 맞춰 작성해.`,
-    '자소서 영혼 주입기': (i1, i2, i3) => `너는 취업 컨설턴트야. [직무:${i1}], [경험:${i2}], [어조:${i3}].\n[예시] 입력: 마케팅/카페알바/성과중심 -> 출력: "카페 아르바이트 당시, 고객 응대 프로세스를 개선하여 피크타임 회전율을 15% 높인 경험이 있습니다."\n이제 조건에 맞춰 작성해.`,
-    '철벽 방어 거절문': (i1, i2, i3) => `너는 커뮤니케이션 전문가야. [대상:${i1}], [사유:${i2}], [어조:${i3}].\n[예시] 입력: 친구/돈없음/단호하게 -> 출력: "정말 미안하지만 나도 여유가 없어서 빌려주기 어려워. 이해해 주길 바라."\n이제 조건에 맞춰 작성해.`,
-    '센스있는 인사/축하': (i1, i2, i3) => `너는 카피라이터야. [상황:${i1}], [내용:${i2}], [어조:${i3}].\n[예시] 입력: 동료결혼/참석못함/따뜻하게 -> 출력: "결혼 진심으로 축하해! 직접 참석하지 못해 아쉽지만, 누구보다 행복하길 응원할게."\n이제 조건에 맞춰 작성해.`,
-    '진심 어린 사과문': (i1, i2, i3) => `너는 심리상담사야. [대상:${i1}], [잘못:${i2}], [어조:${i3}].\n[예시] 입력: 애인/연락두절/진중하게 -> 출력: "미리 연락하지 못해 정말 미안해. 내 잘못을 깊이 반성하고 있어."\n이제 조건에 맞춰 작성해.`,
-    '당근 진상 퇴치기': (i1, i2, i3) => `너는 중고거래 고수야. [상황:${i1}], [팩트:${i2}], [어조:${i3}].\n[예시] 입력: 무리한네고/에눌불가/단호하게 -> 출력: "본문에 기재된 대로 네고는 불가합니다. 구매 의사가 없으시다면 거래를 취소하겠습니다."\n이제 조건에 맞춰 작성해.`,
-    '매력적인 판매글': (i1, i2, i3) => `너는 판매글 장인이야. [물건:${i1}], [특징:${i2}], [어조:${i3}].\n[예시] 입력: 아이패드/기스있음/신뢰감 -> 출력: "아이패드 판매합니다. 미세한 생활 기스가 있으나 기능과 배터리 성능에는 전혀 문제없는 A급 기기입니다."\n이제 조건에 맞춰 작성해.`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [별점:${i1}], [리뷰:${i2}], [어조:${i3}].\n[예시] 입력: 1점/배달늦음/정중하게 -> 출력: "고객님, 배달 지연으로 큰 불편을 드려 대단히 죄송합니다. 매장으로 연락주시면 신속히 조치해 드리겠습니다."\n이제 조건에 맞춰 작성해.`,
-    '함수 수식 뚝딱이': (i1, i2, i3) => `너는 데이터 분석가야. [상황:${i1}], [결과:${i2}], [프로그램:${i3}].\n[예시] 입력: A열이름/합계구하기/엑셀 -> 출력: "\`\`\`excel\n=SUM(A:A)\n\`\`\`\nA열의 모든 숫자를 합산하는 수식입니다."\n이제 조건에 맞춰 작성해.`,
-    '외계어 수식 해독기': (i1, i2, i3) => `너는 친절한 엑셀 강사야. [수식:${i1}], [질문:${i2}], [수준:${i3}].\n[예시] 입력: =VLOOKUP/무슨뜻?/초보자 -> 출력: "VLOOKUP은 책에서 원하는 단어를 찾는 것과 같아요! 원하는 값을 왼쪽에서 오른쪽으로 찾아줍니다."\n이제 조건에 맞춰 작성해.`,
-    '반복작업 매크로': (i1, i2, i3) => `너는 자동화 전문가야. [환경:${i1}], [작업:${i2}], [스타일:${i3}].\n[예시] 입력: VBA/시트복사/주석포함 -> 출력: "\`\`\`vba\n' 현재 활성화된 시트를 복사합니다\nActiveSheet.Copy\n\`\`\`"\n이제 조건에 맞춰 작성해.`,
-    'SQL 쿼리 짜기': (i1, i2, i3) => `너는 시니어 DB 관리자야. [테이블:${i1}], [원하는데이터:${i2}], [DBMS종류:${i3}].\n[예시] 입력: users/나이30이상/MySQL -> 출력: "\`\`\`sql\nSELECT * FROM users WHERE age >= 30;\n\`\`\`\n나이가 30 이상인 유저를 조회하는 쿼리입니다."\n이제 조건에 맞춰 작성해.`,
-    '정규식(Regex) 설명': (i1, i2, i3) => `너는 시니어 개발자야. [상황/패턴:${i1}], [요청사항:${i2}], [이해수준:${i3}].\n[예시] 입력: 이메일추출/정규식짜줘/초보자 -> 출력: "\`\`\`regex\n^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$\n\`\`\`\n@ 기호를 기준으로 이메일 형식이 맞는지 검사하는 패턴입니다."\n이제 조건에 맞춰 작성해.`,
-    '인스타그램 해시태그': (i1, i2, i3) => `너는 SNS 마케터야. [주제/사진설명:${i1}], [타겟고객:${i2}], [분위기:${i3}].\n[예시] 입력: 강남역카페/20대여성/감성 -> 출력: "#강남역카페 #강남디저트 #감성카페 #카페투어 #20대일상"\n이제 조건에 맞춰 작성해.`,
-    '광고 카피라이팅': (i1, i2, i3) => `너는 광고 카피라이터야. [제품/서비스:${i1}], [소구포인트:${i2}], [광고매체:${i3}].\n[예시] 입력: 무선청소기/흡입력/페이스북 -> 출력: "먼지 한 톨도 용납하지 않는 압도적 흡입력! 지금 바로 경험하세요 🧹✨"\n이제 조건에 맞춰 작성해.`
-  },
-  en: {
-    '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}].\n[Example] Input: Marketing/Late report/Firm -> Output: "Subject: Urgent: Report Status\nHi, please provide an update on the delayed report immediately."\nNow write.`,
-    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}].\n[Example] Input: Weekly Report/Bug fixed/Speed -> Output: "## Weekly Update\n- **Resolved bugs swiftly** ensuring no downtime."\nNow write.`,
-    '프로 사과문': (i1, i2, i3) => `Act as PR manager. [Issue:${i1}], [Solution:${i2}], [Audience:${i3}].\n[Example] Input: Missing attachment/Resend/Client -> Output: "I sincerely apologize for the missing file. Please find it attached here."\nNow write.`,
-    '리포트 심폐소생': (i1, i2, i3) => `Act as an academic tutor. [Audience:${i1}], [Draft:${i2}], [Tone:${i3}].\n[Example] Input: Professor/Messy intro/Academic -> Output: "This paper aims to explore the theoretical implications..."\nNow write.`,
-    '발표 대본 변환': (i1, i2, i3) => `Act as a speech coach. [Target:${i1}], [Slides:${i2}], [Tone:${i3}].\n[Example] Input: 5 mins/AI rules/Engaging -> Output: "Hey everyone! AI is everywhere today, let's dive right in!"\nNow write.`,
-    '자소서 영혼 주입기': (i1, i2, i3) => `Act as a tech recruiter. [Role:${i1}], [Exp:${i2}], [Tone:${i3}].\n[Example] Input: Marketing/Cafe job/Data-driven -> Output: "Boosted customer retention by 15% through optimized service at a busy cafe."\nNow write.`,
-    '철벽 방어 거절문': (i1, i2, i3) => `Act as an assertiveness coach. [Recipient:${i1}], [Reason:${i2}], [Tone:${i3}].\n[Example] Input: Friend/No money/Firm -> Output: "I can't lend you money right now as I'm on a strict budget. Thanks for understanding."\nNow write.`,
-    '센스있는 인사/축하': (i1, i2, i3) => `Act as a greeting expert. [Situation:${i1}], [Details:${i2}], [Tone:${i3}].\n[Example] Input: Wedding/Can't attend/Warm -> Output: "So happy for your wedding! Sorry I can't be there, wishing you the absolute best."\nNow write.`,
-    '진심 어린 사과문': (i1, i2, i3) => `Act as a counselor. [Recipient:${i1}], [Mistake:${i2}], [Tone:${i3}].\n[Example] Input: Partner/Missed call/Sincere -> Output: "I am truly sorry for missing your call and making you worry. I'll do better."\nNow write.`,
-    '당근 진상 퇴치기': (i1, i2, i3) => `Act as an expert seller. [Situation:${i1}], [Facts:${i2}], [Tone:${i3}].\n[Example] Input: Lowballer/Price is FIRM/Direct -> Output: "As stated, the price is FIRM. I cannot accept lower offers."\nNow write.`,
-    '매력적인 판매글': (i1, i2, i3) => `Act as a copywriter. [Item:${i1}], [Features:${i2}], [Tone:${i3}].\n[Example] Input: iPad/Minor scratch/Trustworthy -> Output: "Selling my iPad. Works perfectly, just one minor scratch. NWT condition otherwise."\nNow write.`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Rating:${i1}], [Review:${i2}], [Tone:${i3}].\n[Example] Input: 1 Star/Cold food/Professional -> Output: "We sincerely apologize for the cold food. Please contact us directly to resolve this."\nNow write.`,
-    '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}].\n[Example] Input: Col A/Sum/Excel -> Output: "\`\`\`excel\n=SUM(A:A)\n\`\`\`\nThis formula sums up all values in column A."\nNow write.`,
-    '외계어 수식 해독기': (i1, i2, i3) => `Act as an Excel Instructor. [Formula:${i1}], [Question:${i2}], [Level:${i3}].\n[Example] Input: =SUM/What is this?/Beginner -> Output: "It simply adds numbers together, just like a calculator!"\nNow write.`,
-    '반복작업 매크로': (i1, i2, i3) => `Act as an Automation Engineer. [Env:${i1}], [Task:${i2}], [Style:${i3}].\n[Example] Input: VBA/Copy sheet/With comments -> Output: "\`\`\`vba\n' Copies the active sheet\nActiveSheet.Copy\n\`\`\`"\nNow write.`,
-    'SQL 쿼리 짜기': (i1, i2, i3) => `Act as a Senior DBA. [Table:${i1}], [Data Needed:${i2}], [DBMS:${i3}].\n[Example] Input: users/age > 30/MySQL -> Output: "\`\`\`sql\nSELECT * FROM users WHERE age > 30;\n\`\`\`\nRetrieves users older than 30."\nNow write.`,
-    '정규식(Regex) 설명': (i1, i2, i3) => `Act as a Developer. [Pattern:${i1}], [Request:${i2}], [Level:${i3}].\n[Example] Input: email/give regex/beginner -> Output: "\`\`\`regex\n^\\S+@\\S+\\.\\S+$\n\`\`\`\nMatches basic email formats."\nNow write.`,
-    '인스타그램 해시태그': (i1, i2, i3) => `Act as a Social Media Manager. [Topic:${i1}], [Target:${i2}], [Vibe:${i3}].\n[Example] Input: Coffee shop/Gen Z/Aesthetic -> Output: "#CafeVibes #AestheticCafe #CoffeeLover #GenZ #Daily"\nNow write.`,
-    '광고 카피라이팅': (i1, i2, i3) => `Act as an Ad Copywriter. [Product:${i1}], [Hook:${i2}], [Platform:${i3}].\n[Example] Input: Vacuum/Strong suction/Facebook -> Output: "Say goodbye to dust! Experience unmatched suction power today. 🧹✨"\nNow write.`
-  }
-};
-
-const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론("네, 작성해 드릴게요", "다음은~" 등)을 절대 쓰지 마세요.\n- 바로 복사해서 사용할 수 있는 최종 결과물만 출력하세요.`,
-  en: `\n\n[GLOBAL RULE]\n- Absolutely NO conversational fillers like "Sure, here is..." or "I hope this helps".\n- Output ONLY the final result.`
-};
-
-// --- 2. 다국어 완벽 번역 객체 (translations) ---
+// --- 다국어 완벽 번역 객체 (translations) ---
 const translations = {
     ko: {
         ui: {
@@ -71,7 +13,7 @@ const translations = {
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             alertError: '채티폭스 에러: ',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다. API 키를 확인해주세요.',
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다. (서버 통신 실패)',
             feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
@@ -144,7 +86,7 @@ const translations = {
             toastMsg: 'Copied! Ready to paste.',
             alertEmpty: 'Please fill all fields.',
             alertError: 'ChattyFox Error: ',
-            fetchError: 'An error occurred while fetching data. Check your API key.',
+            fetchError: 'An error occurred while fetching data. (Server communication failed)',
             feedbackThanks: 'Feedback received. Thanks! 🦊'
         },
         appData: [
@@ -206,7 +148,7 @@ const translations = {
     }
 };
 
-// --- 3. 전역 상태 변수 ---
+// --- 전역 상태 변수 ---
 let currentLang = 'ko'; 
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
@@ -217,7 +159,7 @@ let hasDragged = false;
 let startX;
 let scrollLeft;
 
-// --- 4. DOM 요소 ---
+// --- DOM 요소 ---
 const mainTabsContainer = document.getElementById('mainTabs');
 const subFeaturesContainer = document.getElementById('subFeatures');
 const aiForm = document.getElementById('aiForm');
@@ -250,7 +192,7 @@ const btnLike = document.getElementById('btnLike');
 const btnDislike = document.getElementById('btnDislike');
 
 
-// --- 5. 다크모드 로직 ---
+// --- 다크모드 로직 ---
 function initDarkMode() {
     const isDark = localStorage.getItem('darkMode') === 'true';
     if (isDark) document.documentElement.classList.add('dark');
@@ -263,7 +205,7 @@ function initDarkMode() {
 }
 
 
-// --- 6. 완벽한 다국어 동적 UI 업데이트 로직 (setLanguage) ---
+// --- 다국어 동적 UI 업데이트 로직 ---
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
@@ -297,7 +239,7 @@ function setLanguage(lang) {
     renderHistory();
 }
 
-// --- 7. 화면 그리기 (렌더링) ---
+// --- 화면 그리기 (렌더링) ---
 function updateTabContent() {
     renderMainTabs();
     renderSubFeatures();
@@ -413,7 +355,7 @@ function updateFormFields() {
 }
 
 
-// --- 8. 히스토리 로컬 스토리지 ---
+// --- 히스토리 로컬 스토리지 ---
 function getHistory() {
     const history = localStorage.getItem('quickfix_history');
     return history ? JSON.parse(history) : [];
@@ -472,7 +414,7 @@ closeHistoryBtn.addEventListener('click', () => {
 });
 
 
-// --- 9. 구글 AI 직접 통신 (서버 의존성 제거 완료) ---
+// --- [중요] Vercel 서버리스 함수 호출 (안전한 방식) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
@@ -486,12 +428,6 @@ aiForm.addEventListener('submit', async (e) => {
         alert(uiText.alertEmpty); return;
     }
 
-    // 1. API 키 확인
-    if (GEMINI_API_KEY === 'YOUR_API_KEY_HERE') {
-        alert("app.js 파일 맨 위에 있는 GEMINI_API_KEY 변수에 실제 API 키를 입력해주세요!");
-        return;
-    }
-
     resultArea.classList.remove('hidden');
     resultContent.innerHTML = ''; 
     if (resultSpinner) resultSpinner.classList.remove('hidden');
@@ -500,47 +436,43 @@ aiForm.addEventListener('submit', async (e) => {
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     try {
-        // 2. 프롬프트(명령어) 조립 (기존 서버 로직을 프론트엔드로 가져옴)
-        const promptsForLang = SYSTEM_PROMPTS[currentLang];
-        const promptGenerator = promptsForLang[feature.apiId];
-        const finalPrompt = promptGenerator(currentInput1, currentInput2, currentInput3) + GLOBAL_RULES[currentLang];
+        // 더 이상 프론트엔드에 API 키나 프롬프트를 두지 않습니다.
+        // Vercel이 제공하는 안전한 서버리스 라우트('/api/generate')로 요청을 보냅니다.
+        // 만약 로컬(내 컴퓨터)에서 테스트 중이라면 로컬호스트 주소를 쓰고, 배포되면 자동으로 /api 경로를 찾습니다.
+        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:3000/api/generate' // (참고) 로컬 테스트 시에는 별도 설정이 필요할 수 있습니다.
+            : '/api/generate';
 
-        // 3. 구글 제미나이(1.5-flash) API로 직접 요청 발송
-        // 요리사(백엔드)를 거치지 않고 바로 구글 본사에 주문을 넣습니다.
-        const apiUrl = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${GEMINI_API_KEY}\`;
-        
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: finalPrompt }]
-                }]
+                subCategory: feature.apiId,
+                input1: currentInput1, 
+                input2: currentInput2, 
+                input3: currentInput3,
+                lang: currentLang
             })
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Gemini API Error:', errorData);
-            throw new Error(errorData.error?.message || \`HTTP Status \${response.status}\`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || \`HTTP Status \${response.status}\`);
         }
 
         const data = await response.json();
 
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
-        // 4. 구글이 보내준 응답 데이터 구조에 맞게 텍스트 추출
-        const generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-        if (generatedText) {
-            resultContent.innerHTML = marked.parse(generatedText);
-            saveHistory(generatedText, feature.title);
+        if (data.success && data.result) {
+            resultContent.innerHTML = marked.parse(data.result);
+            saveHistory(data.result, feature.title);
         } else {
-            alert(uiText.alertError + 'AI가 빈 답변을 반환했습니다.');
+            alert(uiText.alertError + (data.message || 'AI가 빈 답변을 반환했습니다.'));
         }
 
     } catch (error) {
-        console.error('Direct API Request Failed:', error);
+        console.error('API Request Failed:', error);
         if (resultSpinner) resultSpinner.classList.add('hidden');
         alert(uiText.fetchError + '\\n(' + error.message + ')');
     } finally {
@@ -549,7 +481,7 @@ aiForm.addEventListener('submit', async (e) => {
 });
 
 
-// --- 10. 편의 기능 (복사 및 피드백) ---
+// --- 편의 기능 (복사 및 피드백) ---
 copyBtn.addEventListener('click', async () => {
     try {
         const textToCopy = resultContent.innerText;
@@ -565,17 +497,14 @@ async function sendFeedback(rating) {
     const text = resultContent.innerText;
     if(!text) return;
     
-    // [참고] 백엔드 서버를 제거했으므로, 현재 피드백은 서버로 전송되지 않습니다.
-    // 사용자에게는 정상적으로 피드백이 들어갔다는 감사 인사만 출력합니다.
-    // 추후 데이터베이스(DB)나 서버리스 함수가 준비되면 이곳에 저장 로직을 추가하세요.
-    console.log(\`[피드백 임시 기록] 평가: \${rating}, 내용: \${text.substring(0, 20)}...\`);
+    console.log(\`[피드백 기록] 평가: \${rating}, 내용: \${text.substring(0, 20)}...\`);
     alert(translations[currentLang].ui.feedbackThanks);
 }
 btnLike.addEventListener('click', () => sendFeedback('like'));
 btnDislike.addEventListener('click', () => sendFeedback('dislike'));
 
 
-// --- 11. 초기화 ---
+// --- 초기화 ---
 function init() {
     initDarkMode();
     
