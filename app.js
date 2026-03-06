@@ -2,7 +2,7 @@
 const translations = {
     ko: {
         ui: {
-            logoTitle: '<img src="logo_ko.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
+            logoTitle: '<img src="logo_ko.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
             subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
             historyEmpty: '최근 생성된 텍스트가 없습니다.',
@@ -146,7 +146,6 @@ const translations = {
 
 // --- 2. 전역 상태 변수 ---
 let currentLang = 'ko'; 
-// 초기화 시엔 빈 객체로 두고 updateLanguageUI 함수를 통해 매핑합니다.
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
 
@@ -201,8 +200,9 @@ function initDarkMode() {
     });
 }
 
-// --- 5. 완벽한 다국어 동적 UI 업데이트 로직 ---
-function updateLanguageUI(lang) {
+
+// --- 5. 완벽한 다국어 동적 UI 업데이트 로직 (setLanguage) ---
+function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
     
@@ -216,25 +216,34 @@ function updateLanguageUI(lang) {
     historyTitle.innerHTML = t.ui.historyTitle;
     historyEmptyMsg.textContent = t.ui.historyEmpty;
 
-    // 언어 버튼 스타일 활성화 상태
+    // 언어 버튼 토글 스타일 갱신
     const btnKo = document.getElementById('btn-ko');
     const btnEn = document.getElementById('btn-en');
     if (lang === 'en') {
         btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
-        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
+        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors bg-transparent';
     } else {
         btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
-        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors';
+        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors bg-transparent';
     }
 
-    // 탭 및 폼 다시 그리기
-    renderMainTabs();
-    renderSubFeatures();
-    updateFormFields();
-    renderHistory(); // 히스토리 날짜 포맷 변경을 위해 재렌더링
+    // URL 파라미터 업데이트 (새로고침 방지)
+    const url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.history.replaceState({}, '', url);
+
+    // 언어가 바뀌면 화면의 탭과 폼을 현재 선택된 인덱스 기준으로 즉시 렌더링
+    updateTabContent();
+    renderHistory();
 }
 
 // --- 6. 화면 그리기 (렌더링) ---
+function updateTabContent() {
+    renderMainTabs();
+    renderSubFeatures();
+    updateFormFields();
+}
+
 function renderMainTabs() {
     mainTabsContainer.innerHTML = ''; 
     const currentAppData = translations[currentLang].appData;
@@ -242,17 +251,19 @@ function renderMainTabs() {
     currentAppData.forEach((category, index) => {
         const btn = document.createElement('button');
         const isSelected = currentCategoryIndex === index;
-        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
+        
+        // 탭 디자인: 선택 시 오렌지색 하단 바와 글자색 변경
+        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
             isSelected 
-            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200 border-b-2 border-primary' 
-            : 'bg-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700'
+            ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' 
+            : 'bg-transparent text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 border-b-2 border-transparent'
         }`;
         btn.textContent = category.categoryName;
         btn.addEventListener('click', (e) => {
             if (hasDragged) { e.preventDefault(); e.stopPropagation(); return; }
             currentCategoryIndex = index;
-            currentFeatureIndex = 0; 
-            renderMainTabs(); renderSubFeatures(); updateFormFields(); 
+            currentFeatureIndex = 0; // 카테고리 변경 시 첫 번째 서브기능으로 초기화
+            updateTabContent();
         });
         mainTabsContainer.appendChild(btn);
     });
@@ -270,8 +281,7 @@ mainTabsContainer.addEventListener('mouseup', () => { isDragging = false; mainTa
 mainTabsContainer.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
     e.preventDefault();
-    const x = e.pageX - mainTabsContainer.offsetLeft;
-    const walk = x - startX;
+    const walk = (e.pageX - mainTabsContainer.offsetLeft) - startX;
     if (Math.abs(walk) > 5) hasDragged = true; 
     mainTabsContainer.scrollLeft = scrollLeft - walk;
 });
@@ -289,18 +299,18 @@ function renderSubFeatures() {
         
         btn.className = `p-4 text-center rounded-xl border-2 transition-all duration-200 group flex flex-col items-center justify-center ${
             isSelected 
-            ? 'border-primary bg-orange-50 dark:bg-slate-700 shadow-md transform scale-[1.02]' 
+            ? 'border-orange-500 bg-orange-50 dark:bg-slate-700 shadow-md transform scale-[1.02]' 
             : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-orange-300 dark:hover:border-orange-400 hover:bg-gray-50 dark:hover:bg-slate-700'
         }`;
 
         btn.innerHTML = `
             <span class="text-3xl mb-2">${feature.icon}</span>
-            <strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1 group-hover:text-primary dark:group-hover:text-orange-400">${feature.title}</strong>
+            <strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1 group-hover:text-orange-500 dark:group-hover:text-orange-400">${feature.title}</strong>
             <span class="text-xs text-gray-500 dark:text-slate-400 break-keep">${feature.desc}</span>
         `;
         btn.addEventListener('click', () => {
             currentFeatureIndex = index;
-            renderSubFeatures(); updateFormFields();  
+            updateTabContent();
         });
         subFeaturesContainer.appendChild(btn);
     });
@@ -312,6 +322,7 @@ function updateFormFields() {
 
     input1Label.textContent = feature.input1.label;
     input1.placeholder = feature.input1.placeholder;
+    // 값을 보존하고 싶다면 아래 라인을 지우고, 비우고 싶다면 유지합니다 (여기선 기능 변경 시 비움)
     input1.value = '';
 
     input2Label.textContent = feature.input2.label;
@@ -432,7 +443,7 @@ aiForm.addEventListener('submit', async (e) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                subCategory: feature.apiId, // 백엔드 매핑용 고유 ID
+                subCategory: feature.apiId,
                 input1: currentInput1, input2: currentInput2, input3: currentInput3,
                 lang: currentLang
             })
@@ -496,7 +507,10 @@ btnDislike.addEventListener('click', () => sendFeedback('dislike'));
 
 
 // --- 10. 초기화 ---
-function handleUrlParams() {
+function init() {
+    initDarkMode();
+    
+    // URL에서 파라미터 감지
     const urlParams = new URLSearchParams(window.location.search);
     const langParam = urlParams.get('lang');
     const targetLang = (langParam === 'en') ? 'en' : 'ko';
@@ -507,15 +521,17 @@ function handleUrlParams() {
         const catIdx = appData.findIndex(cat => cat.categoryId === tabParam);
         if (catIdx !== -1) {
             currentCategoryIndex = catIdx;
+            
+            const subParam = urlParams.get('sub');
+            if(subParam) {
+                const subIdx = appData[catIdx].subFeatures.findIndex(sub => sub.id === subParam);
+                if(subIdx !== -1) currentFeatureIndex = subIdx;
+            }
         }
     }
     
-    updateLanguageUI(targetLang); // 다국어 및 전체 UI 렌더링 시작
-}
-
-function init() {
-    initDarkMode();
-    handleUrlParams(); // URL 파싱 후 updateLanguageUI 실행 -> 탭/서브/폼 렌더링 완료됨
+    // UI 및 다국어 렌더링 시작
+    setLanguage(targetLang); 
 }
 
 init();
