@@ -1,10 +1,7 @@
-// --- [중요] API 키 설정 ---
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE'; // 🚨 VSC에서 사장님의 실제 키로 교체하세요!
-
 // --- 1. AI 명령어 설정 (19가지 모든 기능 완벽 유지) ---
 const SYSTEM_PROMPTS = {
   ko: {
-    '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n조건에 맞춰 작성해.`,
+    '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
     '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].\n이제 조건에 맞춰 작성해.`,
     '프로 사과문': (i1, i2, i3) => `너는 위기관리 전문가야. [사고:${i1}], [대안:${i2}], [대상:${i3}].\n이제 조건에 맞춰 작성해.`,
     '리포트 심폐소생': (i1, i2, i3) => `너는 논문 전문가야. [대상:${i1}], [초안:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
@@ -26,51 +23,96 @@ const SYSTEM_PROMPTS = {
   },
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}]. Now write.`,
-    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`
+    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`,
+    '프로 사과문': (i1, i2, i3) => `Act as PR manager. [Issue:${i1}], [Solution:${i2}], [Audience:${i3}]. Now write.`,
+    '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}]. Now write.`,
+    '광고 카피라이팅': (i1, i2, i3) => `Act as an Ad Copywriter. [Product:${i1}], [Hook:${i2}], [Platform:${i3}]. Now write.`
   }
 };
 
 const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말 없이 결과물만 출력하세요.`,
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 결과물만 출력하세요.`,
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
-// --- 2. 다국어 번역 데이터 ---
+// --- 2. 다국어 번역 데이터 (19가지 기능 정보 포함) ---
 const translations = {
     ko: {
         ui: {
             docTitle: '🦊 채티폭스 - AI Workspace',
-            logoText: '<span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
-            subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 정답',
-            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 기록',
-            historyEmpty: '기록이 없습니다.',
-            submitBtn: '<i class="fa-solid fa-bolt mr-2"></i> ✨ 3초 만에 텍스트 뽑기',
-            resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (수정 가능)',
+            logoText: '<span class="text-slate-800 dark:text-white tracking-tight">채티</span><span class="text-orange-500 tracking-tight">폭스</span>',
+            subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
+            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
+            historyEmpty: '최근 생성된 텍스트가 없습니다.',
+            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ 3초 만에 텍스트 뽑기',
+            resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 직접 수정 가능)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
-            toastMsg: '복사 완료!',
+            toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             generating: '🦊 여우 비서가 생성 중입니다...',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.'
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
+            feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
             {
                 categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
                 subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '주간업무보고 등', type: 'text' }, input2: { label: '메모 내용', placeholder: '내용 입력', type: 'textarea' }, input3: { label: '강조 포인트', placeholder: '강조할 내용', type: 'text' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정 빼고 정중하게', input1: { label: '수신자', placeholder: '누구에게', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '날것 그대로', type: 'textarea' }, input3: { label: '온도', type: 'select', options: [ { value: '🙇‍♂️정중하게', text: '🙇‍♂️정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' } ] } },
-                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '무슨 일이?', type: 'text' }, input2: { label: '수습 대안', placeholder: '해결책', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
+                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
+                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '발생한 사고', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부 상사용', text: '🏢내부 상사용' }, { value: '🤝외부 거래처용', text: '🤝외부 거래처용' } ] } }
                 ]
             },
             {
                 categoryId: 'school', categoryName: '🏫 과제/요약',
                 subFeatures: [
-                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽하게', input1: { label: '제출 대상', placeholder: '교수님 등', type: 'text' }, input2: { label: '초안 복붙', placeholder: '내용 입력', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [ { value: '🎓학술적', text: '🎓학술적' }, { value: '📝개조식', text: '📝개조식' } ] } }
+                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적으로', text: '🎓학술적으로' }, { value: '📝핵심만 개조식으로', text: '📝핵심만 개조식으로' } ] } },
+                    { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로', input1: { label: '발표 시간/타겟', placeholder: '예: 5분, 대학생', type: 'text' }, input2: { label: '발표 자료', placeholder: 'PPT 내용 복붙', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [ { value: '🎙️전문적', text: '🎙️전문적' }, { value: '💬청중 소통톤', text: '💬청중 소통톤' } ] } },
+                    { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: '자소서 영혼 주입기', desc: '경험을 성과로', input1: { label: '지원 직무', placeholder: '예: 마케팅', type: 'text' }, input2: { label: '나의 경험', placeholder: '카페 알바 6개월...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🔥열정 가득', text: '🔥열정 가득' }, { value: '📊데이터 중심', text: '📊데이터 중심' } ] } }
                 ]
             },
             {
                 categoryId: 'excel', categoryName: '📊 엑셀/시트',
                 subFeatures: [
-                    { id: 'excelFormula', apiId: '함수 수식 뚝딱이', icon: '🧮', title: '함수 수식 뚝딱이', desc: '말로 하면 수식으로', input1: { label: '데이터 상황', placeholder: 'A열은 이름 등', type: 'text' }, input2: { label: '원하는 결과', placeholder: '합계 등', type: 'textarea' }, input3: { label: '프로그램', type: 'select', options: [ { value: 'MS 엑셀', text: 'MS 엑셀' }, { value: '구글 시트', text: '구글 시트' } ] } }
+                    { id: 'excelFormula', apiId: '함수 수식 뚝딱이', icon: '🧮', title: '함수 수식 뚝딱이', desc: '말로 하면 수식으로', input1: { label: '데이터 상황', placeholder: '예: A열은 이름, B열은 실적', type: 'text' }, input2: { label: '원하는 결과', placeholder: '예: 실적 80 이상 인원수', type: 'textarea' }, input3: { label: '프로그램', type: 'select', options: [ { value: 'MS 엑셀', text: 'MS 엑셀' }, { value: '구글 시트', text: '구글 시트' } ] } },
+                    { id: 'excelDecode', apiId: '외계어 수식 해독기', icon: '🔍', title: '외계어 수식 해독기', desc: '수식 분석', input1: { label: '수식/에러', placeholder: '=VLOOKUP...', type: 'text' }, input2: { label: '질문', placeholder: '무슨 뜻이야?', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [ { value: '👶초보자용', text: '👶초보자용' }, { value: '🧑‍💻실무자용', text: '🧑‍💻실무자용' } ] } },
+                    { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: '반복작업 매크로', desc: 'VBA 생성', input1: { label: '환경', placeholder: '예: 엑셀 VBA', type: 'text' }, input2: { label: '작업 설명', placeholder: '시트 쪼개기 등', type: 'textarea' }, input3: { label: '스타일', type: 'select', options: [ { value: '📝주석 포함', text: '📝주석 포함' }, { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' } ] } }
+                ]
+            },
+            {
+                categoryId: 'dev', categoryName: '💻 개발/코딩',
+                subFeatures: [
+                    { id: 'sqlGen', apiId: 'SQL 쿼리 짜기', icon: '🗄️', title: 'SQL 쿼리 짜기', desc: '원하는 데이터를 쿼리로', input1: { label: '테이블 구조', placeholder: '예: users(id, age)', type: 'text' }, input2: { label: '원하는 데이터', placeholder: '나이가 30 이상', type: 'textarea' }, input3: { label: 'DBMS', type: 'select', options: [ { value: 'MySQL', text: 'MySQL' }, { value: 'PostgreSQL', text: 'PostgreSQL' } ] } },
+                    { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '패턴', placeholder: '이메일 추출 등', type: 'text' }, input2: { label: '요청사항', placeholder: '설명해줘 등', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [ { value: '👶초보', text: '👶초보' }, { value: '🧑‍💻시니어', text: '🧑‍💻시니어' } ] } }
+                ]
+            },
+            {
+                categoryId: 'marketing', categoryName: '📱 마케팅/SNS',
+                subFeatures: [
+                    { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
+                    { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [ { value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' } ] } }
+                ]
+            }
+        ]
+    },
+    en: {
+        ui: {
+            docTitle: '🦊 ChattyFox - AI Workspace',
+            logoText: '<span class="text-slate-800 dark:text-white transition-colors">Chatty</span><span class="text-orange-500">Fox</span>',
+            subtitle: 'Professional AI assistant.',
+            historyTitle: 'History',
+            historyEmpty: 'No history.',
+            submitBtn: '✨ Generate Now',
+            resultTitle: 'Result',
+            copyBtn: 'Copy',
+            toastMsg: 'Copied!',
+            alertEmpty: 'Fill all fields.',
+            generating: '🦊 Generating...'
+        },
+        appData: [
+            {
+                categoryId: 'business', categoryName: '🏢 Business',
+                subFeatures: [
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'e.g., Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'What to highlight' } }
                 ]
             }
         ]
@@ -104,9 +146,11 @@ function initDarkMode() {
     };
 }
 
+// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
+    document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
@@ -124,40 +168,44 @@ function updateTabContent() {
 }
 
 function renderMainTabs() {
+    if (!mainTabsContainer) return;
     mainTabsContainer.innerHTML = ''; 
     translations[currentLang].appData.forEach((category, index) => {
         const btn = document.createElement('button');
-        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors \${currentCategoryIndex === index ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'}`;
+        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors ${currentCategoryIndex === index ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'}`;
         btn.textContent = category.categoryName;
         btn.onclick = () => { if (!hasDragged) { currentCategoryIndex = index; currentFeatureIndex = 0; updateTabContent(); } };
         mainTabsContainer.appendChild(btn);
     });
 }
 
-// 탭 드래그 스크롤
-mainTabsContainer.addEventListener('mousedown', (e) => {
-    isDragging = true; hasDragged = false;
-    mainTabsContainer.classList.add('cursor-grabbing');
-    startX = e.pageX - mainTabsContainer.offsetLeft;
-    scrollLeft = mainTabsContainer.scrollLeft;
-});
-mainTabsContainer.addEventListener('mouseleave', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
-mainTabsContainer.addEventListener('mouseup', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
-mainTabsContainer.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const walk = (e.pageX - mainTabsContainer.offsetLeft) - startX;
-    if (Math.abs(walk) > 5) hasDragged = true; 
-    mainTabsContainer.scrollLeft = scrollLeft - walk;
-});
+// [탭 드래그 기능 부활]
+if (mainTabsContainer) {
+    mainTabsContainer.addEventListener('mousedown', (e) => {
+        isDragging = true; hasDragged = false;
+        mainTabsContainer.classList.add('cursor-grabbing');
+        startX = e.pageX - mainTabsContainer.offsetLeft;
+        scrollLeft = mainTabsContainer.scrollLeft;
+    });
+    mainTabsContainer.addEventListener('mouseleave', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
+    mainTabsContainer.addEventListener('mouseup', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
+    mainTabsContainer.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const walk = (e.pageX - mainTabsContainer.offsetLeft) - startX;
+        if (Math.abs(walk) > 5) hasDragged = true; 
+        mainTabsContainer.scrollLeft = scrollLeft - walk;
+    });
+}
 
 function renderSubFeatures() {
+    if (!subFeaturesContainer) return;
     subFeaturesContainer.innerHTML = ''; 
     const features = translations[currentLang].appData[currentCategoryIndex].subFeatures;
     features.forEach((feature, index) => {
         const btn = document.createElement('button');
-        btn.className = `p-4 text-center rounded-xl border-2 transition-all \${currentFeatureIndex === index ? 'border-orange-500 bg-orange-50 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'}`;
-        btn.innerHTML = `<span class="text-3xl mb-2">\${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">\${feature.title}</strong>`;
+        btn.className = `p-4 text-center rounded-xl border-2 transition-all ${currentFeatureIndex === index ? 'border-orange-500 bg-orange-50 dark:bg-slate-800 shadow-md' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'}`;
+        btn.innerHTML = `<span class="text-3xl mb-2">${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">${feature.title}</strong>`;
         btn.onclick = () => { currentFeatureIndex = index; updateTabContent(); };
         subFeaturesContainer.appendChild(btn);
     });
@@ -165,82 +213,88 @@ function renderSubFeatures() {
 
 function updateFormFields() {
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    document.getElementById('input1Label').textContent = feature.input1.label;
-    document.getElementById('input1').placeholder = feature.input1.placeholder;
-    document.getElementById('input2Label').textContent = feature.input2.label;
-    document.getElementById('input2').placeholder = feature.input2.placeholder;
-    input3Container.innerHTML = `<label class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">\${feature.input3.label}</label>`;
-    const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg outline-none transition bg-gray-50 dark:bg-slate-800 dark:text-white';
-    if (feature.input3.type === 'select') {
-        const select = document.createElement('select');
-        select.id = 'input3'; select.className = commonClasses;
-        feature.input3.options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.value; option.textContent = opt.text;
-            select.appendChild(option);
-        });
-        input3Container.appendChild(select);
-    } else {
-        const input = document.createElement('input');
-        input.type = 'text'; input.id = 'input3'; input.className = commonClasses;
-        input.placeholder = feature.input3.placeholder;
-        input3Container.appendChild(input);
+    const l1 = document.getElementById('input1Label');
+    const i1 = document.getElementById('input1');
+    const l2 = document.getElementById('input2Label');
+    const i2 = document.getElementById('input2');
+    
+    if(l1) l1.textContent = feature.input1.label;
+    if(i1) i1.placeholder = feature.input1.placeholder;
+    if(l2) l2.textContent = feature.input2.label;
+    if(i2) i2.placeholder = feature.input2.placeholder;
+    
+    if (input3Container) {
+        input3Container.innerHTML = `<label class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
+        const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white';
+        if (feature.input3.type === 'select') {
+            const select = document.createElement('select');
+            select.id = 'input3'; select.className = commonClasses;
+            feature.input3.options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value; option.textContent = opt.text;
+                select.appendChild(option);
+            });
+            input3Container.appendChild(select);
+        } else {
+            const input = document.createElement('input');
+            input.type = 'text'; input.id = 'input3'; input.className = commonClasses;
+            input.placeholder = feature.input3.placeholder;
+            input3Container.appendChild(input);
+        }
     }
 }
 
+// [문법 오류 해결] renderHistory 정규식 백틱 충돌 수정
 function renderHistory() {
     const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
     if (!historyList) return;
     historyList.innerHTML = '';
-    document.getElementById('historyEmptyMsg').style.display = history.length ? 'none' : 'block';
+    const msg = document.getElementById('historyEmptyMsg');
+    if (msg) msg.style.display = history.length ? 'none' : 'block';
+    
     history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 mb-2';
         const cleanText = item.text.replace(/[#*`]/g, '');
-        div.innerHTML = `<span class="text-xs font-bold text-primary">\${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">\${cleanText}</p>`;
+        div.innerHTML = `<span class="text-xs font-bold text-primary">${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">${cleanText}</p>`;
         div.onclick = () => { resultContent.innerHTML = marked.parse(item.text); resultArea.classList.remove('hidden'); historySidebar.classList.add('translate-x-full'); };
         historyList.appendChild(div);
     });
 }
 
-// --- 5. [최종 해결] 구글 정식 API v1beta 직접 호출 로직 ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    const i1 = document.getElementById('input1').value.trim();
-    const i2 = document.getElementById('input2').value.trim();
-    const i3 = document.getElementById('input3').value.trim();
+    const val1 = document.getElementById('input1').value.trim();
+    const val2 = document.getElementById('input2').value.trim();
+    const val3 = document.getElementById('input3').value.trim();
 
-    if (!i1 || !i2 || !i3) { alert(uiText.alertEmpty); return; }
+    if (!val1 || !val2 || !val3) { alert(uiText.alertEmpty); return; }
 
     resultArea.classList.remove('hidden');
-    resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>\${uiText.generating}</span></div>`;
+    resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
     aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${GEMINI_API_KEY}`;
-        const prompt = SYSTEM_PROMPTS[currentLang][feature.apiId](i1, i2, i3) + GLOBAL_RULES[currentLang];
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            body: JSON.stringify({ subCategory: feature.apiId, input1: val1, input2: val2, input3: val3, lang: currentLang })
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || 'API 통신 실패');
+        if (!response.ok) throw new Error(data.message || 'AI 통신 실패');
 
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (text) {
-            resultContent.innerHTML = marked.parse(text);
+        if (data.success && data.result) {
+            resultContent.innerHTML = marked.parse(data.result);
             const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
-            history.unshift({ title: feature.title, text: text });
+            history.unshift({ title: feature.title, text: data.result });
             localStorage.setItem('quickfix_history', JSON.stringify(history.slice(0, 10)));
             renderHistory();
         }
     } catch (error) {
-        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border rounded-lg">Error: \${error.message}</div>`;
+        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border border-red-200 bg-red-50 rounded-lg">Error: ${error.message}</div>`;
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
@@ -256,4 +310,4 @@ document.getElementById('openHistoryBtn').onclick = () => historySidebar.classLi
 document.getElementById('closeHistoryBtn').onclick = () => historySidebar.classList.add('translate-x-full');
 
 initDarkMode();
-setLanguage('ko');
+setLanguage(new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko');
