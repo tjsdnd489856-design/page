@@ -2,6 +2,7 @@
 const translations = {
     ko: {
         ui: {
+            docTitle: '🦊 채티폭스 - AI Workspace',
             logoText: '<span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
             subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
@@ -73,6 +74,7 @@ const translations = {
     },
     en: {
         ui: {
+            docTitle: '🦊 ChattyFox - AI Workspace',
             logoText: '<span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
             subtitle: 'Let the smart fox handle your professional writing in seconds.',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>Recent History',
@@ -207,6 +209,7 @@ function setLanguage(lang) {
     const t = translations[lang];
     
     // 고정 UI 텍스트 갱신 (로고 텍스트는 index.html의 appLogoText에 삽입)
+    document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
