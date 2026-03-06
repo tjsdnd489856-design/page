@@ -31,7 +31,6 @@ app.use('/api/', apiLimiter);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // 4. 데이터 로깅 (Data Logging) 유틸리티 함수
-// 추후 데이터베이스(DB)로 이전하기 쉽게 JSON 파일로 체계적 기록
 async function logData(data) {
   try {
     const logDir = path.join(__dirname, 'logs');
@@ -47,8 +46,7 @@ async function logData(data) {
 }
 
 // ----------------------------------------------------------------------
-// 5. SYSTEM_PROMPTS (Few-Shot 프롬프팅 및 신규 카테고리 추가)
-// 각 프롬프트에 [입력 예시]와 [출력 예시(Best Practice)]를 제공하여 고품질 유지
+// 5. SYSTEM_PROMPTS (Few-Shot 프롬프팅 및 신규 카테고리 유지)
 // ----------------------------------------------------------------------
 const SYSTEM_PROMPTS = {
   ko: {
@@ -92,20 +90,20 @@ const SYSTEM_PROMPTS = {
     '반복작업 매크로': (i1, i2, i3) => `너는 자동화 전문가야. [환경:${i1}], [작업:${i2}], [스타일:${i3}].
 [예시] 입력: VBA/시트복사/주석포함 -> 출력: "\`\`\`vba\n' 현재 활성화된 시트를 복사합니다\nActiveSheet.Copy\n\`\`\`"\n이제 조건에 맞춰 작성해.`,
 
-    // ⭐ [신규: 개발/코딩]
+    // ⭐ [개발/코딩]
     'SQL 쿼리 짜기': (i1, i2, i3) => `너는 시니어 DB 관리자야. [테이블:${i1}], [원하는데이터:${i2}], [DBMS종류:${i3}].
 [예시] 입력: users/나이30이상/MySQL -> 출력: "\`\`\`sql\nSELECT * FROM users WHERE age >= 30;\n\`\`\`\n나이가 30 이상인 유저를 조회하는 쿼리입니다."\n이제 조건에 맞춰 작성해.`,
     '정규식(Regex) 설명': (i1, i2, i3) => `너는 시니어 개발자야. [상황/패턴:${i1}], [요청사항:${i2}], [이해수준:${i3}].
 [예시] 입력: 이메일추출/정규식짜줘/초보자 -> 출력: "\`\`\`regex\n^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$\n\`\`\`\n@ 기호를 기준으로 이메일 형식이 맞는지 검사하는 패턴입니다."\n이제 조건에 맞춰 작성해.`,
 
-    // ⭐ [신규: 마케팅/SNS]
+    // ⭐ [마케팅/SNS]
     '인스타그램 해시태그': (i1, i2, i3) => `너는 SNS 마케터야. [주제/사진설명:${i1}], [타겟고객:${i2}], [분위기:${i3}].
 [예시] 입력: 강남역카페/20대여성/감성 -> 출력: "#강남역카페 #강남디저트 #감성카페 #카페투어 #20대일상"\n이제 조건에 맞춰 작성해.`,
     '광고 카피라이팅': (i1, i2, i3) => `너는 광고 카피라이터야. [제품/서비스:${i1}], [소구포인트:${i2}], [광고매체:${i3}].
 [예시] 입력: 무선청소기/흡입력/페이스북 -> 출력: "먼지 한 톨도 용납하지 않는 압도적 흡입력! 지금 바로 경험하세요 🧹✨"\n이제 조건에 맞춰 작성해.`
   },
   en: {
-    // English versions with Few-shot prompting
+    // English versions
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}].\n[Example] Input: Marketing/Late report/Firm -> Output: "Subject: Urgent: Report Status\nHi, please provide an update on the delayed report immediately."\nNow write.`,
     '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}].\n[Example] Input: Weekly Report/Bug fixed/Speed -> Output: "## Weekly Update\n- **Resolved bugs swiftly** ensuring no downtime."\nNow write.`,
     '프로 사과문': (i1, i2, i3) => `Act as PR manager. [Issue:${i1}], [Solution:${i2}], [Audience:${i3}].\n[Example] Input: Missing attachment/Resend/Client -> Output: "I sincerely apologize for the missing file. Please find it attached here."\nNow write.`,
@@ -121,10 +119,8 @@ const SYSTEM_PROMPTS = {
     '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}].\n[Example] Input: Col A/Sum/Excel -> Output: "\`\`\`excel\n=SUM(A:A)\n\`\`\`\nThis formula sums up all values in column A."\nNow write.`,
     '외계어 수식 해독기': (i1, i2, i3) => `Act as an Excel Instructor. [Formula:${i1}], [Question:${i2}], [Level:${i3}].\n[Example] Input: =SUM/What is this?/Beginner -> Output: "It simply adds numbers together, just like a calculator!"\nNow write.`,
     '반복작업 매크로': (i1, i2, i3) => `Act as an Automation Engineer. [Env:${i1}], [Task:${i2}], [Style:${i3}].\n[Example] Input: VBA/Copy sheet/With comments -> Output: "\`\`\`vba\n' Copies the active sheet\nActiveSheet.Copy\n\`\`\`"\nNow write.`,
-    // ⭐ [New: Dev Helper]
     'SQL 쿼리 짜기': (i1, i2, i3) => `Act as a Senior DBA. [Table:${i1}], [Data Needed:${i2}], [DBMS:${i3}].\n[Example] Input: users/age > 30/MySQL -> Output: "\`\`\`sql\nSELECT * FROM users WHERE age > 30;\n\`\`\`\nRetrieves users older than 30."\nNow write.`,
     '정규식(Regex) 설명': (i1, i2, i3) => `Act as a Developer. [Pattern:${i1}], [Request:${i2}], [Level:${i3}].\n[Example] Input: email/give regex/beginner -> Output: "\`\`\`regex\n^\\S+@\\S+\\.\\S+$\n\`\`\`\nMatches basic email formats."\nNow write.`,
-    // ⭐ [New: Marketing]
     '인스타그램 해시태그': (i1, i2, i3) => `Act as a Social Media Manager. [Topic:${i1}], [Target:${i2}], [Vibe:${i3}].\n[Example] Input: Coffee shop/Gen Z/Aesthetic -> Output: "#CafeVibes #AestheticCafe #CoffeeLover #GenZ #Daily"\nNow write.`,
     '광고 카피라이팅': (i1, i2, i3) => `Act as an Ad Copywriter. [Product:${i1}], [Hook:${i2}], [Platform:${i3}].\n[Example] Input: Vacuum/Strong suction/Facebook -> Output: "Say goodbye to dust! Experience unmatched suction power today. 🧹✨"\nNow write.`
   }
@@ -137,7 +133,7 @@ const GLOBAL_RULES = {
 
 
 // ----------------------------------------------------------------------
-// 6. AI 생성 엔드포인트 (Streaming 적용)
+// 6. AI 생성 엔드포인트 (단일 응답 방식으로 롤백)
 // ----------------------------------------------------------------------
 app.post('/api/generate', async (req, res) => {
   try {
@@ -158,47 +154,29 @@ app.post('/api/generate', async (req, res) => {
     // [로깅] 사용자 요청 기록
     await logData({ type: 'request', subCategory, input1, input2, input3, lang });
 
-    // [중요] 실시간 스트리밍을 위한 SSE(Server-Sent Events) 헤더 설정
-    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders(); // 헤더를 즉시 프론트로 전송하여 연결을 염
-
+    // 단일 응답(generateContent) 방식으로 생성
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
-    // 스트림(Stream) 방식으로 요청
-    const resultStream = await model.generateContentStream(prompt);
-    
-    let fullOutput = "";
-
-    // AI가 생성하는 청크(조각) 데이터를 실시간으로 전송
-    for await (const chunk of resultStream.stream) {
-      const chunkText = chunk.text();
-      fullOutput += chunkText;
-      
-      // 줄바꿈이 포함될 수 있으므로 JSON으로 안전하게 감싸서 전송
-      res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
-    }
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
 
     // [로깅] 완성된 전체 답변 기록
-    await logData({ type: 'response', subCategory, lang, output: fullOutput });
+    await logData({ type: 'response', subCategory, lang, output: responseText });
 
-    // 통신 종료 신호 전송
-    res.write(`data: [DONE]\n\n`);
-    res.end();
+    // 프론트엔드로 성공 결과 전송 (요구사항에 맞춘 JSON 형식)
+    res.status(200).json({ success: true, result: responseText });
 
   } catch (error) {
     console.error('[Gemini API Error]', error);
-    // 스트리밍 도중 에러가 발생한 경우 에러 메시지를 SSE 형태로 전송
-    res.write(`data: ${JSON.stringify({ error: '서버에서 AI 응답을 생성하는 중 오류가 발생했습니다. (Timeout or API Error)' })}\n\n`);
-    res.end();
+    res.status(500).json({ 
+      success: false, 
+      message: '서버에서 AI 응답을 생성하는 중 오류가 발생했습니다. (Timeout or API Error)' 
+    });
   }
 });
 
 
 // ----------------------------------------------------------------------
-// 7. 피드백 수집 엔드포인트 (신규)
-// 프론트에서 좋아요/싫어요 버튼 클릭 시 호출됨
+// 7. 피드백 수집 엔드포인트 (유지)
 // ----------------------------------------------------------------------
 app.post('/api/feedback', async (req, res) => {
   try {
