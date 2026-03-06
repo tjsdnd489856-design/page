@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (19가지 모든 기능 완벽 유지) ---
+// --- 1. AI 명령어 설정 (19가지 모든 기능 완벽 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -23,15 +23,12 @@ const SYSTEM_PROMPTS = {
   },
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}]. Now write.`,
-    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`,
-    '프로 사과문': (i1, i2, i3) => `Act as PR manager. [Issue:${i1}], [Solution:${i2}], [Audience:${i3}]. Now write.`,
-    '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}]. Now write.`,
-    '광고 카피라이팅': (i1, i2, i3) => `Act as an Ad Copywriter. [Product:${i1}], [Hook:${i2}], [Platform:${i3}]. Now write.`
+    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`
   }
 };
 
 const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 결과물만 출력하세요.`,
+  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 최종 결과물만 출력하세요.`,
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
@@ -58,7 +55,7 @@ const translations = {
                 categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
                 subFeatures: [
                     { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
+                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️웃으면서 뼈 때리기', text: '🗡️웃으면서 뼈 때리기' } ] } },
                     { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '발생한 사고', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부 상사용', text: '🏢내부 상사용' }, { value: '🤝외부 거래처용', text: '🤝외부 거래처용' } ] } }
                 ]
             },
@@ -97,22 +94,22 @@ const translations = {
     en: {
         ui: {
             docTitle: '🦊 ChattyFox - AI Workspace',
-            logoText: '<span class="text-slate-800 dark:text-white transition-colors">Chatty</span><span class="text-orange-500">Fox</span>',
-            subtitle: 'Professional AI assistant.',
+            logoText: 'ChattyFox',
+            subtitle: 'AI assistant.',
             historyTitle: 'History',
-            historyEmpty: 'No history.',
-            submitBtn: '✨ Generate Now',
+            historyEmpty: 'Empty.',
+            submitBtn: 'Generate',
             resultTitle: 'Result',
             copyBtn: 'Copy',
             toastMsg: 'Copied!',
-            alertEmpty: 'Fill all fields.',
-            generating: '🦊 Generating...'
+            alertEmpty: 'Fill all.',
+            generating: 'Thinking...'
         },
         appData: [
             {
-                categoryId: 'business', categoryName: '🏢 Business',
+                categoryId: 'business', categoryName: 'Business',
                 subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'e.g., Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'What to highlight' } }
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } }
                 ]
             }
         ]
@@ -146,11 +143,9 @@ function initDarkMode() {
     };
 }
 
-// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
-    document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
@@ -179,7 +174,7 @@ function renderMainTabs() {
     });
 }
 
-// [탭 드래그 기능 부활]
+// 탭 드래그 스크롤
 if (mainTabsContainer) {
     mainTabsContainer.addEventListener('mousedown', (e) => {
         isDragging = true; hasDragged = false;
@@ -244,7 +239,6 @@ function updateFormFields() {
     }
 }
 
-// [문법 오류 해결] renderHistory 정규식 백틱 충돌 수정
 function renderHistory() {
     const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
     if (!historyList) return;
@@ -262,6 +256,7 @@ function renderHistory() {
     });
 }
 
+// --- 5. 서버 경유 API 호출 (보안 유지) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
