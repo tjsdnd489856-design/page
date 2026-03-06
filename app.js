@@ -1,4 +1,4 @@
-// --- 1. AI 명령어 설정 (기존 데이터 완벽 보존) ---
+// --- 1. AI 명령어 설정 (모든 데이터 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -32,7 +32,7 @@ const GLOBAL_RULES = {
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
-// --- 2. 다국어 번역 데이터 (19가지 기능 보존) ---
+// --- 2. 다국어 번역 데이터 (아이콘 태그 포함) ---
 const translations = {
     ko: {
         ui: {
@@ -55,7 +55,7 @@ const translations = {
                 categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
                 subFeatures: [
                     { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '하고 싶은 말', placeholder: '예: 기획서 3번이나 말했는데 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️웃으면서 뼈 때리기', text: '🗡️웃으면서 뼈 때리기' } ] } },
+                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말 (날것 그대로)', placeholder: '예: 기획서 3번이나 말했는데 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️웃으면서 뼈 때리기', text: '🗡️웃으면서 뼈 때리기' } ] } },
                     { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '발생한 사고', placeholder: '예: 첨부파일 누락됨', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 재발송하고 사과 메일 따로 보냄', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부 상사용', text: '🏢내부 상사용' }, { value: '🤝외부 거래처용', text: '🤝외부 거래처용' } ] } }
                 ]
             },
@@ -103,10 +103,10 @@ const translations = {
         ui: {
             docTitle: '🦊 ChattyFox - AI Workspace',
             logoText: '<span class="text-slate-800 dark:text-white transition-colors">Chatty</span><span class="text-orange-500">Fox</span>',
-            subtitle: 'Professional text generation assistant.',
-            historyTitle: 'History',
+            subtitle: 'Professional AI assistant.',
+            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>History',
             historyEmpty: 'No history.',
-            submitBtn: '✨ Generate Now',
+            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ Generate',
             resultTitle: 'Result',
             copyBtn: 'Copy',
             toastMsg: 'Copied!',
@@ -117,7 +117,7 @@ const translations = {
             {
                 categoryId: 'business', categoryName: '🏢 Business',
                 subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'e.g., Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'What to highlight' } }
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } }
                 ]
             }
         ]
@@ -159,16 +159,16 @@ function initDarkMode() {
     };
 }
 
-// [핵심 수정] textContent 대신 innerHTML을 사용하여 아이콘 태그가 렌더링되게 함
+// [핵심 수정] innerHTML을 사용하여 아이콘 태그가 렌더링되도록 함
 function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang] || translations.ko;
     document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
-    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; // innerHTML 적용
-    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle; // innerHTML 적용
-    document.getElementById('copyBtn').innerHTML = t.ui.copyBtn; // innerHTML 적용
+    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
+    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle;
+    document.getElementById('copyBtn').innerHTML = t.ui.copyBtn;
     document.getElementById('toastMsg').textContent = t.ui.toastMsg;
     updateTabContent();
     renderHistory();
@@ -262,7 +262,7 @@ function renderHistory() {
     });
 }
 
-// --- API 호출 로직 (Gemini 2.0 규격 준수) ---
+// --- API 호출 로직 (안정성 강화 버전) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
