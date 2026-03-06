@@ -27,12 +27,7 @@ const SYSTEM_PROMPTS = {
   }
 };
 
-const GLOBAL_RULES = {
-  ko: `\n\n[필수 요구사항]\n- 불필요한 인사말이나 서론 없이 결과물만 출력하세요.`,
-  en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
-};
-
-// --- 2. 다국어 번역 데이터 (전체 보존) ---
+// --- 2. 다국어 번역 데이터 ---
 const translations = {
     ko: {
         ui: {
@@ -61,7 +56,7 @@ const translations = {
             {
                 categoryId: 'school', categoryName: '🏫 과제/요약',
                 subFeatures: [
-                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적', text: '🎓학술적' }, { value: '📝핵심만 개조식으로', text: '📝핵심만 개조식으로' } ] } },
+                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적', text: '🎓학술적' }, { value: '📝개조식', text: '📝개조식' } ] } },
                     { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로', input1: { label: '발표 시간/타겟', placeholder: '예: 5분, 대학생', type: 'text' }, input2: { label: '발표 자료', placeholder: 'PPT 내용 복붙', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [ { value: '🎙️전문적', text: '🎙️전문적' }, { value: '💬청중 소통톤', text: '💬청중 소통톤' } ] } },
                     { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: '자소서 영혼 주입기', desc: '경험을 성과로', input1: { label: '지원 직무', placeholder: '예: 마케팅', type: 'text' }, input2: { label: '나의 경험', placeholder: '카페 알바 6개월...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🔥열정 가득', text: '🔥열정 가득' }, { value: '📊데이터 중심', text: '📊데이터 중심' } ] } }
                 ]

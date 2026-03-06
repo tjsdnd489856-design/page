@@ -1,6 +1,4 @@
-// Vercel Serverless Function - 정식 v1 규격 고정 버전
-// 404 에러를 완벽하게 차단하기 위해 구글 정식 API v1 경로를 사용합니다.
-
+// Vercel Serverless Function - 최종 안정화 버전 (v1beta 고정)
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -43,13 +41,12 @@ module.exports = async (req, res) => {
   try {
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
-    
     if (!apiKey) return res.status(500).json({ success: false, message: 'API_KEY가 없습니다.' });
 
     const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // [최종 해결] 구글 API v1 정식 경로를 직접 호출하여 404 에러를 해결합니다.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // [최종 해결] 404 에러를 방지하기 위해 구글 v1beta 정식 경로를 사용합니다.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -60,13 +57,7 @@ module.exports = async (req, res) => {
     });
 
     const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ 
-        success: false, 
-        message: data.error?.message || '구글 API 응답 오류' 
-      });
-    }
+    if (!response.ok) return res.status(response.status).json({ success: false, message: data.error?.message || 'AI 통신 실패' });
 
     const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     res.status(200).json({ success: true, result: generatedText });
