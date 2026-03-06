@@ -35,15 +35,6 @@
             50% { transform: translateY(-20px); }
             100% { transform: translateY(0px); }
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .dark .glass-card {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
     </style>
 </head>
 <body class="bg-orange-50/30 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased overflow-x-hidden transition-colors duration-300">
@@ -77,8 +68,8 @@
     </nav>
 
     <!-- 1. 히어로 섹션 -->
-    <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative text-center">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
                 회원가입 없이 3초 만에 끝내는 AI 글쓰기
             </div>
@@ -90,12 +81,13 @@
                 거친 메모는 정중한 이메일로, 복잡한 고민은 명쾌한 엑셀 수식으로.<br class="hidden md:block">
                 당신의 스마트한 여우 비서가 가장 세련된 정답을 실시간으로 제안합니다.
             </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
-                <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all hover:-translate-y-1 shadow-2xl shadow-orange-200 dark:shadow-none flex items-center justify-center">
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all hover:-translate-y-1 shadow-2xl">
                     지금 무료로 시작하기 <i class="fa-solid fa-rocket ml-2"></i>
                 </a>
             </div>
 
+            <!-- 아이콘 애니메이션 배경 -->
             <div class="mt-24 relative max-w-4xl mx-auto h-32 md:h-48 animate-float">
                 <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-3xl rounded-full"></div>
                 <div class="relative flex justify-center items-center gap-12 opacity-40">
@@ -165,7 +157,7 @@
         </div>
     </section>
 
-    <!-- 3. 사용 방법 (How it works) -->
+    <!-- 3. 사용 방법 -->
     <section id="how-it-works" class="py-24 bg-orange-50/50 dark:bg-slate-950">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-5xl font-black mb-16 dark:text-white">사용법은 단 3단계</h2>
@@ -240,7 +232,7 @@
     <!-- 6. 최종 CTA -->
     <section class="py-24 bg-primary relative overflow-hidden text-center">
         <div class="max-w-4xl mx-auto px-4 relative z-10">
-            <h2 class="text-3xl md:text-5xl font-black text-white mb-8">글쓰기 고민은 채티폭스에게 맡기고,<br>당신은 더 가치 있는 일에 집중하세요.</h2>
+            <h2 class="text-3xl md:text-5xl font-black text-white mb-8 leading-tight">글쓰기 고민은 채티폭스에게 맡기고,<br>당신은 더 가치 있는 일에 집중하세요.</h2>
             <a href="app.html" class="inline-block bg-white text-primary font-bold text-2xl px-12 py-6 rounded-full shadow-2xl hover:scale-105 transition-all">
                 무료 체험하기 <i class="fa-solid fa-rocket ml-2"></i>
             </a>
