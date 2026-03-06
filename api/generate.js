@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
     const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
 
     // [최종 조치] v1beta 경로를 직접 호출하여 404 에러를 원천 차단합니다.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
