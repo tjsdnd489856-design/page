@@ -47,7 +47,7 @@ const translations = {
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             generating: '🦊 여우 비서가 생성 중입니다...',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다. API 키를 확인해 주세요.',
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
             feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
@@ -158,7 +158,7 @@ function renderMainTabs() {
     mainTabsContainer.innerHTML = ''; 
     translations[currentLang].appData.forEach((category, index) => {
         const btn = document.createElement('button');
-        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors \${currentCategoryIndex === index ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'}`;
+        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors ${currentCategoryIndex === index ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'}`;
         btn.textContent = category.categoryName;
         btn.onclick = () => { if (!hasDragged) { currentCategoryIndex = index; currentFeatureIndex = 0; updateTabContent(); } };
         mainTabsContainer.appendChild(btn);
@@ -187,8 +187,8 @@ function renderSubFeatures() {
     const features = translations[currentLang].appData[currentCategoryIndex].subFeatures;
     features.forEach((feature, index) => {
         const btn = document.createElement('button');
-        btn.className = `p-4 text-center rounded-xl border-2 transition-all \${currentFeatureIndex === index ? 'border-orange-500 bg-orange-50 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'}`;
-        btn.innerHTML = `<span class="text-3xl mb-2">\${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">\${feature.title}</strong>`;
+        btn.className = `p-4 text-center rounded-xl border-2 transition-all ${currentFeatureIndex === index ? 'border-orange-500 bg-orange-50 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'}`;
+        btn.innerHTML = `<span class="text-3xl mb-2">${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">${feature.title}</strong>`;
         btn.onclick = () => { currentFeatureIndex = index; updateTabContent(); };
         subFeaturesContainer.appendChild(btn);
     });
@@ -200,7 +200,7 @@ function updateFormFields() {
     input1.placeholder = feature.input1.placeholder;
     document.getElementById('input2Label').textContent = feature.input2.label;
     input2.placeholder = feature.input2.placeholder;
-    input3Container.innerHTML = `<label id="input3Label" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">\${feature.input3.label}</label>`;
+    input3Container.innerHTML = `<label id="input3Label" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
     const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white';
     if (feature.input3.type === 'select') {
         const select = document.createElement('select');
@@ -221,15 +221,19 @@ function updateFormFields() {
 
 function renderHistory() {
     const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
-    historyList.innerHTML = '';
-    if (!history.length) document.getElementById('historyEmptyMsg').style.display = 'block';
-    else document.getElementById('historyEmptyMsg').style.display = 'none';
+    const list = document.getElementById('historyList');
+    const msg = document.getElementById('historyEmptyMsg');
+    if (!list) return;
+    list.innerHTML = '';
+    if (msg) msg.style.display = history.length ? 'none' : 'block';
     history.forEach(item => {
         const div = document.createElement('div');
         div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 mb-2';
-        div.innerHTML = `<span class="text-xs font-bold text-primary">\${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">\${item.text.replace(/[#*`]/g, '')}</p>`;
+        // [문법 수정] 템플릿 리터럴 충돌 방지를 위해 역슬래시 교정
+        const cleanText = item.text.replace(/[#*`]/g, '');
+        div.innerHTML = `<span class="text-xs font-bold text-primary">${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">${cleanText}</p>`;
         div.onclick = () => { resultContent.innerHTML = marked.parse(item.text); resultArea.classList.remove('hidden'); historySidebar.classList.add('translate-x-full'); };
-        historyList.appendChild(div);
+        list.appendChild(div);
     });
 }
 
@@ -243,12 +247,10 @@ aiForm.addEventListener('submit', async (e) => {
     if (!i1 || !i2 || !i3) { alert(uiText.alertEmpty); return; }
 
     resultArea.classList.remove('hidden');
-    resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>\${uiText.generating}</span></div>`;
+    resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
     aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
-        // [수정] 브라우저가 구글에 직접 가지 않고, 우리 서버(/api/generate)에게 요청합니다.
-        // 우리 서버는 Vercel 환경 변수에서 키를 몰래 꺼내서 사용하므로 안전합니다!
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -268,7 +270,7 @@ aiForm.addEventListener('submit', async (e) => {
             throw new Error('응답이 올바르지 않습니다.');
         }
     } catch (error) {
-        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border border-red-200 bg-red-50 rounded-lg">Error: \${error.message}</div>`;
+        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border border-red-200 bg-red-50 rounded-lg">Error: ${error.message}</div>`;
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
