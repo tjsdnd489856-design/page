@@ -1,6 +1,4 @@
-// Vercel Serverless Function - 초경량 Native Fetch 버전
-// SDK 라이브러리 없이 직접 구글 API v1 호출하여 500 에러를 원천 차단합니다.
-
+// Vercel Serverless Function - 모델 안정화 버전 (1.5-flash)
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -48,8 +46,8 @@ module.exports = async (req, res) => {
 
     const prompt = SYSTEM_PROMPTS[lang][subCategory](input1, input2, input3) + GLOBAL_RULES[lang];
 
-    // [최종 해결] 구글 API v1 정식 Endpoint에 직접 fetch 요청
-    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    // [에러 해결] 2.0 모델 제한(limit:0) 문제를 해결하기 위해 안정적인 1.5-flash 모델로 변경
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -62,9 +60,13 @@ module.exports = async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
+      // 구글의 영문 에러 메시지 대신 한글로 친절하게 반환
+      let customMsg = data.error?.message || '구글 API 오류';
+      if (response.status === 429) customMsg = '현재 구글 AI 사용량이 너무 많습니다. 약 30초~1분 후 다시 시도해 주세요.';
+      
       return res.status(response.status).json({ 
         success: false, 
-        message: data.error?.message || '구글 API 응답 오류' 
+        message: customMsg 
       });
     }
 
