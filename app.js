@@ -208,8 +208,6 @@ function setLanguage(lang) {
     
     // 고정 UI 텍스트 갱신 (로고 텍스트는 index.html의 appLogoText에 삽입)
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
-    const logoImg = document.getElementById('appLogoImg');
-    if(logoImg) logoImg.src = lang === 'en' ? 'logo_en.svg' : 'logo_ko.svg';
     
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn;
