@@ -13,6 +13,7 @@ const translations = {
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
             alertError: '채티폭스 에러: ',
+            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
             feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
@@ -85,6 +86,7 @@ const translations = {
             toastMsg: 'Copied! Ready to paste.',
             alertEmpty: 'Please fill all fields.',
             alertError: 'ChattyFox Error: ',
+            fetchError: 'An error occurred while fetching data.',
             feedbackThanks: 'Feedback received. Thanks! 🦊'
         },
         appData: [
@@ -418,7 +420,7 @@ closeHistoryBtn.addEventListener('click', () => {
 });
 
 
-// --- 8. 서버 통신 (JSON 단일 응답) ---
+// --- 8. 서버 통신 (JSON 파싱 에러 방어 로직 추가) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
@@ -450,12 +452,29 @@ aiForm.addEventListener('submit', async (e) => {
             })
         });
 
-        const data = await response.json();
+        // 스트림(data: ) 찌꺼기가 남아있을 경우를 대비해 text()로 읽어 수동 파싱
+        const rawText = await response.text();
+        let data;
+
+        try {
+            let jsonString = rawText.trim();
+            // 스트림 포맷 예외 처리
+            if (jsonString.startsWith('data:')) {
+                jsonString = jsonString.replace(/^data:\s*/i, '');
+            }
+            // 완료 신호 예외 처리
+            jsonString = jsonString.replace(/data:\s*\[DONE\]/gi, '').trim();
+            
+            data = JSON.parse(jsonString);
+        } catch (parseError) {
+            throw new Error('응답 데이터를 분석하는 중 오류가 발생했습니다. (JSON Parse Error)');
+        }
+
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
         if (data.success) {
-            resultContent.innerHTML = marked.parse(data.result);
-            saveHistory(data.result, feature.title);
+            resultContent.innerHTML = marked.parse(data.result || data.text || '');
+            saveHistory(data.result || data.text || '', feature.title);
         } else {
             alert(uiText.alertError + data.message);
         }
@@ -463,7 +482,8 @@ aiForm.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error('Fetch Error:', error);
         if (resultSpinner) resultSpinner.classList.add('hidden');
-        alert(uiText.alertError + error.message);
+        // 에러 발생 시 사용자 친화적 메시지 출력
+        alert(uiText.fetchError || '데이터를 가져오는 중 오류가 발생했습니다.');
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
