@@ -1,8 +1,4 @@
-// --- 1. [중요] API 키 설정 ---
-// Vercel 환경 변수 혹은 직접 입력을 통해 키를 확보합니다.
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE'; // 🚨 VSC에서 사장님의 실제 API 키로 교체해 주세요!
-
-// --- 2. AI 명령어 설정 (19가지 모든 기능 보존) ---
+// --- 1. AI 명령어 설정 (기존 데이터 완벽 보존) ---
 const SYSTEM_PROMPTS = {
   ko: {
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].\n[예시] 입력: 마케팅팀/기획서 늦음/사무적으로 -> 출력: "제목: [요청] 기획서 송부 일정 확인의 건\n본문: 마케팅팀 담당자님, 기획서가 지연되어 일정 확인 차 연락드립니다."\n이제 조건에 맞춰 작성해.`,
@@ -36,7 +32,7 @@ const GLOBAL_RULES = {
   en: `\n\n[GLOBAL RULE]\n- Output ONLY the final result.`
 };
 
-// --- 3. 다국어 번역 데이터 ---
+// --- 2. 다국어 번역 데이터 ---
 const translations = {
     ko: {
         ui: {
@@ -59,7 +55,7 @@ const translations = {
                 categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
                 subFeatures: [
                     { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️정중하게', text: '🙇‍♂️정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
+                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️정중하게', text: '🙇‍♂️정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
                     { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '핑계 없는 수습의 정석', input1: { label: '발생한 사고', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
                 ]
             },
@@ -78,14 +74,38 @@ const translations = {
             {
                 categoryId: 'marketing', categoryName: '📱 마케팅/SNS',
                 subFeatures: [
+                    { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
                     { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '흡입력 깡패', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [ { value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버', text: '🟢 네이버' } ] } }
+                ]
+            }
+        ]
+    },
+    en: {
+        ui: {
+            docTitle: '🦊 ChattyFox - AI Workspace',
+            logoText: '<span class="text-slate-800 dark:text-white transition-colors">Chatty</span><span class="text-orange-500">Fox</span>',
+            subtitle: 'Professional AI assistant.',
+            historyTitle: 'History',
+            historyEmpty: 'No history.',
+            submitBtn: '✨ Generate Now',
+            resultTitle: 'Result',
+            copyBtn: 'Copy',
+            toastMsg: 'Copied!',
+            alertEmpty: 'Fill all fields.',
+            generating: '🦊 Generating...'
+        },
+        appData: [
+            {
+                categoryId: 'business', categoryName: '🏢 Business',
+                subFeatures: [
+                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Notes to docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Raw notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } }
                 ]
             }
         ]
     }
 };
 
-// --- 4. 전역 상태 및 드래그 변수 ---
+// --- 3. 전역 상태 및 드래그 변수 ---
 let currentLang = 'ko'; 
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
@@ -213,7 +233,7 @@ function renderHistory() {
     });
 }
 
-// --- 5. [최종 조치] 구글 정식 API v1beta 직접 호출 로직 ---
+// --- 5. [보안 고도화] 서버 경유 API 호출 (키 유출 방지 방식) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
@@ -222,35 +242,26 @@ aiForm.addEventListener('submit', async (e) => {
 
     if (!i1 || !i2 || !i3) { alert(uiText.alertEmpty); return; }
 
-    // 생성 중 상태 표시
     resultArea.classList.remove('hidden');
     resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>\${uiText.generating}</span></div>`;
     aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
-        // [지시사항 반영] 구글 본사 v1beta 전체 주소 사용 (로컬/상대경로 완전 제거)
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${GEMINI_API_KEY}`;
-        
-        const prompt = SYSTEM_PROMPTS[currentLang][feature.apiId](i1, i2, i3) + GLOBAL_RULES[currentLang];
-
-        const response = await fetch(apiUrl, {
+        // [수정] 브라우저가 구글에 직접 가지 않고, 우리 서버(/api/generate)에게 요청합니다.
+        // 우리 서버는 Vercel 환경 변수에서 키를 몰래 꺼내서 사용하므로 안전합니다!
+        const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
+            body: JSON.stringify({ subCategory: feature.apiId, input1: i1, input2: i2, input3: i3, lang: currentLang })
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || 'API 통신 실패');
+        if (!response.ok) throw new Error(data.message || 'AI 통신 실패');
 
-        // [지시사항 반영] 정식 규격 파싱 data.candidates[0].content.parts[0].text
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-        if (text) {
-            resultContent.innerHTML = marked.parse(text);
+        if (data.success && data.result) {
+            resultContent.innerHTML = marked.parse(data.result);
             const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
-            history.unshift({ title: feature.title, text: text });
+            history.unshift({ title: feature.title, text: data.result });
             localStorage.setItem('quickfix_history', JSON.stringify(history.slice(0, 10)));
             renderHistory();
         } else {
