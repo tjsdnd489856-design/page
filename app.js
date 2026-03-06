@@ -1,17 +1,18 @@
-// --- 1. 다국어 언어 팩 및 신규 카테고리 추가 (LANG_PACKAGE) ---
+// --- 1. 다국어 언어 팩 (채티폭스 리브랜딩 반영) ---
 const LANG_PACKAGE = {
     ko: {
         ui: {
-            title: '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>AI 뚝딱',
-            subtitle: '빈칸만 채우면 일잘러의 텍스트가 완성됩니다.',
-            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ 3초 만에 텍스트 뽑기',
-            resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 수정 가능)',
+            title: '<img src="logo_ko.svg" class="h-8 w-auto inline-block mr-2 drop-shadow-md" alt="ChattyFox Logo">채티폭스',
+            subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
+            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ 3초 만에 텍스트 뽑기',
+            loadingText: '상황에 맞는 최적의 단어를 고르고 있습니다...',
+            resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 직접 수정 가능)',
             copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
             toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
             alertEmpty: '모든 빈칸을 채워주세요.',
-            alertError: 'AI 뚝딱 에러: ',
+            alertError: '채티폭스 에러: ',
             alertServer: '서버 응답이 없습니다. 서버가 켜져 있는지 확인해 주세요.',
-            feedbackThanks: '피드백이 전달되었습니다. 감사합니다!'
+            feedbackThanks: '소중한 피드백이 전달되었습니다. 감사합니다! 🦊'
         },
         appData: [
             {
@@ -54,7 +55,6 @@ const LANG_PACKAGE = {
                     { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: '반복작업 매크로', desc: 'VBA/Apps Script 생성', input1: { label: '환경', placeholder: '예: 엑셀 VBA', type: 'text' }, input2: { label: '작업 설명', placeholder: '예: 부서별 시트 쪼개기', type: 'textarea' }, input3: { label: '스타일', type: 'select', options: [ { value: '📝주석 포함', text: '📝주석 포함' }, { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' } ] } }
                 ]
             },
-            // ⭐ [개발/코딩]
             {
                 categoryId: 'dev', categoryName: '💻 개발/코딩',
                 subFeatures: [
@@ -62,7 +62,6 @@ const LANG_PACKAGE = {
                     { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '상황 또는 패턴', placeholder: '예: 이메일 추출하기, 또는 ^[a-z]+$', type: 'text' }, input2: { label: '요청사항', placeholder: '예: 정규식 만들어줘, 혹은 설명해줘', type: 'textarea' }, input3: { label: '이해 수준', type: 'select', options: [ { value: '👶 정규식 초보', text: '👶 정규식 초보' }, { value: '🧑‍💻 시니어 개발자', text: '🧑‍💻 시니어 개발자' } ] } }
                 ]
             },
-            // ⭐ [마케팅/SNS]
             {
                 categoryId: 'marketing', categoryName: '📱 마케팅/SNS',
                 subFeatures: [
@@ -74,16 +73,16 @@ const LANG_PACKAGE = {
     },
     en: {
         ui: {
-            title: '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>QuickFix AI',
-            subtitle: 'Fill in the blanks, let AI write for you.',
-            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-400"></i> ✨ Generate in 3s',
+            title: '<img src="logo_en.svg" class="h-8 w-auto inline-block mr-2 drop-shadow-md" alt="ChattyFox Logo">ChattyFox',
+            subtitle: 'Let the smart fox handle your professional writing in seconds.',
+            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ Generate in 3s',
             resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>Result (Click to Edit)',
-            copyBtn: '<i class="fa-regular fa-copy mr-2"></i> Copy',
+            copyBtn: '<i class="fa-regular fa-copy mr-2"></i> Copy to Clipboard',
             toastMsg: 'Copied! Ready to paste.',
             alertEmpty: 'Please fill all fields.',
-            alertError: 'Error: ',
-            alertServer: 'Server not responding.',
-            feedbackThanks: 'Feedback received. Thanks!'
+            alertError: 'ChattyFox Error: ',
+            alertServer: 'Server not responding. Please check your connection.',
+            feedbackThanks: 'Feedback received. Thanks! 🦊'
         },
         appData: [
             {
@@ -232,7 +231,8 @@ function renderHistory() {
 
     history.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors';
+        // 오렌지 테마 적용
+        div.className = 'p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-600 transition-colors';
         div.innerHTML = `
             <div class="flex justify-between items-center mb-1">
                 <span class="text-xs font-bold text-primary">${item.title}</span>
@@ -241,7 +241,6 @@ function renderHistory() {
             <p class="text-xs text-gray-600 dark:text-slate-300 truncate">${item.text.replace(/[#*`]/g, '')}</p>
         `;
         div.addEventListener('click', () => {
-            // 사이드바 닫고 결과창에 로드
             historySidebar.classList.add('translate-x-full');
             resultContent.innerHTML = marked.parse(item.text);
             resultArea.classList.remove('hidden');
@@ -251,7 +250,6 @@ function renderHistory() {
     });
 }
 
-// 히스토리 사이드바 열기/닫기 이벤트
 openHistoryBtn.addEventListener('click', () => {
     renderHistory();
     historySidebar.classList.remove('translate-x-full');
@@ -284,7 +282,7 @@ function initLanguage() {
 }
 
 
-// --- 7. 화면 그리기 (렌더링) ---
+// --- 7. 화면 그리기 (렌더링 - 오렌지 테마 반영) ---
 function renderMainTabs() {
     mainTabsContainer.innerHTML = ''; 
     appData.forEach(category => {
@@ -292,7 +290,7 @@ function renderMainTabs() {
         const isSelected = currentCategory.categoryId === category.categoryId;
         btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors duration-200 ${
             isSelected 
-            ? 'bg-blue-100 text-blue-700 dark:bg-indigo-900 dark:text-indigo-200 border-b-2 border-primary' 
+            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200 border-b-2 border-primary' 
             : 'bg-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700'
         }`;
         btn.textContent = category.categoryName;
@@ -334,13 +332,13 @@ function renderSubFeatures() {
         
         btn.className = `p-4 text-center rounded-xl border-2 transition-all duration-200 group flex flex-col items-center justify-center ${
             isSelected 
-            ? 'border-primary bg-blue-50 dark:bg-slate-700 shadow-md transform scale-[1.02]' 
-            : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+            ? 'border-primary bg-orange-50 dark:bg-slate-700 shadow-md transform scale-[1.02]' 
+            : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-orange-300 dark:hover:border-orange-400 hover:bg-gray-50 dark:hover:bg-slate-700'
         }`;
 
         btn.innerHTML = `
             <span class="text-3xl mb-2">${feature.icon}</span>
-            <strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1 group-hover:text-primary dark:group-hover:text-indigo-400">${feature.title}</strong>
+            <strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1 group-hover:text-primary dark:group-hover:text-orange-400">${feature.title}</strong>
             <span class="text-xs text-gray-500 dark:text-slate-400 break-keep">${feature.desc}</span>
         `;
         btn.addEventListener('click', () => {
@@ -401,12 +399,10 @@ aiForm.addEventListener('submit', async (e) => {
         alert(uiText.alertEmpty); return;
     }
 
-    // 결과창을 표시하고, 기존 텍스트를 비운 후 스피너 오버레이 작동
     resultArea.classList.remove('hidden');
     resultContent.innerHTML = ''; 
     if (resultSpinner) resultSpinner.classList.remove('hidden');
     
-    // 폼 비활성화 (중복 클릭 방지)
     aiForm.classList.add('opacity-50', 'pointer-events-none');
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -421,17 +417,12 @@ aiForm.addEventListener('submit', async (e) => {
             })
         });
 
-        // 한 번에 JSON으로 응답받기
         const data = await response.json();
 
-        // 스피너 숨기기
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
         if (data.success) {
-            // 한 번에 마크다운 렌더링
             resultContent.innerHTML = marked.parse(data.result);
-            
-            // 로컬 스토리지에 결과 저장
             saveHistory(data.result, currentFeature.title);
         } else {
             alert(uiText.alertError + data.message);
@@ -459,7 +450,6 @@ copyBtn.addEventListener('click', async () => {
     }
 });
 
-// 피드백 전송 함수
 async function sendFeedback(rating) {
     const text = resultContent.innerText;
     if(!text) return;
@@ -498,12 +488,12 @@ function handleUrlParams() {
 }
 
 function init() {
-    initDarkMode();       // 다크모드 로컬스토리지 확인 및 적용
-    initLanguage();       // 언어 설정
-    handleUrlParams();    // URL 탭 파라미터 적용
-    renderMainTabs();     // 카테고리 렌더링
-    renderSubFeatures();  // 서브기능 렌더링
-    updateFormFields();   // 폼 렌더링
+    initDarkMode();
+    initLanguage();
+    handleUrlParams();
+    renderMainTabs();
+    renderSubFeatures();
+    updateFormFields();
 }
 
 init();
