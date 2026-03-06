@@ -4,21 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🦊 ChattyFox - AI Workspace</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class', 
             theme: {
                 extend: {
-                    colors: { primary: '#f97316', secondary: '#fbbf24' }
+                    colors: { 
+                        primary: '#f97316', 
+                        secondary: '#fbbf24',
+                        orange: { 500: '#FF7A00' } 
+                    } 
                 }
             }
         }
     </script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- marked.js (CDN URL 변경 및 crossorigin 추가) -->
+    <!-- marked.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js" crossorigin="anonymous"></script>
     
     <style>

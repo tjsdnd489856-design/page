@@ -210,7 +210,6 @@ function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
     
-    // 고정 UI 텍스트 갱신 (로고 텍스트는 index.html의 appLogoText에 삽입)
     document.title = t.ui.docTitle;
     document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     
@@ -222,7 +221,6 @@ function setLanguage(lang) {
     historyTitle.innerHTML = t.ui.historyTitle;
     historyEmptyMsg.textContent = t.ui.historyEmpty;
 
-    // 언어 버튼 토글 스타일 갱신
     const btnKo = document.getElementById('btn-ko');
     const btnEn = document.getElementById('btn-en');
     if (lang === 'en') {
@@ -233,12 +231,10 @@ function setLanguage(lang) {
         btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors bg-transparent';
     }
 
-    // URL 파라미터 업데이트 (새로고침 방지)
     const url = new URL(window.location);
     url.searchParams.set('lang', lang);
     window.history.replaceState({}, '', url);
 
-    // 언어가 바뀌면 화면의 탭과 폼을 현재 선택된 인덱스 기준으로 즉시 렌더링
     updateTabContent();
     renderHistory();
 }
@@ -258,7 +254,6 @@ function renderMainTabs() {
         const btn = document.createElement('button');
         const isSelected = currentCategoryIndex === index;
         
-        // 탭 디자인: 선택 시 오렌지색 하단 바와 글자색 변경
         btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
             isSelected 
             ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' 
@@ -268,14 +263,13 @@ function renderMainTabs() {
         btn.addEventListener('click', (e) => {
             if (hasDragged) { e.preventDefault(); e.stopPropagation(); return; }
             currentCategoryIndex = index;
-            currentFeatureIndex = 0; // 카테고리 변경 시 첫 번째 서브기능으로 초기화
+            currentFeatureIndex = 0; 
             updateTabContent();
         });
         mainTabsContainer.appendChild(btn);
     });
 }
 
-// 탭 스크롤 드래그 
 mainTabsContainer.addEventListener('mousedown', (e) => {
     isDragging = true; hasDragged = false;
     mainTabsContainer.classList.add('cursor-grabbing');
@@ -420,7 +414,7 @@ closeHistoryBtn.addEventListener('click', () => {
 });
 
 
-// --- 8. 서버 통신 (JSON 파싱 에러 방어 로직 추가) ---
+// --- 8. 서버 통신 (API 호출 로직 전면 수정 및 정교한 예외처리) ---
 aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const uiText = translations[currentLang].ui;
@@ -442,7 +436,9 @@ aiForm.addEventListener('submit', async (e) => {
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     try {
-        const response = await fetch('http://localhost:3000/api/generate', {
+        // 요구사항: URL 끝부분이 반드시 :generateContent 로 끝나도록 설정
+        // 백엔드 또는 프록시 환경에 맞춰 /api/generate:generateContent 로 호출합니다.
+        const response = await fetch('http://localhost:3000/api/generate:generateContent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -452,37 +448,48 @@ aiForm.addEventListener('submit', async (e) => {
             })
         });
 
-        // 스트림(data: ) 찌꺼기가 남아있을 경우를 대비해 text()로 읽어 수동 파싱
+        // 예외 처리 1: HTTP 상태 코드 확인 (response.ok)
+        if (!response.ok) {
+            console.error(`Fetch Error: HTTP Status ${response.status} - ${response.statusText}`);
+            throw new Error(`Server returned status ${response.status}`);
+        }
+
         const rawText = await response.text();
         let data;
 
+        // 예외 처리 2: 정교한 JSON 파싱 (스트림 찌꺼기 완벽 방어)
         try {
             let jsonString = rawText.trim();
-            // 스트림 포맷 예외 처리
             if (jsonString.startsWith('data:')) {
                 jsonString = jsonString.replace(/^data:\s*/i, '');
             }
-            // 완료 신호 예외 처리
             jsonString = jsonString.replace(/data:\s*\[DONE\]/gi, '').trim();
-            
             data = JSON.parse(jsonString);
         } catch (parseError) {
-            throw new Error('응답 데이터를 분석하는 중 오류가 발생했습니다. (JSON Parse Error)');
+            console.error('JSON Parse Error:', parseError, 'Raw Text:', rawText);
+            throw new Error('응답 데이터를 분석하는 중 오류가 발생했습니다.');
         }
 
         if (resultSpinner) resultSpinner.classList.add('hidden');
 
-        if (data.success) {
-            resultContent.innerHTML = marked.parse(data.result || data.text || '');
-            saveHistory(data.result || data.text || '', feature.title);
+        // 예외 처리 3: Optional Chaining을 이용한 Gemini API 응답 구조 안전 참조
+        // Gemini API 원본 응답 또는 기존 커스텀 응답({success, result}) 모두 완벽 대응
+        const generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text 
+                              || data?.result 
+                              || data?.text 
+                              || '';
+
+        if (generatedText) {
+            resultContent.innerHTML = marked.parse(generatedText);
+            saveHistory(generatedText, feature.title);
         } else {
-            alert(uiText.alertError + data.message);
+            // 에러 응답인 경우 (data.message)
+            alert(uiText.alertError + (data.message || 'Unknown Error'));
         }
 
     } catch (error) {
-        console.error('Fetch Error:', error);
+        console.error('API Request Failed:', error);
         if (resultSpinner) resultSpinner.classList.add('hidden');
-        // 에러 발생 시 사용자 친화적 메시지 출력
         alert(uiText.fetchError || '데이터를 가져오는 중 오류가 발생했습니다.');
     } finally {
         aiForm.classList.remove('opacity-50', 'pointer-events-none');
