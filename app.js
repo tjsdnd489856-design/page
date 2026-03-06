@@ -2,7 +2,7 @@
 const translations = {
     ko: {
         ui: {
-            logoTitle: '<img src="logo_ko.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
+            logoText: '<span class="text-slate-800 dark:text-white">채티</span><span class="text-orange-500">폭스</span>',
             subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
             historyEmpty: '최근 생성된 텍스트가 없습니다.',
@@ -73,7 +73,7 @@ const translations = {
     },
     en: {
         ui: {
-            logoTitle: '<img src="logo_en.svg" class="h-8 w-auto inline-block drop-shadow-sm" alt="ChattyFox Logo" onerror="this.style.display=\'none\'"><span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
+            logoText: '<span class="text-slate-800 dark:text-white">Chatty</span><span class="text-orange-500">Fox</span>',
             subtitle: 'Let the smart fox handle your professional writing in seconds.',
             historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>Recent History',
             historyEmpty: 'No recent generations found.',
@@ -206,8 +206,8 @@ function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
     
-    // 고정 UI 텍스트 갱신
-    document.getElementById('appLogoTitle').innerHTML = t.ui.logoTitle;
+    // 고정 UI 텍스트 갱신 (로고 텍스트는 index.html의 appLogoText에 삽입)
+    document.getElementById('appLogoText').innerHTML = t.ui.logoText;
     document.getElementById('appSubtitle').textContent = t.ui.subtitle;
     document.getElementById('submitBtn').innerHTML = t.ui.submitBtn;
     document.getElementById('resultTitle').innerHTML = t.ui.resultTitle;
@@ -221,10 +221,10 @@ function setLanguage(lang) {
     const btnEn = document.getElementById('btn-en');
     if (lang === 'en') {
         btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
-        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors bg-transparent';
+        btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors bg-transparent';
     } else {
         btnKo.className = 'px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300 transition-colors';
-        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors bg-transparent';
+        btnEn.className = 'px-3 py-1 rounded-full text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors bg-transparent';
     }
 
     // URL 파라미터 업데이트 (새로고침 방지)
@@ -299,8 +299,8 @@ function renderSubFeatures() {
         
         btn.className = `p-4 text-center rounded-xl border-2 transition-all duration-200 group flex flex-col items-center justify-center ${
             isSelected 
-            ? 'border-orange-500 bg-orange-50 dark:bg-slate-700 shadow-md transform scale-[1.02]' 
-            : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-orange-300 dark:hover:border-orange-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+            ? 'border-orange-500 bg-orange-50 dark:bg-slate-800 shadow-md transform scale-[1.02]' 
+            : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-orange-300 dark:hover:border-orange-400 hover:bg-gray-50 dark:hover:bg-slate-800'
         }`;
 
         btn.innerHTML = `
@@ -322,12 +322,9 @@ function updateFormFields() {
 
     input1Label.textContent = feature.input1.label;
     input1.placeholder = feature.input1.placeholder;
-    // 값을 보존하고 싶다면 아래 라인을 지우고, 비우고 싶다면 유지합니다 (여기선 기능 변경 시 비움)
-    input1.value = '';
 
     input2Label.textContent = feature.input2.label;
     input2.placeholder = feature.input2.placeholder;
-    input2.value = '';
 
     input3Container.innerHTML = '';
     const label = document.createElement('label');
@@ -336,7 +333,7 @@ function updateFormFields() {
     label.textContent = feature.input3.label;
     input3Container.appendChild(label);
 
-    const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 dark:text-white';
+    const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
 
     if (feature.input3.type === 'select') {
         const select = document.createElement('select');
@@ -390,7 +387,7 @@ function renderHistory() {
 
     history.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-600 transition-colors';
+        div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors';
         div.innerHTML = `
             <div class="flex justify-between items-center mb-1">
                 <span class="text-xs font-bold text-primary">${item.title}</span>
