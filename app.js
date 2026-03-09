@@ -148,6 +148,7 @@ const translations = {
 let currentLang = 'ko';
 let currentCategoryIndex = 0;
 let currentFeatureIndex = 0;
+let currentFeedbackId = null; // 현재 생성된 결과의 로그 ID (피드백 용도)
 
 // 탭 드래그 관련 상태
 let isDragging = false;
@@ -163,6 +164,8 @@ const DOM = {
   resultArea: document.getElementById('resultArea'),
   resultContent: document.getElementById('resultContent'),
   copyBtn: document.getElementById('copyBtn'),
+  btnLike: document.getElementById('btnLike'),
+  btnDislike: document.getElementById('btnDislike'),
   toast: document.getElementById('toast'),
   historyList: document.getElementById('historyList'),
   historySidebar: document.getElementById('historySidebar'),
@@ -388,6 +391,28 @@ const setLanguage = (lang) => {
   renderHistory();
 };
 
+// 피드백 전송 함수
+const sendFeedback = async (rating) => {
+  if (!currentFeedbackId) return;
+  
+  try {
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedbackId: currentFeedbackId, rating })
+    });
+    
+    if (response.ok) {
+      alert(currentLang === 'ko' ? '소중한 피드백 감사합니다!' : 'Thank you for your feedback!');
+      // 피드백 버튼 비활성화 (중복 제출 방지)
+      if(DOM.btnLike) DOM.btnLike.disabled = true;
+      if(DOM.btnDislike) DOM.btnDislike.disabled = true;
+    }
+  } catch (error) {
+    console.error('Feedback Error:', error);
+  }
+};
+
 // --- 6. 이벤트 리스너 설정 ---
 
 // 6.1. 탭 드래그 스크롤
@@ -427,6 +452,14 @@ if (DOM.aiForm) {
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
     
+    // GA4 이벤트 전송 (추적)
+    if (typeof gtag === 'function') {
+      gtag('event', 'generate_text', {
+        'feature_name': feature.apiId,
+        'language': currentLang
+      });
+    }
+    
     // hidden 요소일 경우 value 값을 강제로 채워넣어 유효성 검사를 통과하게 합니다.
     let val1 = document.getElementById('input1')?.value.trim();
     if (feature.input1?.type === 'hidden') val1 = feature.input1.value || ' ';
@@ -447,6 +480,11 @@ if (DOM.aiForm) {
       DOM.resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
     }
     
+    // 새 요청 시 피드백 버튼 초기화
+    if(DOM.btnLike) DOM.btnLike.disabled = false;
+    if(DOM.btnDislike) DOM.btnDislike.disabled = false;
+    currentFeedbackId = null;
+
     DOM.aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
@@ -468,6 +506,11 @@ if (DOM.aiForm) {
       if (data.success && data.result && DOM.resultContent) {
         DOM.resultContent.innerHTML = marked.parse(data.result);
         
+        // 피드백 ID 저장
+        if (data.feedbackId) {
+          currentFeedbackId = data.feedbackId;
+        }
+        
         // 로컬 스토리지에 히스토리 저장
         const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
         history.unshift({ title: feature.title, text: data.result });
@@ -484,7 +527,7 @@ if (DOM.aiForm) {
   });
 }
 
-// 6.3. 복사 버튼
+// 6.3. 복사 버튼 및 피드백 버튼
 if (DOM.copyBtn) {
   DOM.copyBtn.addEventListener('click', () => {
     if (!DOM.resultContent) return;
@@ -498,6 +541,14 @@ if (DOM.copyBtn) {
       }
     });
   });
+}
+
+if (DOM.btnLike) {
+  DOM.btnLike.addEventListener('click', () => sendFeedback(1));
+}
+
+if (DOM.btnDislike) {
+  DOM.btnDislike.addEventListener('click', () => sendFeedback(-1));
 }
 
 // 6.4. 사이드바 히스토리 열기/닫기

@@ -47,6 +47,16 @@ const SYSTEM_PROMPTS = {
   },
 };
 
+// --- Supabase 초기화 ---
+const { createClient } = require('@supabase/supabase-js');
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+let supabase = null;
+
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+}
+
 // --- 2. Vercel Serverless Function 메인 로직 ---
 module.exports = async (req, res) => {
   // CORS(Cross-Origin Resource Sharing) 설정: 외부에서 API 호출을 허용합니다.
@@ -107,11 +117,51 @@ module.exports = async (req, res) => {
     // 9. 결과값 추출 (안전하게 접근하기 위해 옵셔널 체이닝(?.) 사용)
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '답변 생성에 실패했습니다.';
     
-    // 10. 성공적으로 클라이언트에 결과 반환
-    return res.status(200).json({ success: true, result: resultText });
+    // 10. Supabase에 비동기로 로그 저장 (사용자 응답 속도에 영향을 주지 않도록 await을 기다리지 않거나 에러를 무시하도록 처리)
+    let logId = null;
+    if (supabase) {
+      // 비동기로 실행하여 응답 지연 방지 (에러가 나더라도 본 응답은 정상 처리되도록 함)
+      supabase.from('chat_logs').insert([
+        { 
+          sub_category: subCategory, 
+          inputs: { input1, input2, input3 }, 
+          ai_result: resultText, 
+          lang: lang 
+        }
+      ]).select('id').single().then(({ data, error }) => {
+        if (error) {
+           console.error("Supabase Log Insert Error:", error);
+        } else {
+           console.log("Log saved successfully with ID:", data.id);
+        }
+      });
+      // 임시로 클라이언트에 넘겨줄 ID가 바로 필요하다면 동기 처리를 해야 하지만,
+      // 사용자 체감 속도를 위해 여기서는 응답 결과만 먼저 보냅니다.
+      // 피드백을 위해 UUID를 서버에서 생성해서 넘겨주고, 그걸로 DB에 저장하도록 방식을 변경합니다.
+    }
+    
+    // 피드백 매칭을 위해 고유 ID(timestamp 기반 난수)를 하나 생성해서 응답에 포함시킵니다.
+    const feedbackId = `log_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    
+    if (supabase) {
+      supabase.from('chat_logs').insert([
+        { 
+          id: feedbackId,
+          sub_category: subCategory, 
+          inputs: { input1, input2, input3 }, 
+          ai_result: resultText, 
+          lang: lang 
+        }
+      ]).then(({ error }) => {
+        if (error) console.error("Supabase Log Insert Error:", error);
+      });
+    }
+
+    // 11. 성공적으로 클라이언트에 결과 및 feedbackId 반환
+    return res.status(200).json({ success: true, result: resultText, feedbackId: feedbackId });
 
   } catch (error) {
-    // 11. 에러 처리: 서버 내부에서 예상치 못한 에러가 발생한 경우
+    // 12. 에러 처리: 서버 내부에서 예상치 못한 에러가 발생한 경우
     console.error("Server Internal Error:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
