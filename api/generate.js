@@ -63,11 +63,9 @@ module.exports = async (req, res) => {
     // 5. 프롬프트 조립 및 필수 조건 추가
     const finalPrompt = promptFunc(input1, input2, input3) + '\n\n[필수] 불필요한 인사말 없이 결과물만 출력해.';
 
-    // 6. Gemini API 통신 규격 설정 (최신, 가장 안정적인 모델명으로 변경)
-    // 이전 에러 원인: 구글 API v1beta 버전에서 gemini-1.5-flash 모델의 접근 이름이 변경되었거나 제한됨.
-    // 해결: 구글 공식 문서 상 가장 기본적이고 권장되는 구버전 호환 모델명(gemini-pro)으로 폴백(Fallback)하거나 가장 최신 모델 형식으로 변경.
-    // 현재 v1beta에서 가장 안전한 호출 방식인 gemini-1.5-flash를 사용하되 URL 구조를 확인해야 합니다.
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // 6. Gemini API 통신 규격 설정 (최신 gemini-2.5-flash 모델 적용)
+    // 2026년 기준 가장 빠르고 안정적인 모델인 gemini-2.5-flash 모델로 완벽 고정
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     // 7. 구글 서버로 요청 보내기
     const response = await fetch(apiUrl, {
