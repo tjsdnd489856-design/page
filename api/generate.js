@@ -2,7 +2,7 @@
 // 사용자 요청에 맞는 프롬프트를 생성하는 함수들의 모음입니다.
 const SYSTEM_PROMPTS = {
   ko: {
-    '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].`,
+    '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].\n[엄격한 규칙] 절대 네가 스스로 새로운 정보나 내용을 추가하거나 지어내지 마. 오직 사용자가 입력한 [메모] 내용 안에서만 문장을 다듬고 요약/정리해서 [문서형태]로 만들어야 해.`,
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].`,
     '프로 사과문': (i1, i2, i3) => `너는 위기관리 전문가야. [사고:${i1}], [대안:${i2}], [대상:${i3}].`,
     '리포트 심폐소생': (i1, i2, i3) => `너는 논문 전문가야. [대상:${i1}], [초안:${i2}], [어조:${i3}].`,
@@ -24,7 +24,7 @@ const SYSTEM_PROMPTS = {
   },
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}].`,
-    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}].`,
+    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}].\n[STRICT RULE] NEVER add or invent new information. You must ONLY summarize and format the provided [Notes].`,
   },
 };
 
