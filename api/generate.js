@@ -63,8 +63,9 @@ module.exports = async (req, res) => {
     // 5. 프롬프트 조립 및 필수 조건 추가
     const finalPrompt = promptFunc(input1, input2, input3) + '\n\n[필수] 불필요한 인사말 없이 결과물만 출력해.';
 
-    // 6. Gemini API 통신 규격 설정 (모델명: gemini-1.5-flash-latest 고정)
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // 6. Gemini API 통신 규격 설정 (모델명: gemini-1.5-flash 고정)
+    // 에러 원인 해결: 'latest' 키워드가 지원되지 않는 환경이 있어 안정적인 버전 이름으로 수정합니다.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     // 7. 구글 서버로 요청 보내기
     const response = await fetch(apiUrl, {
