@@ -19,281 +19,435 @@ const SYSTEM_PROMPTS = {
     'SQL 쿼리 짜기': (i1, i2, i3) => `너는 시니어 DB 관리자야. [테이블:${i1}], [원하는데이터:${i2}], [DBMS종류:${i3}].\n이제 조건에 맞춰 작성해.`,
     '정규식(Regex) 설명': (i1, i2, i3) => `너는 시니어 개발자야. [상황/패턴:${i1}], [요청사항:${i2}], [이해수준:${i3}].\n이제 조건에 맞춰 작성해.`,
     '인스타그램 해시태그': (i1, i2, i3) => `너는 SNS 마케터야. [주제/사진설명:${i1}], [타겟고객:${i2}], [분위기:${i3}].\n이제 조건에 맞춰 작성해.`,
-    '광고 카피라이팅': (i1, i2, i3) => `너는 광고 카피라이터야. [제품/서비스:${i1}], [소구포인트:${i2}], [광고매체:${i3}].\n이제 조건에 맞춰 작성해.`
+    '광고 카피라이팅': (i1, i2, i3) => `너는 광고 카피라이터야. [제품/서비스:${i1}], [소구포인트:${i2}], [광고매체:${i3}].\n이제 조건에 맞춰 작성해.`,
   },
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}]. Now write.`,
-    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`
+    '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`,
+  },
+};
+
+// --- 2. 다국어 및 UI 데이터 ---
+const translations = {
+  ko: {
+    ui: {
+      docTitle: '🦊 채티폭스 - AI Workspace',
+      logoText: '<span class="text-slate-800 dark:text-white tracking-tight">채티</span><span class="text-orange-500 tracking-tight">폭스</span>',
+      subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
+      historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
+      historyEmpty: '최근 생성된 텍스트가 없습니다.',
+      submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ 3초 만에 텍스트 뽑기',
+      resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 직접 수정 가능)',
+      copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
+      toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
+      alertEmpty: '모든 빈칸을 채워주세요.',
+      generating: '🦊 여우 비서가 생성 중입니다...',
+      fetchError: '데이터를 가져오는 중 오류가 발생했습니다.',
+    },
+    appData: [
+      {
+        categoryId: 'business',
+        categoryName: '🏢 비즈니스/이메일',
+        subFeatures: [
+          { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
+          { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [{ value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' }] } },
+          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [{ value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' }] } },
+        ],
+      },
+      {
+        categoryId: 'school',
+        categoryName: '🏫 과제/요약',
+        subFeatures: [
+          { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [{ value: '🎓학술적', text: '🎓학술적' }, { value: '📝핵심만 개조식으로', text: '📝핵심만 개조식으로' }] } },
+          { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로', input1: { label: '발표 시간/타겟', placeholder: '예: 5분, 대학생', type: 'text' }, input2: { label: '발표 자료', placeholder: 'PPT 내용 복붙', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [{ value: '🎙️전문적', text: '🎙️전문적' }, { value: '💬청중 소통톤', text: '💬청중 소통톤' }] } },
+          { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: '자소서 영혼 주입기', desc: '경험을 성과로', input1: { label: '지원 직무', placeholder: '예: 마케팅', type: 'text' }, input2: { label: '나의 경험', placeholder: '카페 알바 6개월...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [{ value: '🔥열정 가득', text: '🔥열정 가득' }, { value: '📊데이터 중심', text: '📊데이터 중심' }] } },
+        ],
+      },
+      {
+        categoryId: 'excel',
+        categoryName: '📊 엑셀/시트',
+        subFeatures: [
+          { id: 'excelFormula', apiId: '함수 수식 뚝딱이', icon: '🧮', title: '함수 수식 뚝딱이', desc: '말로 하면 수식으로', input1: { label: '데이터 상황', placeholder: '예: A열은 이름, B열은 실적', type: 'text' }, input2: { label: '원하는 결과', placeholder: '예: 실적 80 이상 인원수', type: 'textarea' }, input3: { label: '프로그램', type: 'select', options: [{ value: 'MS 엑셀', text: 'MS 엑셀' }, { value: '구글 시트', text: '구글 시트' }] } },
+          { id: 'excelDecode', apiId: '외계어 수식 해독기', icon: '🔍', title: '외계어 수식 해독기', desc: '수식 분석', input1: { label: '수식/에러', placeholder: '=VLOOKUP...', type: 'text' }, input2: { label: '질문', placeholder: '무슨 뜻이야?', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [{ value: '👶초보자용', text: '👶초보자용' }, { value: '🧑‍💻실무자용', text: '🧑‍💻실무자용' }] } },
+          { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: '반복작업 매크로', desc: 'VBA 생성', input1: { label: '환경', placeholder: '예: 엑셀 VBA', type: 'text' }, input2: { label: '작업 설명', placeholder: '시트 쪼개기 등', type: 'textarea' }, input3: { label: '스타일', type: 'select', options: [{ value: '📝주석 포함', text: '📝주석 포함' }, { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' }] } },
+        ],
+      },
+      {
+        categoryId: 'dev',
+        categoryName: '💻 개발/코딩',
+        subFeatures: [
+          { id: 'sqlGen', apiId: 'SQL 쿼리 짜기', icon: '🗄️', title: 'SQL 쿼리 짜기', desc: '원하는 데이터를 쿼리로', input1: { label: '테이블 구조', placeholder: '예: users(id, age)', type: 'text' }, input2: { label: '원하는 데이터', placeholder: '나이가 30 이상', type: 'textarea' }, input3: { label: 'DBMS', type: 'select', options: [{ value: 'MySQL', text: 'MySQL' }, { value: 'PostgreSQL', text: 'PostgreSQL' }] } },
+          { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '패턴', placeholder: '이메일 추출 등', type: 'text' }, input2: { label: '요청사항', placeholder: '설명해줘 등', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [{ value: '👶초보', text: '👶초보' }, { value: '🧑‍💻시니어', text: '🧑‍💻시니어' }] } },
+        ],
+      },
+      {
+        categoryId: 'marketing',
+        categoryName: '📱 마케팅/SNS',
+        subFeatures: [
+          { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
+          { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [{ value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' }] } },
+        ],
+      },
+    ],
+  },
+  en: {
+    ui: {
+      docTitle: '🦊 ChattyFox - AI Workspace',
+      logoText: 'ChattyFox',
+      subtitle: 'Professional AI assistant.',
+      historyTitle: 'History',
+      historyEmpty: 'Empty.',
+      submitBtn: 'Generate',
+      resultTitle: 'Result',
+      copyBtn: 'Copy',
+      toastMsg: 'Copied!',
+      alertEmpty: 'Fill all.',
+      generating: 'Thinking...',
+    },
+    appData: [
+      {
+        categoryId: 'business',
+        categoryName: 'Business',
+        subFeatures: [
+          { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } },
+        ],
+      },
+    ],
+  },
+};
+
+// --- 3. 전역 상태 변수 (State) ---
+let currentLang = 'ko';
+let currentCategoryIndex = 0;
+let currentFeatureIndex = 0;
+
+// 탭 드래그 관련 상태
+let isDragging = false;
+let hasDragged = false;
+let startX;
+let scrollLeft;
+
+// --- 4. DOM 요소 캐싱 ---
+const DOM = {
+  mainTabsContainer: document.getElementById('mainTabs'),
+  subFeaturesContainer: document.getElementById('subFeatures'),
+  aiForm: document.getElementById('aiForm'),
+  resultArea: document.getElementById('resultArea'),
+  resultContent: document.getElementById('resultContent'),
+  copyBtn: document.getElementById('copyBtn'),
+  toast: document.getElementById('toast'),
+  historyList: document.getElementById('historyList'),
+  historySidebar: document.getElementById('historySidebar'),
+  darkModeToggle: document.getElementById('darkModeToggle'),
+  appLogoText: document.getElementById('appLogoText'),
+  appSubtitle: document.getElementById('appSubtitle'),
+  submitBtn: document.getElementById('submitBtn'),
+  resultTitle: document.getElementById('resultTitle'),
+  toastMsg: document.getElementById('toastMsg'),
+  openHistoryBtn: document.getElementById('openHistoryBtn'),
+  closeHistoryBtn: document.getElementById('closeHistoryBtn'),
+};
+
+// --- 5. UI 및 로직 함수 ---
+
+// 5.1. 다크모드 초기화
+const initDarkMode = () => {
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.documentElement.classList.add('dark');
+  }
+  
+  if (DOM.darkModeToggle) {
+    DOM.darkModeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    });
   }
 };
 
-const translations = {
-    ko: {
-        ui: {
-            docTitle: '🦊 채티폭스 - AI Workspace',
-            logoText: '<span class="text-slate-800 dark:text-white tracking-tight">채티</span><span class="text-orange-500 tracking-tight">폭스</span>',
-            subtitle: '이메일 작성부터 엑셀 수식까지, 스마트한 여우 비서가 찾아주는 세련된 정답',
-            historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>최근 생성 기록',
-            historyEmpty: '최근 생성된 텍스트가 없습니다.',
-            submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> ✨ 3초 만에 텍스트 뽑기',
-            resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>결과물 (클릭하여 직접 수정 가능)',
-            copyBtn: '<i class="fa-regular fa-copy mr-2"></i> 바로 복사해서 쓰기',
-            toastMsg: '복사 완료! Ctrl+V로 붙여넣으세요.',
-            alertEmpty: '모든 빈칸을 채워주세요.',
-            generating: '🦊 여우 비서가 생성 중입니다...',
-            fetchError: '데이터를 가져오는 중 오류가 발생했습니다.'
-        },
-        appData: [
-            {
-                categoryId: 'business', categoryName: '🏢 비즈니스/이메일',
-                subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
-                    { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [ { value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' } ] } },
-                    { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [ { value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' } ] } }
-                ]
-            },
-            {
-                categoryId: 'school', categoryName: '🏫 과제/요약',
-                subFeatures: [
-                    { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: '리포트 심폐소생', desc: '초안을 완벽한 리포트로', input1: { label: '제출 대상', placeholder: '예: 교수님', type: 'text' }, input2: { label: '초안 복붙', placeholder: '예: 서론은...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🎓학술적', text: '🎓학술적' }, { value: '📝핵심만 개조식으로', text: '📝핵심만 개조식으로' } ] } },
-                    { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: '발표 대본 변환', desc: '자료를 자연스러운 대본으로', input1: { label: '발표 시간/타겟', placeholder: '예: 5분, 대학생', type: 'text' }, input2: { label: '발표 자료', placeholder: 'PPT 내용 복붙', type: 'textarea' }, input3: { label: '어조', type: 'select', options: [ { value: '🎙️전문적', text: '🎙️전문적' }, { value: '💬청중 소통톤', text: '💬청중 소통톤' } ] } },
-                    { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: '자소서 영혼 주입기', desc: '경험을 성과로', input1: { label: '지원 직무', placeholder: '예: 마케팅', type: 'text' }, input2: { label: '나의 경험', placeholder: '카페 알바 6개월...', type: 'textarea' }, input3: { label: '어조 선택', type: 'select', options: [ { value: '🔥열정 가득', text: '🔥열정 가득' }, { value: '📊데이터 중심', text: '📊데이터 중심' } ] } }
-                ]
-            },
-            {
-                categoryId: 'excel', categoryName: '📊 엑셀/시트',
-                subFeatures: [
-                    { id: 'excelFormula', apiId: '함수 수식 뚝딱이', icon: '🧮', title: '함수 수식 뚝딱이', desc: '말로 하면 수식으로', input1: { label: '데이터 상황', placeholder: '예: A열은 이름, B열은 실적', type: 'text' }, input2: { label: '원하는 결과', placeholder: '예: 실적 80 이상 인원수', type: 'textarea' }, input3: { label: '프로그램', type: 'select', options: [ { value: 'MS 엑셀', text: 'MS 엑셀' }, { value: '구글 시트', text: '구글 시트' } ] } },
-                    { id: 'excelDecode', apiId: '외계어 수식 해독기', icon: '🔍', title: '외계어 수식 해독기', desc: '수식 분석', input1: { label: '수식/에러', placeholder: '=VLOOKUP...', type: 'text' }, input2: { label: '질문', placeholder: '무슨 뜻이야?', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [ { value: '👶초보자용', text: '👶초보자용' }, { value: '🧑‍💻실무자용', text: '🧑‍💻실무자용' } ] } },
-                    { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: '반복작업 매크로', desc: 'VBA 생성', input1: { label: '환경', placeholder: '예: 엑셀 VBA', type: 'text' }, input2: { label: '작업 설명', placeholder: '시트 쪼개기 등', type: 'textarea' }, input3: { label: '스타일', type: 'select', options: [ { value: '📝주석 포함', text: '📝주석 포함' }, { value: '⚡코드만 깔끔하게', text: '⚡코드만 깔끔하게' } ] } }
-                ]
-            },
-            {
-                categoryId: 'dev', categoryName: '💻 개발/코딩',
-                subFeatures: [
-                    { id: 'sqlGen', apiId: 'SQL 쿼리 짜기', icon: '🗄️', title: 'SQL 쿼리 짜기', desc: '원하는 데이터를 쿼리로', input1: { label: '테이블 구조', placeholder: '예: users(id, age)', type: 'text' }, input2: { label: '원하는 데이터', placeholder: '나이가 30 이상', type: 'textarea' }, input3: { label: 'DBMS', type: 'select', options: [ { value: 'MySQL', text: 'MySQL' }, { value: 'PostgreSQL', text: 'PostgreSQL' } ] } },
-                    { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '패턴', placeholder: '이메일 추출 등', type: 'text' }, input2: { label: '요청사항', placeholder: '설명해줘 등', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [ { value: '👶초보', text: '👶초보' }, { value: '🧑‍💻시니어', text: '🧑‍💻시니어' } ] } }
-                ]
-            },
-            {
-                categoryId: 'marketing', categoryName: '📱 마케팅/SNS',
-                subFeatures: [
-                    { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
-                    { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [ { value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' } ] } }
-                ]
-            }
-        ]
-    },
-    en: {
-        ui: {
-            docTitle: '🦊 ChattyFox - AI Workspace',
-            logoText: 'ChattyFox',
-            subtitle: 'Professional AI assistant.',
-            historyTitle: 'History',
-            historyEmpty: 'Empty.',
-            submitBtn: 'Generate',
-            resultTitle: 'Result',
-            copyBtn: 'Copy',
-            toastMsg: 'Copied!',
-            alertEmpty: 'Fill all.',
-            generating: 'Thinking...'
-        },
-        appData: [
-            {
-                categoryId: 'business', categoryName: 'Business',
-                subFeatures: [
-                    { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } }
-                ]
-            }
-        ]
-    }
+// 5.2. 메인 탭 렌더링
+const renderMainTabs = () => {
+  if (!DOM.mainTabsContainer) return;
+  DOM.mainTabsContainer.innerHTML = '';
+  
+  translations[currentLang].appData.forEach((category, index) => {
+    const btn = document.createElement('button');
+    const isActive = currentCategoryIndex === index;
+    
+    btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors ${
+      isActive 
+        ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' 
+        : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'
+    }`;
+    btn.textContent = category.categoryName;
+    
+    btn.addEventListener('click', () => {
+      if (!hasDragged) {
+        currentCategoryIndex = index;
+        currentFeatureIndex = 0;
+        updateTabContent();
+      }
+    });
+    
+    DOM.mainTabsContainer.appendChild(btn);
+  });
 };
 
-let currentLang = 'ko'; 
-let currentCategoryIndex = 0;
-let currentFeatureIndex = 0;
-let isDragging = false; let hasDragged = false; let startX; let scrollLeft;
-
-const mainTabsContainer = document.getElementById('mainTabs');
-const subFeaturesContainer = document.getElementById('subFeatures');
-const aiForm = document.getElementById('aiForm');
-const resultArea = document.getElementById('resultArea');
-const resultContent = document.getElementById('resultContent'); 
-const copyBtn = document.getElementById('copyBtn');
-const toast = document.getElementById('toast');
-const historyList = document.getElementById('historyList');
-const historySidebar = document.getElementById('historySidebar');
-
-function initDarkMode() {
-    if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
-    document.getElementById('darkModeToggle').onclick = () => {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    };
-}
-
-// [아이콘 깨짐 해결] innerHTML을 사용하여 아이콘 태그가 렌더링되도록 함
-function setLanguage(lang) {
-    currentLang = lang;
-    const t = translations[lang] || translations.ko;
-    document.title = t.ui.docTitle;
-    document.getElementById('appLogoText').innerHTML = t.ui.logoText;
-    document.getElementById('appSubtitle').textContent = t.ui.subtitle;
-    document.getElementById('submitBtn').innerHTML = t.ui.submitBtn; 
-    document.getElementById('resultTitle').innerHTML = t.ui.resultTitle;
-    document.getElementById('copyBtn').innerHTML = t.ui.copyBtn;
-    document.getElementById('toastMsg').textContent = t.ui.toastMsg;
-    updateTabContent();
-    renderHistory();
-}
-
-function updateTabContent() {
-    renderMainTabs();
-    renderSubFeatures();
-    updateFormFields();
-}
-
-function renderMainTabs() {
-    if (!mainTabsContainer) return;
-    mainTabsContainer.innerHTML = ''; 
-    translations[currentLang].appData.forEach((category, index) => {
-        const btn = document.createElement('button');
-        btn.className = `whitespace-nowrap flex-shrink-0 px-4 py-2 text-sm font-semibold transition-colors ${currentCategoryIndex === index ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-gray-500 dark:text-slate-400 border-b-2 border-transparent'}`;
-        btn.textContent = category.categoryName;
-        btn.onclick = () => { if (!hasDragged) { currentCategoryIndex = index; currentFeatureIndex = 0; updateTabContent(); } };
-        mainTabsContainer.appendChild(btn);
-    });
-}
-
-// 탭 드래그 기능 (보존)
-if (mainTabsContainer) {
-    mainTabsContainer.addEventListener('mousedown', (e) => {
-        isDragging = true; hasDragged = false;
-        mainTabsContainer.classList.add('cursor-grabbing');
-        startX = e.pageX - mainTabsContainer.offsetLeft;
-        scrollLeft = mainTabsContainer.scrollLeft;
-    });
-    mainTabsContainer.addEventListener('mouseleave', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
-    mainTabsContainer.addEventListener('mouseup', () => { isDragging = false; mainTabsContainer.classList.remove('cursor-grabbing'); });
-    mainTabsContainer.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const walk = (e.pageX - mainTabsContainer.offsetLeft) - startX;
-        if (Math.abs(walk) > 5) hasDragged = true; 
-        mainTabsContainer.scrollLeft = scrollLeft - walk;
-    });
-}
-
-function renderSubFeatures() {
-    if (!subFeaturesContainer) return;
-    subFeaturesContainer.innerHTML = ''; 
-    const features = translations[currentLang].appData[currentCategoryIndex].subFeatures;
-    features.forEach((feature, index) => {
-        const btn = document.createElement('button');
-        btn.className = `p-4 text-center rounded-xl border-2 transition-all ${currentFeatureIndex === index ? 'border-orange-500 bg-orange-50 dark:bg-slate-800 shadow-md' : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'}`;
-        btn.innerHTML = `<span class="text-3xl mb-2">${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">${feature.title}</strong>`;
-        btn.onclick = () => { currentFeatureIndex = index; updateTabContent(); };
-        subFeaturesContainer.appendChild(btn);
-    });
-}
-
-function updateFormFields() {
-    const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    const l1 = document.getElementById('input1Label');
-    const i1 = document.getElementById('input1');
-    const l2 = document.getElementById('input2Label');
-    const i2 = document.getElementById('input2');
-    const i3c = document.getElementById('input3Container');
+// 5.3. 서브 기능 렌더링
+const renderSubFeatures = () => {
+  if (!DOM.subFeaturesContainer) return;
+  DOM.subFeaturesContainer.innerHTML = '';
+  
+  const features = translations[currentLang].appData[currentCategoryIndex].subFeatures;
+  
+  features.forEach((feature, index) => {
+    const btn = document.createElement('button');
+    const isActive = currentFeatureIndex === index;
     
-    if(l1) l1.textContent = feature.input1.label;
-    if(i1) i1.placeholder = feature.input1.placeholder;
-    if(l2) l2.textContent = feature.input2.label;
-    if(i2) i2.placeholder = feature.input2.placeholder;
+    btn.className = `p-4 text-center rounded-xl border-2 transition-all ${
+      isActive 
+        ? 'border-orange-500 bg-orange-50 dark:bg-slate-800 shadow-md' 
+        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+    }`;
+    btn.innerHTML = `<span class="text-3xl mb-2">${feature.icon}</span><strong class="block text-gray-800 dark:text-slate-200 font-bold mb-1">${feature.title}</strong>`;
     
-    if (i3c) {
-        i3c.innerHTML = `<label class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
-        const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white';
-        if (feature.input3.type === 'select') {
-            const select = document.createElement('select');
-            select.id = 'input3'; select.className = commonClasses;
-            feature.input3.options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value; option.textContent = opt.text;
-                select.appendChild(option);
-            });
-            i3c.appendChild(select);
-        } else {
-            const input = document.createElement('input');
-            input.type = 'text'; input.id = 'input3'; input.className = commonClasses;
-            input.placeholder = feature.input3.placeholder;
-            i3c.appendChild(input);
-        }
+    btn.addEventListener('click', () => {
+      currentFeatureIndex = index;
+      updateTabContent();
+    });
+    
+    DOM.subFeaturesContainer.appendChild(btn);
+  });
+};
+
+// 5.4. 폼 필드 업데이트
+const updateFormFields = () => {
+  const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
+  
+  const l1 = document.getElementById('input1Label');
+  const i1 = document.getElementById('input1');
+  const l2 = document.getElementById('input2Label');
+  const i2 = document.getElementById('input2');
+  const i3c = document.getElementById('input3Container');
+  
+  if (l1) l1.textContent = feature.input1.label;
+  if (i1) i1.placeholder = feature.input1.placeholder;
+  if (l2) l2.textContent = feature.input2.label;
+  if (i2) i2.placeholder = feature.input2.placeholder;
+  
+  if (i3c) {
+    i3c.innerHTML = `<label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
+    const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
+    
+    if (feature.input3.type === 'select') {
+      const select = document.createElement('select');
+      select.id = 'input3';
+      select.className = commonClasses;
+      
+      feature.input3.options.forEach((opt) => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.text;
+        select.appendChild(option);
+      });
+      i3c.appendChild(select);
+    } else {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'input3';
+      input.className = commonClasses;
+      input.placeholder = feature.input3.placeholder;
+      i3c.appendChild(input);
     }
-}
+  }
+};
 
-function renderHistory() {
-    const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
-    if (!historyList) return;
-    historyList.innerHTML = '';
-    const msg = document.getElementById('historyEmptyMsg');
-    if (msg) msg.style.display = history.length ? 'none' : 'block';
+// 5.5. 전체 탭 콘텐츠 업데이트
+const updateTabContent = () => {
+  renderMainTabs();
+  renderSubFeatures();
+  updateFormFields();
+};
+
+// 5.6. 히스토리 렌더링
+const renderHistory = () => {
+  const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
+  if (!DOM.historyList) return;
+  
+  DOM.historyList.innerHTML = '';
+  const msg = document.getElementById('historyEmptyMsg');
+  
+  if (msg) {
+    msg.style.display = history.length ? 'none' : 'block';
+  }
+  
+  history.forEach((item) => {
+    const div = document.createElement('div');
+    div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 mb-2';
     
-    history.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-orange-50 mb-2';
-        const cleanText = item.text.replace(new RegExp("[#*`]", "g"), '');
-        div.innerHTML = `<span class="text-xs font-bold text-primary">${item.title}</span><p class="text-xs text-gray-600 dark:text-slate-300 truncate">${cleanText}</p>`;
-        div.onclick = () => { resultContent.innerHTML = marked.parse(item.text); resultArea.classList.remove('hidden'); historySidebar.classList.add('translate-x-full'); };
-        historyList.appendChild(div);
+    // 특수문자 제거 후 말줄임표 처리
+    const cleanText = item.text.replace(/[#*`]/g, '');
+    div.innerHTML = `
+      <span class="text-xs font-bold text-primary">${item.title}</span>
+      <p class="text-xs text-gray-600 dark:text-slate-300 truncate">${cleanText}</p>
+    `;
+    
+    div.addEventListener('click', () => {
+      if (DOM.resultContent && DOM.resultArea && DOM.historySidebar) {
+        DOM.resultContent.innerHTML = marked.parse(item.text);
+        DOM.resultArea.classList.remove('hidden');
+        DOM.historySidebar.classList.add('translate-x-full');
+      }
     });
+    
+    DOM.historyList.appendChild(div);
+  });
+};
+
+// 5.7. 다국어 설정
+const setLanguage = (lang) => {
+  currentLang = lang;
+  const t = translations[lang] || translations.ko;
+  
+  document.title = t.ui.docTitle;
+  if (DOM.appLogoText) DOM.appLogoText.innerHTML = t.ui.logoText;
+  if (DOM.appSubtitle) DOM.appSubtitle.textContent = t.ui.subtitle;
+  if (DOM.submitBtn) DOM.submitBtn.innerHTML = t.ui.submitBtn;
+  if (DOM.resultTitle) DOM.resultTitle.innerHTML = t.ui.resultTitle;
+  if (DOM.copyBtn) DOM.copyBtn.innerHTML = t.ui.copyBtn;
+  if (DOM.toastMsg) DOM.toastMsg.textContent = t.ui.toastMsg;
+  
+  updateTabContent();
+  renderHistory();
+};
+
+// --- 6. 이벤트 리스너 설정 ---
+
+// 6.1. 탭 드래그 스크롤
+if (DOM.mainTabsContainer) {
+  DOM.mainTabsContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    hasDragged = false;
+    DOM.mainTabsContainer.classList.add('cursor-grabbing');
+    startX = e.pageX - DOM.mainTabsContainer.offsetLeft;
+    scrollLeft = DOM.mainTabsContainer.scrollLeft;
+  });
+  
+  DOM.mainTabsContainer.addEventListener('mouseleave', () => {
+    isDragging = false;
+    DOM.mainTabsContainer.classList.remove('cursor-grabbing');
+  });
+  
+  DOM.mainTabsContainer.addEventListener('mouseup', () => {
+    isDragging = false;
+    DOM.mainTabsContainer.classList.remove('cursor-grabbing');
+  });
+  
+  DOM.mainTabsContainer.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const walk = (e.pageX - DOM.mainTabsContainer.offsetLeft) - startX;
+    if (Math.abs(walk) > 5) hasDragged = true;
+    DOM.mainTabsContainer.scrollLeft = scrollLeft - walk;
+  });
 }
 
-aiForm.addEventListener('submit', async (e) => {
+// 6.2. 폼 제출 (AI 생성 요청)
+if (DOM.aiForm) {
+  DOM.aiForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
-    const val1 = document.getElementById('input1').value.trim();
-    const val2 = document.getElementById('input2').value.trim();
-    const val3 = document.getElementById('input3').value.trim();
+    
+    const val1 = document.getElementById('input1')?.value.trim();
+    const val2 = document.getElementById('input2')?.value.trim();
+    const val3 = document.getElementById('input3')?.value.trim();
 
-    if (!val1 || !val2 || !val3) { alert(uiText.alertEmpty); return; }
+    if (!val1 || !val2 || !val3) {
+      alert(uiText.alertEmpty);
+      return;
+    }
 
-    resultArea.classList.remove('hidden');
-    resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
-    aiForm.classList.add('opacity-50', 'pointer-events-none');
+    if (DOM.resultArea && DOM.resultContent) {
+      DOM.resultArea.classList.remove('hidden');
+      DOM.resultContent.innerHTML = `<div class="flex flex-col items-center py-4 text-orange-500 font-bold animate-pulse"><span>${uiText.generating}</span></div>`;
+    }
+    
+    DOM.aiForm.classList.add('opacity-50', 'pointer-events-none');
 
     try {
-        const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subCategory: feature.apiId, input1: val1, input2: val2, input3: val3, lang: currentLang })
-        });
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          subCategory: feature.apiId, 
+          input1: val1, 
+          input2: val2, 
+          input3: val3, 
+          lang: currentLang 
+        }),
+      });
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'AI 통신 실패');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'AI 통신 실패');
 
-        if (data.success && data.result) {
-            resultContent.innerHTML = marked.parse(data.result);
-            const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
-            history.unshift({ title: feature.title, text: data.result });
-            localStorage.setItem('quickfix_history', JSON.stringify(history.slice(0, 10)));
-            renderHistory();
-        }
+      if (data.success && data.result && DOM.resultContent) {
+        DOM.resultContent.innerHTML = marked.parse(data.result);
+        
+        // 로컬 스토리지에 히스토리 저장
+        const history = JSON.parse(localStorage.getItem('quickfix_history') || '[]');
+        history.unshift({ title: feature.title, text: data.result });
+        localStorage.setItem('quickfix_history', JSON.stringify(history.slice(0, 10)));
+        renderHistory();
+      }
     } catch (error) {
-        resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border rounded-lg">Error: ${error.message}</div>`;
+      if (DOM.resultContent) {
+        DOM.resultContent.innerHTML = `<div class="text-red-500 font-bold p-4 border rounded-lg">Error: ${error.message}</div>`;
+      }
     } finally {
-        aiForm.classList.remove('opacity-50', 'pointer-events-none');
+      DOM.aiForm.classList.remove('opacity-50', 'pointer-events-none');
     }
-});
+  });
+}
 
-copyBtn.onclick = () => {
-    navigator.clipboard.writeText(resultContent.innerText).then(() => {
-        toast.classList.remove('opacity-0', 'translate-y-4');
-        setTimeout(() => toast.classList.add('opacity-0', 'translate-y-4'), 2500);
+// 6.3. 복사 버튼
+if (DOM.copyBtn) {
+  DOM.copyBtn.addEventListener('click', () => {
+    if (!DOM.resultContent) return;
+    
+    navigator.clipboard.writeText(DOM.resultContent.innerText).then(() => {
+      if (DOM.toast) {
+        DOM.toast.classList.remove('opacity-0', 'translate-y-4');
+        setTimeout(() => {
+          DOM.toast.classList.add('opacity-0', 'translate-y-4');
+        }, 2500);
+      }
     });
-};
-document.getElementById('openHistoryBtn').onclick = () => historySidebar.classList.remove('translate-x-full');
-document.getElementById('closeHistoryBtn').onclick = () => historySidebar.classList.add('translate-x-full');
+  });
+}
 
-initDarkMode();
-setLanguage(new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko');
+// 6.4. 사이드바 히스토리 열기/닫기
+if (DOM.openHistoryBtn && DOM.historySidebar) {
+  DOM.openHistoryBtn.addEventListener('click', () => {
+    DOM.historySidebar.classList.remove('translate-x-full');
+  });
+}
+
+if (DOM.closeHistoryBtn && DOM.historySidebar) {
+  DOM.closeHistoryBtn.addEventListener('click', () => {
+    DOM.historySidebar.classList.add('translate-x-full');
+  });
+}
+
+// --- 7. 초기화 실행 ---
+const initApp = () => {
+  initDarkMode();
+  
+  // URL에서 언어 파라미터 확인 후 설정 (기본값: ko)
+  const urlParams = new URLSearchParams(window.location.search);
+  const lang = urlParams.get('lang') === 'en' ? 'en' : 'ko';
+  setLanguage(lang);
+};
+
+// 앱 시작
+initApp();
