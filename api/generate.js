@@ -21,7 +21,8 @@ const SYSTEM_PROMPTS = {
     '진심 어린 사과문': (i1, i2, i3) => `너는 심리상담사야. [대상:${i1}], [잘못:${i2}], [어조:${i3}].`,
     '당근 진상 퇴치기': (i1, i2, i3) => `너는 중고거래 고수야. [상황:${i1}], [팩트:${i2}], [어조:${i3}].`,
     '매력적인 판매글': (i1, i2, i3) => `너는 판매글 장인이야. [물건:${i1}], [특징:${i2}], [어조:${i3}].`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [별점:${i1}], [리뷰:${i2}], [어조:${i3}].`,
+    // 별점 항목이 제거되었으므로 i1은 무시하고 i2(리뷰), i3(어조)만 사용합니다.
+    '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [고객리뷰:${i2}], [어조:${i3}].`,
   },
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}].`,
@@ -35,7 +36,7 @@ const SYSTEM_PROMPTS = {
     '진심 어린 사과문': (i1, i2, i3) => `Act as a counselor. [Recipient:${i1}], [Mistake:${i2}], [Tone:${i3}].`,
     '당근 진상 퇴치기': (i1, i2, i3) => `Act as an expert seller. [Situation:${i1}], [Facts:${i2}], [Tone:${i3}].`,
     '매력적인 판매글': (i1, i2, i3) => `Act as a copywriter. [Item:${i1}], [Features:${i2}], [Tone:${i3}].`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Rating:${i1}], [Review:${i2}], [Tone:${i3}].`,
+    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Review:${i2}], [Tone:${i3}].`,
     '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}].`,
     '외계어 수식 해독기': (i1, i2, i3) => `Act as an Excel Instructor. [Formula:${i1}], [Question:${i2}], [Level:${i3}].`,
     '반복작업 매크로': (i1, i2, i3) => `Act as an Automation Engineer. [Env:${i1}], [Task:${i2}], [Style:${i3}].`,
