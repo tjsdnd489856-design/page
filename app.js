@@ -51,7 +51,8 @@ const translations = {
         subFeatures: [
           { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: "회의결과 1. 예산 삭감됨..."', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
           { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [{ value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' }] } },
-          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { label: '대상', type: 'select', options: [{ value: '🏢내부용', text: '🏢내부용' }, { value: '🤝외부용', text: '🤝외부용' }] } },
+          // 프로 사과문의 대상(input3)을 고정값 '외부용'으로 처리하기 위해 화면에서는 숨김(hidden) 처리합니다.
+          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { type: 'hidden', value: '외부용' } },
         ],
       },
       {
@@ -229,34 +230,47 @@ const updateFormFields = () => {
   const i2 = document.getElementById('input2');
   const i3c = document.getElementById('input3Container');
   
-  if (l1) l1.textContent = feature.input1.label;
-  if (i1) i1.placeholder = feature.input1.placeholder;
-  if (l2) l2.textContent = feature.input2.label;
-  if (i2) i2.placeholder = feature.input2.placeholder;
+  if (l1) l1.textContent = feature.input1?.label || '';
+  if (i1) i1.placeholder = feature.input1?.placeholder || '';
+  if (l2) l2.textContent = feature.input2?.label || '';
+  if (i2) i2.placeholder = feature.input2?.placeholder || '';
   
+  // 세 번째 입력란 렌더링 로직 (hidden 타입 추가 지원)
   if (i3c) {
-    i3c.innerHTML = `<label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
-    const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
+    i3c.innerHTML = ''; // 기존 내용 초기화
     
-    if (feature.input3.type === 'select') {
-      const select = document.createElement('select');
-      select.id = 'input3';
-      select.className = commonClasses;
+    if (feature.input3?.type === 'hidden') {
+      // hidden 타입인 경우 라벨이나 입력칸을 화면에 그리지 않고, 숨겨진 input만 추가합니다.
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.id = 'input3';
+      hiddenInput.value = feature.input3.value;
+      i3c.appendChild(hiddenInput);
+    } else if (feature.input3) {
+      // 일반적인 text 또는 select 타입인 경우
+      i3c.innerHTML = `<label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
+      const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#FF7A00] outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
       
-      feature.input3.options.forEach((opt) => {
-        const option = document.createElement('option');
-        option.value = opt.value;
-        option.textContent = opt.text;
-        select.appendChild(option);
-      });
-      i3c.appendChild(select);
-    } else {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.id = 'input3';
-      input.className = commonClasses;
-      input.placeholder = feature.input3.placeholder;
-      i3c.appendChild(input);
+      if (feature.input3.type === 'select') {
+        const select = document.createElement('select');
+        select.id = 'input3';
+        select.className = commonClasses;
+        
+        feature.input3.options.forEach((opt) => {
+          const option = document.createElement('option');
+          option.value = opt.value;
+          option.textContent = opt.text;
+          select.appendChild(option);
+        });
+        i3c.appendChild(select);
+      } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'input3';
+        input.className = commonClasses;
+        input.placeholder = feature.input3.placeholder;
+        i3c.appendChild(input);
+      }
     }
   }
 };
