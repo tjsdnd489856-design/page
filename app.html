@@ -35,6 +35,9 @@
     gtag('config', 'G-LDVW2VJZNH');
   </script>
 
+  <!-- Google AdSense 자동 광고 스크립트 (플레이스홀더) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
   <script>
     // Tailwind 다크모드 및 색상 초기화 설정
     window.tailwind = {
@@ -143,7 +146,7 @@
     [contenteditable]:focus { outline: none; }
   </style>
 </head>
-<body class="bg-orange-50 text-gray-800 dark:bg-slate-950 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
+<body class="bg-orange-50 text-gray-800 dark:bg-slate-950 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex flex-col items-center p-4">
 
   <!-- ==================== 플로팅 컨트롤 바 ==================== -->
   <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
@@ -238,6 +241,15 @@
 
       <!-- 4. 결과 출력 영역 (기본은 숨김 처리) -->
       <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t border-gray-200 dark:border-slate-800 pt-6">
+        
+        <!-- 광고 슬롯 1 (디스플레이 광고) -->
+        <div class="mb-6 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700/50 flex flex-col items-center justify-center min-h-[90px] shadow-sm">
+          <span class="text-[10px] text-gray-400 font-semibold tracking-wider uppercase mb-1">Sponsored</span>
+          <!-- 애드센스 디스플레이 광고 삽입부 -->
+          <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+          <p class="text-xs text-gray-400 dark:text-slate-500">Google AdSense Display Ad</p>
+        </div>
+
         <div class="flex items-center justify-between mb-3">
           <h3 id="resultTitle" class="text-sm font-bold text-[#FF7A00]"></h3>
         </div>
@@ -261,6 +273,15 @@
             <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="아쉬워요">👎</button>
           </div>
         </div>
+
+        <!-- 광고 슬롯 2 (콘텐츠 내 자동 광고) -->
+        <div class="mt-6 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700/50 flex flex-col items-center justify-center min-h-[90px] shadow-sm">
+          <span class="text-[10px] text-gray-400 font-semibold tracking-wider uppercase mb-1">Sponsored</span>
+          <!-- 애드센스 인아티클 광고 삽입부 -->
+          <!-- <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+          <p class="text-xs text-gray-400 dark:text-slate-500">Google AdSense In-Article Ad</p>
+        </div>
+
       </div>
       
       <!-- 복사 완료 알림 토스트 (숨김 처리) -->
@@ -271,6 +292,66 @@
 
     </main>
   </div>
+
+  <!-- 푸터 (법적 고지) -->
+  <footer class="text-center pb-8 pt-4 mt-auto w-full">
+    <div class="flex justify-center space-x-4 mb-2">
+      <button onclick="openModal('privacyModal')" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-xs font-medium">개인정보처리방침</button>
+      <button onclick="openModal('termsModal')" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-xs font-medium">이용약관</button>
+    </div>
+    <p class="text-slate-400 dark:text-slate-500 text-xs">© 2026 ChattyFox. All rights reserved.</p>
+  </footer>
+
+  <!-- ==================== 모달 공통 영역 ==================== -->
+  <!-- 개인정보처리방침 모달 -->
+  <div id="privacyModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl border border-gray-200 dark:border-slate-800">
+      <div class="p-6 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">개인정보처리방침</h3>
+        <button onclick="closeModal('privacyModal')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto text-sm text-gray-600 dark:text-slate-300 leading-relaxed space-y-4 text-left">
+        <p><strong>1. 쿠키 사용 안내</strong><br>채티폭스는 사용자 경험 향상 및 구글 애널리틱스(GA4)를 통한 통계 분석, 구글 애드센스(Google AdSense) 맞춤형 광고 제공을 위해 쿠키를 사용합니다.</p>
+        <p><strong>2. Google AdSense 광고 사용</strong><br>본 웹사이트는 Google AdSense를 통해 광고를 송출합니다. Google 및 서드파티 공급업체는 쿠키를 사용하여 사용자의 이전 웹사이트 방문 기록을 기반으로 맞춤형 광고를 게재할 수 있습니다. 사용자는 Google 광고 설정에서 맞춤설정 광고를 선택 해제할 수 있습니다.</p>
+        <p><strong>3. Supabase 데이터 수집 안내</strong><br>AI 모델의 응답 품질 개선 및 서비스 최적화를 위해 사용자가 입력한 데이터의 일부와 피드백 결과는 Supabase 데이터베이스에 안전하게 익명화되어 저장됩니다. 이메일 주소, 비밀번호 등 개인을 식별할 수 있는 민감한 정보는 절대 수집하지 않습니다.</p>
+        <p><strong>4. 데이터 보관 및 파기</strong><br>수집된 데이터는 서비스 개선 목적으로만 활용되며, 법령에 따른 보존 기간이 경과하면 복구할 수 없는 방법으로 안전하게 파기됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 이용약관 모달 -->
+  <div id="termsModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl border border-gray-200 dark:border-slate-800">
+      <div class="p-6 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">이용약관</h3>
+        <button onclick="closeModal('termsModal')" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto text-sm text-gray-600 dark:text-slate-300 leading-relaxed space-y-4 text-left">
+        <p><strong>제1조 (목적)</strong><br>본 약관은 채티폭스(ChattyFox)가 제공하는 AI 텍스트 생성 서비스의 이용 조건 및 절차, 이용자와 서비스 제공자의 권리, 의무, 책임 사항을 규정함을 목적으로 합니다.</p>
+        <p><strong>제2조 (서비스 이용)</strong><br>사용자는 생성된 텍스트를 자유롭게 업무 및 개인적인 용도로 사용할 수 있습니다. 단, AI가 생성한 결과물의 정확성, 적법성 및 이에 따른 법적 책임은 전적으로 사용자 본인에게 있습니다.</p>
+        <p><strong>제3조 (서비스 변경 및 중단)</strong><br>채티폭스는 서비스 향상을 위해 기능을 변경하거나, 운영상/기술상 필요에 의해 서비스를 일시 중단할 수 있으며 사전 공지 없이 이루어질 수 있습니다.</p>
+        <p><strong>제4조 (광고의 게재)</strong><br>서비스 이용 시 화면에 구글 애드센스 등의 광고가 포함될 수 있으며, 사용자는 서비스 이용 시 광고 노출에 동의하는 것으로 간주합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 모달 제어용 간단한 자바스크립트
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if(modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if(modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+  </script>
 
   <!-- 메인 로직 스크립트 연결 -->
   <script src="app.js"></script>
