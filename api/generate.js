@@ -4,7 +4,6 @@ const SYSTEM_PROMPTS = {
   ko: {
     '메모 심폐소생기': (i1, i2, i3) => `너는 전략 컨설턴트야. [문서형태:${i1}], [메모:${i2}], [강조:${i3}].\n[엄격한 규칙] 절대 네가 스스로 새로운 정보나 내용을 추가하거나 지어내지 마. 오직 사용자가 입력한 [메모] 내용 안에서만 문장을 다듬고 요약/정리해서 [문서형태]로 만들어야 해.`,
     '분노조절 이메일': (i1, i2, i3) => `너는 10년 차 기획팀 에이스 과장이야. [수신자:${i1}], [내용:${i2}], [온도:${i3}].`,
-    // 프로 사과문의 i3(대상) 입력란이 화면에서 제거되었으므로, 강제로 '외부 고객(외부용)'으로 기본값을 설정합니다.
     '프로 사과문': (i1, i2, i3) => `너는 위기관리 전문가야. [사고:${i1}], [대안:${i2}], [대상:외부고객(외부용)].\n[조건] 반드시 외부 고객에게 보내는 정중하고 진심 어린 사과문 형태로 작성해.`,
     '리포트 심폐소생': (i1, i2, i3) => `너는 논문 전문가야. [대상:${i1}], [초안:${i2}], [어조:${i3}].`,
     '발표 대본 변환': (i1, i2, i3) => `너는 프레젠테이션 코치야. [타겟/시간:${i1}], [자료:${i2}], [어조:${i3}].`,
@@ -21,7 +20,6 @@ const SYSTEM_PROMPTS = {
     '진심 어린 사과문': (i1, i2, i3) => `너는 심리상담사야. [대상:${i1}], [잘못:${i2}], [어조:${i3}].`,
     '당근 진상 퇴치기': (i1, i2, i3) => `너는 중고거래 고수야. [상황:${i1}], [팩트:${i2}], [어조:${i3}].`,
     '매력적인 판매글': (i1, i2, i3) => `너는 판매글 장인이야. [물건:${i1}], [특징:${i2}], [어조:${i3}].`,
-    // 별점 항목이 제거되었으므로 i1은 무시하고 i2(리뷰), i3(어조)만 사용합니다.
     '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [고객리뷰:${i2}], [어조:${i3}].`,
   },
   en: {
@@ -55,44 +53,34 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- 2. Vercel Serverless Function 메인 로직 ---
 module.exports = async (req, res) => {
-  // CORS(Cross-Origin Resource Sharing) 설정: 외부에서 API 호출을 허용합니다.
+  // CORS(Cross-Origin Resource Sharing) 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
-  // 브라우저의 사전 요청(Preflight)에 대한 빠른 응답
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
-    // 1. 클라이언트(app.js)로부터 데이터 받기
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
-    
-    // 2. 환경 변수에서 구글 API 키 가져오기 (보안 유지)
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // 3. 에러 처리: API 키가 없는 경우
     if (!apiKey) {
       return res.status(500).json({ success: false, message: 'API_KEY가 설정되지 않았습니다.' });
     }
 
-    // 4. 요청된 기능(카테고리)에 맞는 프롬프트 함수 찾기
     const promptFunc = SYSTEM_PROMPTS[lang]?.[subCategory];
     
-    // 에러 처리: 없는 기능을 요청한 경우
     if (!promptFunc) {
       return res.status(400).json({ success: false, message: `지원하지 않는 명령어입니다: ${subCategory}` });
     }
 
-    // 5. 프롬프트 조립 및 필수 조건 추가
     const finalPrompt = promptFunc(input1, input2, input3) + '\n\n[필수] 불필요한 인사말 없이 결과물만 출력해.';
 
-    // 6. Gemini API 통신 규격 설정 
-    // 사장님 요청: v1beta 경로를 사용하여 모델 에러 방지 (최신 안정 버전인 gemini-2.5-flash 사용)
+    // 사용자 요청에 따라 가장 안정적인 모델명 사용 (v1beta에서는 2.5-flash가 안정적)
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    // 7. 구글 서버로 요청 보내기
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -103,16 +91,14 @@ module.exports = async (req, res) => {
 
     const data = await response.json();
 
-    // 8. 에러 처리: 구글 서버에서 에러가 발생한 경우
     if (!response.ok) {
-      console.error("Google API Error:", data); // 서버 로그에서 정확한 원인 파악을 위해 에러 내용 기록
+      console.error("Google API Error:", data); 
       return res.status(response.status).json({ success: false, message: data.error?.message || '구글 API 통신 중 오류가 발생했습니다.' });
     }
 
-    // 9. 결과값 추출 (안전하게 접근하기 위해 옵셔널 체이닝(?.) 사용)
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '답변 생성에 실패했습니다.';
     
-    // 10. Supabase에 로그 저장 및 생성된 ID 반환 받기 (동기 처리)
+    // Supabase에 로그 저장 및 생성된 ID 반환 받기
     let logId = null;
     const { data: insertData, error } = await supabase.from('chat_logs').insert([
       { 
@@ -125,17 +111,14 @@ module.exports = async (req, res) => {
 
     if (error) {
       console.error("Supabase Log Insert Error:", error);
-      // DB 저장 실패해도 사용자에게 결과는 보여주기 위해 에러를 던지지 않고 임시 ID 사용
       logId = `log_err_${Date.now()}`; 
     } else {
       logId = insertData.id;
     }
 
-    // 11. 성공적으로 클라이언트에 결과 및 logId(피드백용) 반환
     return res.status(200).json({ success: true, result: resultText, feedbackId: logId });
 
   } catch (error) {
-    // 12. 에러 처리: 서버 내부에서 예상치 못한 에러가 발생한 경우
     console.error("Server Internal Error:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
