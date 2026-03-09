@@ -12,7 +12,7 @@ const SYSTEM_PROMPTS = {
     '진심 어린 사과문': (i1, i2, i3) => `너는 심리상담사야. [대상:${i1}], [잘못:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
     '당근 진상 퇴치기': (i1, i2, i3) => `너는 중고거래 고수야. [상황:${i1}], [팩트:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
     '매력적인 판매글': (i1, i2, i3) => `너는 판매글 장인이야. [물건:${i1}], [특징:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [별점:${i1}], [리뷰:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
+    '사장님 리뷰 답글': (i1, i2, i3) => `너는 CS 매니저야. [고객리뷰:${i2}], [어조:${i3}].\n이제 조건에 맞춰 작성해.`,
     '함수 수식 뚝딱이': (i1, i2, i3) => `너는 데이터 분석가야. [상황:${i1}], [결과:${i2}], [프로그램:${i3}].\n이제 조건에 맞춰 작성해.`,
     '외계어 수식 해독기': (i1, i2, i3) => `너는 친절한 엑셀 강사야. [수식:${i1}], [질문:${i2}], [수준:${i3}].\n이제 조건에 맞춰 작성해.`,
     '반복작업 매크로': (i1, i2, i3) => `너는 자동화 전문가야. [환경:${i1}], [작업:${i2}], [스타일:${i3}].\n이제 조건에 맞춰 작성해.`,
@@ -33,7 +33,7 @@ const SYSTEM_PROMPTS = {
     '진심 어린 사과문': (i1, i2, i3) => `Act as a counselor. [Recipient:${i1}], [Mistake:${i2}], [Tone:${i3}]. Now write.`,
     '당근 진상 퇴치기': (i1, i2, i3) => `Act as an expert seller. [Situation:${i1}], [Facts:${i2}], [Tone:${i3}]. Now write.`,
     '매력적인 판매글': (i1, i2, i3) => `Act as a copywriter. [Item:${i1}], [Features:${i2}], [Tone:${i3}]. Now write.`,
-    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Rating:${i1}], [Review:${i2}], [Tone:${i3}]. Now write.`,
+    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Review:${i2}], [Tone:${i3}]. Now write.`,
     '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}]. Now write.`,
     '외계어 수식 해독기': (i1, i2, i3) => `Act as an Excel Instructor. [Formula:${i1}], [Question:${i2}], [Level:${i3}]. Now write.`,
     '반복작업 매크로': (i1, i2, i3) => `Act as an Automation Engineer. [Env:${i1}], [Task:${i2}], [Style:${i3}]. Now write.`,
@@ -81,6 +81,15 @@ const translations = {
         ],
       },
       {
+        categoryId: 'marketing',
+        categoryName: '📱 마케팅/SNS',
+        subFeatures: [
+          { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
+          { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [{ value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' }] } },
+          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: '리뷰 답글 자동생성', desc: '고객 리뷰에 찰떡같은 답글을', input1: { type: 'hidden', value: '별점없음' }, input2: { label: '고객 리뷰 내용', placeholder: '예: 음식이 너무 맛있어요!', type: 'textarea' }, input3: { label: '답글 어조', type: 'select', options: [{ value: '😊친절하고 따뜻하게', text: '😊친절하고 따뜻하게' }, { value: '👔정중하고 전문적으로', text: '👔정중하고 전문적으로' }, { value: '🙏진심 어린 사과', text: '🙏진심 어린 사과' }] } }
+        ],
+      },
+      {
         categoryId: 'excel',
         categoryName: '📊 엑셀/시트',
         subFeatures: [
@@ -95,16 +104,6 @@ const translations = {
         subFeatures: [
           { id: 'sqlGen', apiId: 'SQL 쿼리 짜기', icon: '🗄️', title: 'SQL 쿼리 짜기', desc: '원하는 데이터를 쿼리로', input1: { label: '테이블 구조', placeholder: '예: users(id, age)', type: 'text' }, input2: { label: '원하는 데이터', placeholder: '나이가 30 이상', type: 'textarea' }, input3: { label: 'DBMS', type: 'select', options: [{ value: 'MySQL', text: 'MySQL' }, { value: 'PostgreSQL', text: 'PostgreSQL' }] } },
           { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: '정규식 해독/생성', desc: '어려운 정규식을 쉽게', input1: { label: '패턴', placeholder: '이메일 추출 등', type: 'text' }, input2: { label: '요청사항', placeholder: '설명해줘 등', type: 'textarea' }, input3: { label: '수준', type: 'select', options: [{ value: '👶초보', text: '👶초보' }, { value: '🧑‍💻시니어', text: '🧑‍💻시니어' }] } },
-        ],
-      },
-      {
-        categoryId: 'marketing',
-        categoryName: '📱 마케팅/SNS',
-        subFeatures: [
-          { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
-          { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [{ value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' }] } },
-          // 새로 추가된 "사장님 리뷰 답글" 기능
-          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: '리뷰 답글 자동생성', desc: '고객 리뷰에 찰떡같은 답글을', input1: { label: '별점 (1~5점)', placeholder: '예: 5점', type: 'text' }, input2: { label: '고객 리뷰 내용', placeholder: '예: 음식이 너무 맛있어요!', type: 'textarea' }, input3: { label: '답글 어조', type: 'select', options: [{ value: '😊친절하고 따뜻하게', text: '😊친절하고 따뜻하게' }, { value: '👔정중하고 전문적으로', text: '👔정중하고 전문적으로' }, { value: '🙏진심 어린 사과', text: '🙏진심 어린 사과' }] } }
         ],
       },
     ],
@@ -134,12 +133,11 @@ const translations = {
           { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: 'Pro Apology', desc: 'Crisis management', input1: { label: 'Issue', placeholder: 'e.g. Missing file', type: 'text' }, input2: { label: 'Solution', placeholder: 'e.g. Resending now', type: 'textarea' }, input3: { type: 'hidden', value: 'Client' } },
         ],
       },
-      // 영문 마케팅/SNS 탭 추가 및 리뷰 답글 기능 포함
       {
         categoryId: 'marketing',
         categoryName: 'Marketing',
         subFeatures: [
-          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: 'Review Reply', desc: 'Smart replies to reviews', input1: { label: 'Rating', placeholder: 'e.g. 5 Stars', type: 'text' }, input2: { label: 'Customer Review', placeholder: 'e.g. The food was great!', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Friendly', text: 'Friendly' }, { value: 'Professional', text: 'Professional' }, { value: 'Apologetic', text: 'Apologetic' }] } }
+          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: 'Review Reply', desc: 'Smart replies to reviews', input1: { type: 'hidden', value: 'NoRating' }, input2: { label: 'Customer Review', placeholder: 'e.g. The food was great!', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Friendly', text: 'Friendly' }, { value: 'Professional', text: 'Professional' }, { value: 'Apologetic', text: 'Apologetic' }] } }
         ]
       }
     ],
@@ -249,34 +247,57 @@ const renderSubFeatures = () => {
   });
 };
 
-// 5.4. 폼 필드 업데이트
+// 5.4. 폼 필드 업데이트 (hidden 지원 강화)
 const updateFormFields = () => {
   const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
   
   const l1 = document.getElementById('input1Label');
   const i1 = document.getElementById('input1');
+  const i1Container = i1?.parentElement;
+  
   const l2 = document.getElementById('input2Label');
   const i2 = document.getElementById('input2');
+  const i2Container = i2?.parentElement;
+  
   const i3c = document.getElementById('input3Container');
   
-  if (l1) l1.textContent = feature.input1?.label || '';
-  if (i1) i1.placeholder = feature.input1?.placeholder || '';
-  if (l2) l2.textContent = feature.input2?.label || '';
-  if (i2) i2.placeholder = feature.input2?.placeholder || '';
+  // 첫 번째 입력란 (hidden 지원)
+  if (feature.input1?.type === 'hidden') {
+    if (i1Container) i1Container.style.display = 'none';
+    if (i1) i1.required = false;
+  } else {
+    if (i1Container) i1Container.style.display = 'block';
+    if (l1) l1.textContent = feature.input1?.label || '';
+    if (i1) { 
+      i1.placeholder = feature.input1?.placeholder || ''; 
+      i1.required = true; 
+    }
+  }
   
-  // 세 번째 입력란 렌더링 로직 (hidden 타입 추가 지원)
+  // 두 번째 입력란 (hidden 지원)
+  if (feature.input2?.type === 'hidden') {
+    if (i2Container) i2Container.style.display = 'none';
+    if (i2) i2.required = false;
+  } else {
+    if (i2Container) i2Container.style.display = 'block';
+    if (l2) l2.textContent = feature.input2?.label || '';
+    if (i2) { 
+      i2.placeholder = feature.input2?.placeholder || ''; 
+      i2.required = true; 
+    }
+  }
+  
+  // 세 번째 입력란 렌더링 로직
   if (i3c) {
     i3c.innerHTML = ''; // 기존 내용 초기화
     
     if (feature.input3?.type === 'hidden') {
-      // hidden 타입인 경우 라벨이나 입력칸을 화면에 그리지 않고, 숨겨진 input만 추가합니다.
       const hiddenInput = document.createElement('input');
       hiddenInput.type = 'hidden';
       hiddenInput.id = 'input3';
       hiddenInput.value = feature.input3.value;
       i3c.appendChild(hiddenInput);
     } else if (feature.input3) {
-      // 일반적인 text 또는 select 타입인 경우
       i3c.innerHTML = `<label id="input3Label" for="input3" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1">${feature.input3.label}</label>`;
       const commonClasses = 'w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#FF7A00] outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500';
       
@@ -406,9 +427,15 @@ if (DOM.aiForm) {
     const uiText = translations[currentLang].ui;
     const feature = translations[currentLang].appData[currentCategoryIndex].subFeatures[currentFeatureIndex];
     
-    const val1 = document.getElementById('input1')?.value.trim();
-    const val2 = document.getElementById('input2')?.value.trim();
-    const val3 = document.getElementById('input3')?.value.trim();
+    // hidden 요소일 경우 value 값을 강제로 채워넣어 유효성 검사를 통과하게 합니다.
+    let val1 = document.getElementById('input1')?.value.trim();
+    if (feature.input1?.type === 'hidden') val1 = feature.input1.value || ' ';
+    
+    let val2 = document.getElementById('input2')?.value.trim();
+    if (feature.input2?.type === 'hidden') val2 = feature.input2.value || ' ';
+    
+    let val3 = document.getElementById('input3')?.value.trim();
+    if (feature.input3?.type === 'hidden') val3 = feature.input3.value || ' ';
 
     if (!val1 || !val2 || !val3) {
       alert(uiText.alertEmpty);
