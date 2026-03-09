@@ -47,15 +47,11 @@ const SYSTEM_PROMPTS = {
   },
 };
 
-// --- Supabase 초기화 ---
+// --- Supabase 초기화 (제공된 고정 키 사용) ---
 const { createClient } = require('@supabase/supabase-js');
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-let supabase = null;
-
-if (supabaseUrl && supabaseKey) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-}
+const supabaseUrl = 'https://nqfjhryizcnkkcjnujps.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xZmpocnlpemNua2tjam51anBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMjYyMjksImV4cCI6MjA4ODYwMjIyOX0.6Do14Tr2DBH_yCw1JVvrRMmetIglDjJVNWYa1VAlmzc';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- 2. Vercel Serverless Function 메인 로직 ---
 module.exports = async (req, res) => {
@@ -71,7 +67,6 @@ module.exports = async (req, res) => {
 
   try {
     // 1. 클라이언트(app.js)로부터 데이터 받기
-    // input3를 프론트엔드에서 강제로 'hidden_default' 같은 값으로 보낼 수 있으므로, 프롬프트 쪽에서 제어합니다.
     const { subCategory, input1, input2, input3, lang = 'ko' } = req.body;
     
     // 2. 환경 변수에서 구글 API 키 가져오기 (보안 유지)
@@ -93,8 +88,8 @@ module.exports = async (req, res) => {
     // 5. 프롬프트 조립 및 필수 조건 추가
     const finalPrompt = promptFunc(input1, input2, input3) + '\n\n[필수] 불필요한 인사말 없이 결과물만 출력해.';
 
-    // 6. Gemini API 통신 규격 설정 (최신 gemini-2.5-flash 모델 적용)
-    // 2026년 기준 가장 빠르고 안정적인 모델인 gemini-2.5-flash 모델로 완벽 고정
+    // 6. Gemini API 통신 규격 설정 
+    // 사장님 요청: v1beta 경로를 사용하여 모델 에러 방지 (최신 안정 버전인 gemini-2.5-flash 사용)
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     // 7. 구글 서버로 요청 보내기
@@ -117,48 +112,27 @@ module.exports = async (req, res) => {
     // 9. 결과값 추출 (안전하게 접근하기 위해 옵셔널 체이닝(?.) 사용)
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '답변 생성에 실패했습니다.';
     
-    // 10. Supabase에 비동기로 로그 저장 (사용자 응답 속도에 영향을 주지 않도록 await을 기다리지 않거나 에러를 무시하도록 처리)
+    // 10. Supabase에 로그 저장 및 생성된 ID 반환 받기 (동기 처리)
     let logId = null;
-    if (supabase) {
-      // 비동기로 실행하여 응답 지연 방지 (에러가 나더라도 본 응답은 정상 처리되도록 함)
-      supabase.from('chat_logs').insert([
-        { 
-          sub_category: subCategory, 
-          inputs: { input1, input2, input3 }, 
-          ai_result: resultText, 
-          lang: lang 
-        }
-      ]).select('id').single().then(({ data, error }) => {
-        if (error) {
-           console.error("Supabase Log Insert Error:", error);
-        } else {
-           console.log("Log saved successfully with ID:", data.id);
-        }
-      });
-      // 임시로 클라이언트에 넘겨줄 ID가 바로 필요하다면 동기 처리를 해야 하지만,
-      // 사용자 체감 속도를 위해 여기서는 응답 결과만 먼저 보냅니다.
-      // 피드백을 위해 UUID를 서버에서 생성해서 넘겨주고, 그걸로 DB에 저장하도록 방식을 변경합니다.
-    }
-    
-    // 피드백 매칭을 위해 고유 ID(timestamp 기반 난수)를 하나 생성해서 응답에 포함시킵니다.
-    const feedbackId = `log_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-    
-    if (supabase) {
-      supabase.from('chat_logs').insert([
-        { 
-          id: feedbackId,
-          sub_category: subCategory, 
-          inputs: { input1, input2, input3 }, 
-          ai_result: resultText, 
-          lang: lang 
-        }
-      ]).then(({ error }) => {
-        if (error) console.error("Supabase Log Insert Error:", error);
-      });
+    const { data: insertData, error } = await supabase.from('chat_logs').insert([
+      { 
+        sub_category: subCategory, 
+        inputs: { input1, input2, input3 }, 
+        ai_result: resultText, 
+        lang: lang 
+      }
+    ]).select('id').single();
+
+    if (error) {
+      console.error("Supabase Log Insert Error:", error);
+      // DB 저장 실패해도 사용자에게 결과는 보여주기 위해 에러를 던지지 않고 임시 ID 사용
+      logId = `log_err_${Date.now()}`; 
+    } else {
+      logId = insertData.id;
     }
 
-    // 11. 성공적으로 클라이언트에 결과 및 feedbackId 반환
-    return res.status(200).json({ success: true, result: resultText, feedbackId: feedbackId });
+    // 11. 성공적으로 클라이언트에 결과 및 logId(피드백용) 반환
+    return res.status(200).json({ success: true, result: resultText, feedbackId: logId });
 
   } catch (error) {
     // 12. 에러 처리: 서버 내부에서 예상치 못한 에러가 발생한 경우
