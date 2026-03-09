@@ -3,242 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🦊 ChattyFox - AI Workspace</title>
+  <title>🦊 채티폭스 - 센스 있는 AI 텍스트 비서</title>
   
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Tailwind 다크모드 및 색상 초기화 설정
-    window.tailwind = {
-      config: {
-        darkMode: 'class',
-        theme: { 
-          extend: { 
-            colors: { primary: '#FF7A00' } // 브랜드 메인 컬러
-          } 
+    // Tailwind 환경 설정 (다크모드 및 기본 브랜드 컬러 지정)
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF7A00', // 채티폭스 메인 오렌지 컬러
+          }
         }
       }
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- 외부 라이브러리 로드 (아이콘, 마크다운 변환기) -->
+  <!-- 아이콘 및 폰트 설정 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   
+  <!-- 공통 스타일 (애니메이션 및 글래스모피즘 효과) -->
   <style>
-    /* 스크롤바 숨김 처리 (가로 스크롤 영역용) */
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* 페이드 인 업 애니메이션 (결과창 등장용) */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    html { 
+      scroll-behavior: smooth; 
     }
-    .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
-
-    /* =========================================
-       ✨ 마크다운 렌더링 최고급 프리미엄 스타일링
-       ========================================= */
-    .result-markdown { 
-      line-height: 1.8; 
-      word-break: keep-all; 
-      font-size: 1.05rem; 
-      color: #374151; 
+    .text-gradient {
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-image: linear-gradient(to right, #ea580c, #f59e0b);
     }
-    .dark .result-markdown { color: #E5E7EB; }
-    
-    .result-markdown p { margin-bottom: 1.25rem; }
-    
-    .result-markdown h1, .result-markdown h2, .result-markdown h3 { 
-      font-size: 1.35rem; 
-      font-weight: 900; 
-      color: #111827;
-      margin-top: 2rem; 
-      margin-bottom: 1rem; 
-      border-bottom: 2px solid #E5E7EB; 
-      padding-bottom: 0.5rem; 
-      letter-spacing: -0.025em;
+    .animate-float { 
+      animation: float 6s ease-in-out infinite; 
     }
-    .dark .result-markdown h1, .dark .result-markdown h2, .dark .result-markdown h3 {
-      color: #F9FAFB; border-color: #374151;
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
     }
-    
-    .result-markdown ul { list-style: none; padding-left: 0.5rem; margin-bottom: 1.5rem; }
-    .result-markdown ul li { position: relative; padding-left: 1.75rem; margin-bottom: 0.75rem; }
-    .result-markdown ul li::before { 
-      content: '✔'; 
-      position: absolute; left: 0; top: 0.1rem; 
-      color: #FF7A00; font-size: 0.9rem; 
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
-    .result-markdown ol { list-style-type: decimal; padding-left: 1.75rem; margin-bottom: 1.5rem; font-weight: 500; }
-    
-    /* 텍스트 강조 스타일 (형광펜 효과) */
-    .result-markdown strong { 
-      font-weight: 800; color: #EA580C; 
-      background-color: #FFF7ED; padding: 0.1rem 0.4rem; border-radius: 0.25rem; 
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .dark .result-markdown strong { 
-      background-color: rgba(255, 122, 0, 0.15); color: #FDBA74; 
-    }
-    
-    /* 인라인 코드 스타일 (부드러운 배경) */
-    .result-markdown code { 
-      background-color: #F3F4F6; color: #EA580C; 
-      padding: 0.2rem 0.4rem; border-radius: 0.375rem; 
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; 
-      font-size: 0.9em; 
-    }
-    .dark .result-markdown code { background-color: #1F2937; color: #FDBA74; }
-    
-    /* 코드 블록 스타일 (다크 테마 고정) */
-    .result-markdown pre { 
-      background-color: #111827; color: #F9FAFB; 
-      padding: 1.5rem; border-radius: 0.75rem; overflow-x: auto; 
-      margin-bottom: 1.5rem; font-size: 0.95rem; 
-      border: 1px solid #374151; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); 
-    }
-    .result-markdown pre code { background-color: transparent; color: inherit; padding: 0; }
-    
-    /* 인용구 스타일 (세련된 좌측 보더) */
-    .result-markdown blockquote { 
-      border-left: 4px solid #FF7A00; background-color: #FFF7ED; 
-      padding: 1.25rem 1.5rem; color: #4B5563; 
-      border-radius: 0 0.75rem 0.75rem 0; font-style: italic; margin-bottom: 1.5rem;
-    }
-    .dark .result-markdown blockquote { 
-      background-color: rgba(255, 122, 0, 0.1); border-left-color: #FF7A00; color: #D1D5DB; 
-    }
-    
-    [contenteditable]:focus { outline: none; }
   </style>
 </head>
-<body class="bg-orange-50 text-gray-800 dark:bg-slate-950 dark:text-slate-200 font-sans min-h-screen transition-colors duration-300 flex items-center justify-center p-4">
+<body class="bg-orange-50/30 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased overflow-x-hidden transition-colors duration-300">
 
-  <!-- ==================== 플로팅 컨트롤 바 ==================== -->
-  <div class="fixed top-4 right-4 z-40 flex items-center gap-2">
-    
-    <!-- 언어 변경 버튼 -->
-    <div class="flex bg-white dark:bg-slate-800 rounded-full shadow border border-gray-200 dark:border-slate-700 p-1">
-      <button onclick="setLanguage('ko')" id="btn-ko" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">KO</button>
-      <button onclick="setLanguage('en')" id="btn-en" class="px-3 py-1 rounded-full text-sm font-bold transition-colors">EN</button>
-    </div>
-    
-    <!-- 다크모드 토글 버튼 -->
-    <button id="darkModeToggle" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-yellow-400 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-      <i class="fa-solid fa-moon dark:hidden"></i>
-      <i class="fa-solid fa-sun hidden dark:block"></i>
-    </button>
-    
-    <!-- 히스토리 열기 버튼 -->
-    <button id="openHistoryBtn" class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full shadow border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors" title="History">
-      <i class="fa-solid fa-clock-rotate-left"></i>
-    </button>
-  </div>
+  <!-- ==================== 네비게이션 바 (상단 메뉴) ==================== -->
+  <nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 border-b border-orange-100 dark:border-slate-800 transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        
+        <!-- 왼쪽: 로고 영역 -->
+        <div class="flex-shrink-0 flex items-center cursor-pointer group" onclick="window.scrollTo(0,0)">
+          <svg width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:-rotate-6 mr-2 drop-shadow-sm">
+            <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
+            <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
+            <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
+            <circle cx="28" cy="65" r="3" fill="#4A3022"/>
+            <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span class="text-2xl font-black tracking-tight">
+            <span class="text-slate-800 dark:text-white transition-colors">Chatty</span><span class="text-orange-500">Fox</span>
+          </span>
+        </div>
 
-  <!-- ==================== 우측 슬라이드 (히스토리 내역) ==================== -->
-  <div id="historySidebar" class="fixed top-0 right-0 w-80 h-full bg-white dark:bg-slate-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200 dark:border-slate-800 flex flex-col">
-    <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-950">
-      <h2 id="historyTitle" class="text-lg font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-history mr-2 text-[#FF7A00]"></i>History</h2>
-      <button id="closeHistoryBtn" class="text-gray-500 hover:text-red-500 dark:text-slate-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div id="historyList" class="p-4 flex-1 overflow-y-auto space-y-3">
-      <p id="historyEmptyMsg" class="text-sm text-gray-400 text-center mt-10">Empty</p>
-    </div>
-  </div>
+        <!-- 오른쪽: 메뉴 버튼 영역 (데스크탑에서만 보임) -->
+        <div class="hidden md:flex space-x-8 items-center">
+          <a href="#features" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">주요 기능</a>
+          <a href="#how-it-works" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">사용방법</a>
+          <a href="#reviews" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">사용 후기</a>
+          <a href="#faq" class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary font-medium transition-colors">FAQ</a>
+          <a href="landing_en.html" class="text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold text-sm bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full transition-colors"><i class="fa-solid fa-globe mr-1"></i> EN</a>
+          <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-105 shadow-md">무료 시작</a>
+        </div>
 
-  <!-- ==================== 메인 앱 컨테이너 (작업 공간) ==================== -->
-  <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-gray-200 dark:border-slate-800">
-    
-    <!-- 헤더 (로고 및 타이틀) -->
-    <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 text-center transition-colors relative overflow-hidden flex flex-col items-center">
-      <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10 group" onclick="location.href='index.html'">
-        <svg width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:-rotate-6 drop-shadow-sm">
-          <path d="M105,55C105,80,85,100,60,100C48,100,38,95,30,88L12,95L18,78C12,69,10,59,10,48C10,25,32,10,60,10C88,10,105,30,105,55Z" fill="#FFF5E6"/>
-          <path d="M28,65C35,55,45,42,58,42L68,20L72,45C85,50,92,65,88,80C70,88,45,85,28,65Z" fill="#FF7A00"/>
-          <path d="M28,65C40,70,55,75,75,70C65,85,45,82,28,65Z" fill="#FFFFFF" fill-opacity="0.9"/>
-          <circle cx="28" cy="65" r="3" fill="#4A3022"/>
-          <path d="M45,56Q50,52,55,56" stroke="#4A3022" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        </svg>
-        <span id="appLogoText" class="tracking-tight">
-          <!-- app.js에서 동적으로 채워집니다 -->
-        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== 1. 히어로 섹션 (메인 화면) ==================== -->
+  <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      
+      <!-- 상단 작은 알림 뱃지 -->
+      <div class="inline-flex items-center px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary dark:text-orange-400 font-semibold text-sm mb-6 border border-orange-200 dark:border-orange-500/30">
+        회원가입 없이 3초 만에 끝내는 AI 글쓰기
+      </div>
+      
+      <!-- 메인 카피라이트 -->
+      <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
+        비즈니스의 품격은<br>
+        <span class="text-gradient">한 끗 차이, 채티폭스</span>
       </h1>
-      <p id="appSubtitle" class="text-slate-500 dark:text-slate-400 font-medium text-sm relative z-10"></p>
-    </header>
-
-    <main class="p-6">
       
-      <!-- 1. 메인 탭 메뉴 (가로 스크롤) -->
-      <div class="relative w-full mb-6 border-b border-gray-200 dark:border-slate-800">
-        <div id="mainTabs" class="flex overflow-x-auto flex-nowrap gap-2 justify-start scrollbar-hide cursor-grab select-none pb-0 relative z-0">
-          <!-- app.js에서 탭 버튼들이 동적으로 생성됩니다 -->
-        </div>
-        <!-- 우측 끝 그라데이션 페이드 효과 -->
-        <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none z-10"></div>
+      <!-- 서브 설명 -->
+      <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed font-medium max-w-3xl mx-auto">
+        거친 메모는 정중한 이메일로, 복잡한 고민은 명쾌한 엑셀 수식으로.<br class="hidden md:block">
+        당신의 스마트한 여우 비서가 가장 세련된 정답을 실시간으로 제안합니다.
+      </p>
+      
+      <!-- 시작 버튼 -->
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+        <a href="app.html" class="bg-primary hover:bg-orange-600 text-white px-10 py-5 rounded-2xl font-bold text-xl transition-all hover:-translate-y-1 shadow-2xl shadow-orange-200 dark:shadow-none flex items-center justify-center">
+          지금 무료로 시작하기 <i class="fa-solid fa-rocket ml-2"></i>
+        </a>
       </div>
 
-      <!-- 2. 서브 기능 선택 버튼 영역 -->
-      <div id="subFeatures" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-        <!-- app.js에서 기능 버튼들이 동적으로 생성됩니다 -->
+      <!-- 둥둥 떠다니는 아이콘 애니메이션 -->
+      <div class="mt-24 relative max-w-4xl mx-auto h-32 md:h-48 animate-float">
+        <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-3xl rounded-full"></div>
+        <div class="relative flex justify-center items-center gap-12 opacity-40">
+          <i class="fa-solid fa-envelope-open-text text-6xl text-orange-400"></i>
+          <i class="fa-solid fa-wand-magic-sparkles text-8xl text-orange-500"></i>
+          <i class="fa-solid fa-table text-6xl text-orange-400"></i>
+        </div>
       </div>
 
-      <!-- 3. 입력 폼 영역 -->
-      <form id="aiForm" class="space-y-5">
-        <div>
-          <label id="input1Label" for="input1" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-          <input type="text" id="input1" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#FF7A00] outline-none transition bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
-        </div>
-        <div>
-          <label id="input2Label" for="input2" class="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"></label>
-          <textarea id="input2" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#FF7A00] outline-none transition resize-none bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-950 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"></textarea>
-        </div>
-        <div id="input3Container">
-          <!-- app.js에서 상황에 맞게 input 또는 select 박스가 생성됩니다 -->
-        </div>
+    </div>
+  </section>
 
-        <!-- 제출 버튼 -->
-        <button type="submit" id="submitBtn" class="w-full mt-4 bg-gray-800 dark:bg-[#FF7A00] hover:bg-gray-900 dark:hover:bg-[#E66A00] text-white font-bold py-4 px-4 rounded-xl transition-all shadow-md flex items-center justify-center text-lg transform hover:-translate-y-1">
-        </button>
-      </form>
+  <!-- ==================== 2. 상세 기능 섹션 (Features) ==================== -->
+  <section id="features" class="py-24 bg-white dark:bg-slate-900 transition-colors">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-20">
+        <h2 class="text-base font-bold text-primary tracking-widest uppercase mb-3">Professional Tools</h2>
+        <h3 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white">똑똑한 여우의 5가지 필살기</h3>
+      </div>
 
-      <!-- 4. 결과 출력 영역 (기본은 숨김 처리) -->
-      <div id="resultArea" class="hidden mt-8 animate-fade-in-up border-t border-gray-200 dark:border-slate-800 pt-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 id="resultTitle" class="text-sm font-bold text-[#FF7A00]"></h3>
+      <!-- 기능 카드 그리드 뷰 -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- 카드 1: 비즈니스 이메일 -->
+        <div class="p-8 rounded-3xl bg-orange-50/50 dark:bg-slate-800 border border-orange-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+          <div class="w-16 h-16 bg-white dark:bg-slate-700 text-primary rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+          <h4 class="text-2xl font-bold mb-4 dark:text-white">비즈니스 이메일</h4>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">상대방의 기분은 상하지 않게, 하지만 할 말은 다 하는 마법의 필터링. '분노조절 이메일'이 당신의 사회생활을 지켜드립니다.</p>
         </div>
         
-        <div class="relative group">
-          <!-- 로딩 스피너 -->
-          <div id="resultSpinner" class="hidden absolute inset-0 flex justify-center items-center bg-white/80 dark:bg-slate-900/80 rounded-xl z-10 transition-opacity">
-            <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-200 dark:border-slate-700 border-t-[#FF7A00] dark:border-t-[#FF7A00]"></div>
+        <!-- 카드 2: 엑셀 수식 -->
+        <div class="p-8 rounded-3xl bg-green-50/50 dark:bg-slate-800 border border-green-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+          <div class="w-16 h-16 bg-white dark:bg-slate-700 text-green-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-green-600 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-table"></i>
           </div>
-          <!-- 텍스트 출력 공간 -->
-          <div id="resultContent" class="bg-white dark:bg-slate-800 p-6 rounded-xl border-2 border-orange-200 dark:border-slate-700 shadow-inner overflow-x-auto text-sm sm:text-base result-markdown text-gray-800 dark:text-slate-200 focus:border-[#FF7A00] transition-colors cursor-text min-h-[150px]">
-          </div>
+          <h4 class="text-2xl font-bold mb-4 dark:text-white">엑셀 수식 / 매크로</h4>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">"이거랑 이거 합쳐서 보여줘"라고 말만 하세요. 복잡한 VLOOKUP부터 자동화 매크로까지 즉시 복사 가능한 코드로 짜드립니다.</p>
         </div>
         
-        <!-- 하단 액션 버튼 (복사, 좋아요/싫어요) -->
-        <div class="flex flex-col sm:flex-row gap-3 mt-4">
-          <!-- 🔥 문제 해결: Tailwind 색상을 헥스코드로 강제 지정하여 완전히 해결 -->
-          <button type="button" id="copyBtn" class="flex-1 bg-[#FF7A00] hover:bg-[#E66A00] text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center"></button>
-          <div class="flex gap-2 w-full sm:w-auto">
-            <button type="button" id="btnLike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-green-100 dark:hover:bg-green-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="좋아요">👍</button>
-            <button type="button" id="btnDislike" class="flex-1 sm:w-16 bg-gray-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-slate-300 py-3 rounded-xl transition shadow flex items-center justify-center border border-gray-200 dark:border-slate-700" title="아쉬워요">👎</button>
+        <!-- 카드 3: 개발 관련 -->
+        <div class="p-8 rounded-3xl bg-blue-50/50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+          <div class="w-16 h-16 bg-white dark:bg-slate-700 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-code"></i>
           </div>
+          <h4 class="text-2xl font-bold mb-4 dark:text-white">개발 / SQL / 정규식</h4>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">구글링에 1시간 쓰지 마세요. 시니어 개발자가 옆에서 알려주듯 SQL 쿼리와 머리 아픈 정규표현식을 한 번에 해결해 드립니다.</p>
+        </div>
+        
+        <!-- 카드 4: 마케팅 -->
+        <div class="p-8 rounded-3xl bg-pink-50/50 dark:bg-slate-800 border border-pink-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+          <div class="w-16 h-16 bg-white dark:bg-slate-700 text-pink-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-pink-600 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-hashtag"></i>
+          </div>
+          <h4 class="text-2xl font-bold mb-4 dark:text-white">마케팅 / SNS 카피</h4>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">조회수를 부르는 인스타그램 해시태그와 클릭을 부르는 광고 카피라이팅. 당신의 제품에 강력한 매력을 불어넣으세요.</p>
+        </div>
+        
+        <!-- 카드 5: 인간관계 -->
+        <div class="p-8 rounded-3xl bg-purple-50/50 dark:bg-slate-800 border border-purple-100 dark:border-slate-700 hover:shadow-2xl transition-all group">
+          <div class="w-16 h-16 bg-white dark:bg-slate-700 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <h4 class="text-2xl font-bold mb-4 dark:text-white">인간관계 (거절/사과)</h4>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">어려운 부탁을 거절해야 할 때, 진심 어린 사과가 필요할 때. 감정 소모는 줄이고 관계는 지키는 최적의 문장을 찾아드립니다.</p>
+        </div>
+        
+        <!-- 카드 6: Coming Soon -->
+        <div class="p-8 rounded-3xl bg-slate-100/50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+          <p class="text-slate-400 font-bold mb-2 italic">Coming Soon</p>
+          <h4 class="text-xl font-bold dark:text-slate-300">더 많은 도구들이<br>준비 중입니다.</h4>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. 사용 방법 (How it works) ==================== -->
+  <section id="how-it-works" class="py-24 bg-orange-50/50 dark:bg-slate-950">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-5xl font-black mb-16 dark:text-white">사용법은 단 3단계</h2>
+      
+      <div class="grid md:grid-cols-3 gap-12 relative">
+        <!-- 배경 연결 선 (데스크탑 전용) -->
+        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-orange-200 dark:bg-slate-800 -z-10"></div>
+        
+        <!-- 스텝 1 -->
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">1</div>
+          <h4 class="text-xl font-bold mb-3 dark:text-white">상황 선택</h4>
+          <p class="text-slate-600 dark:text-slate-400">이메일, 엑셀 등 필요한 탭을 고르세요.</p>
+        </div>
+        
+        <!-- 스텝 2 -->
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">2</div>
+          <h4 class="text-xl font-bold mb-3 dark:text-white">키워드 입력</h4>
+          <p class="text-slate-600 dark:text-slate-400">핵심 내용만 짧게 입력하세요.</p>
+        </div>
+        
+        <!-- 스텝 3 -->
+        <div class="text-center group">
+          <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">3</div>
+          <h4 class="text-xl font-bold mb-3 dark:text-white">무한 복사</h4>
+          <p class="text-slate-600 dark:text-slate-400">완성된 텍스트를 바로 사용하세요!</p>
         </div>
       </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 4. 사용자 리뷰 (Reviews) ==================== -->
+  <section id="reviews" class="py-24 bg-white dark:bg-slate-900">
+    <div class="max-w-6xl mx-auto px-4">
+      <h3 class="text-3xl md:text-5xl font-black text-center mb-16 dark:text-white">실제 사용자들의 찐 후기</h3>
       
-      <!-- 복사 완료 알림 토스트 (숨김 처리) -->
-      <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-slate-100 text-white dark:text-gray-900 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 translate-y-4 pointer-events-none z-50 flex items-center">
-        <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 mr-2 text-lg"></i> 
-        <span id="toastMsg" class="font-medium"></span>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 리뷰 1 -->
+        <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+          <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p class="text-slate-700 dark:text-slate-300 mb-4">"타 부서랑 일정 조율할 때 감정 소모가 너무 심했는데, 채티폭스 쓰고 나서 업무가 너무 평온해졌어요."</p>
+          <p class="text-sm font-bold text-slate-500">- 마케팅팀 박과장님</p>
+        </div>
+        
+        <!-- 리뷰 2 -->
+        <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+          <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p class="text-slate-700 dark:text-slate-300 mb-4">"엑셀 수식 짤 때마다 구글링하느라 시간 다 보냈는데, 말로 설명하면 바로 알려주니까 칼퇴가 가능해졌어요."</p>
+          <p class="text-sm font-bold text-slate-500">- 운영팀 김OO님</p>
+        </div>
+        
+        <!-- 리뷰 3 -->
+        <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+          <div class="flex text-yellow-400 mb-4"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p class="text-slate-700 dark:text-slate-300 mb-4">"중고거래 빌런들 만날 때마다 스트레스였는데, 단호한 거절문 덕분에 멘탈 지켰습니다."</p>
+          <p class="text-sm font-bold text-slate-500">- 대학생 이OO님</p>
+        </div>
       </div>
 
-    </main>
-  </div>
+    </div>
+  </section>
 
-  <!-- 메인 로직 스크립트 연결 -->
-  <script src="app.js"></script>
+  <!-- ==================== 5. 자주 묻는 질문 (FAQ) ==================== -->
+  <section id="faq" class="py-24 bg-orange-50/30 dark:bg-slate-950">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h3 class="text-3xl font-black mb-12 dark:text-white">자주 묻는 질문</h3>
+      
+      <div class="space-y-4 text-left">
+        <!-- FAQ 1 -->
+        <details class="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-orange-100 dark:border-slate-800 shadow-sm" open>
+          <summary class="list-none flex justify-between items-center font-bold text-lg cursor-pointer dark:text-white">
+            정말 무료인가요?
+            <span class="text-primary group-open:rotate-180 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </summary>
+          <p class="mt-4 text-slate-600 dark:text-slate-400">네, 모든 핵심 기능은 회원가입 없이 누구나 무료로 이용하실 수 있습니다.</p>
+        </details>
+        
+        <!-- FAQ 2 -->
+        <details class="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-orange-100 dark:border-slate-800 shadow-sm">
+          <summary class="list-none flex justify-between items-center font-bold text-lg cursor-pointer dark:text-white">
+            제가 입력한 정보가 저장되나요?
+            <span class="text-primary group-open:rotate-180 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </summary>
+          <p class="mt-4 text-slate-600 dark:text-slate-400">기록은 사용자의 브라우저에만 임시 저장되며, 서버에는 어떠한 개인정보도 남지 않습니다.</p>
+        </details>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 6. 하단 액션 유도 (Call to Action) ==================== -->
+  <section class="py-24 bg-primary relative overflow-hidden text-center">
+    <div class="max-w-4xl mx-auto px-4 relative z-10">
+      <h2 class="text-3xl md:text-5xl font-black text-white mb-8 leading-tight">글쓰기 고민은 채티폭스에게 맡기고,<br>당신은 더 가치 있는 일에 집중하세요.</h2>
+      <a href="app.html" class="inline-block bg-white text-primary font-bold text-2xl px-12 py-6 rounded-full shadow-2xl hover:scale-105 transition-all">
+        무료 체험하기 <i class="fa-solid fa-rocket ml-2"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== 푸터 (Footer) ==================== -->
+  <footer class="bg-slate-900 py-12 border-t border-slate-800 text-center">
+    <p class="text-slate-500 text-sm">© 2026 ChattyFox. All rights reserved. Powered by Google Gemini.</p>
+  </footer>
+
 </body>
 </html>
