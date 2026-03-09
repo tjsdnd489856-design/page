@@ -66,10 +66,8 @@ const translations = {
         categoryId: 'business',
         categoryName: '🏢 비즈니스/이메일',
         subFeatures: [
-          // 메모 심폐소생기 input2의 플레이스홀더를 변경하여 녹음본 변환 텍스트도 가능하다는 점을 명확히 안내합니다.
           { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: '메모 심폐소생기', desc: '두서없는 메모를 완벽한 문서로', input1: { label: '문서 형태', placeholder: '예: 주간업무보고, 회의록', type: 'text' }, input2: { label: '날것의 메모 텍스트', placeholder: '예: (음성 녹음 변환 텍스트, 회의 결과 등 자유롭게 복붙)', type: 'textarea' }, input3: { label: '강조해야 할 포인트', type: 'text', placeholder: '예: 일정 연기 사유 부드럽게 강조' } },
           { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: '분노조절 이메일', desc: '감정은 빼고 할 말은 다 하는', input1: { label: '수신자', placeholder: '예: 영업팀 김팀장님', type: 'text' }, input2: { label: '진짜 하고 싶은 말', placeholder: '예: 기획서 왜 안주나', type: 'textarea' }, input3: { label: '포장지 온도', type: 'select', options: [{ value: '🙇‍♂️최대한 정중하게', text: '🙇‍♂️최대한 정중하게' }, { value: '👔사무적으로', text: '👔사무적으로' }, { value: '🗡️뼈 때리기', text: '🗡️뼈 때리기' }] } },
-          // 프로 사과문의 대상(input3)을 고정값 '외부용'으로 처리하기 위해 화면에서는 숨김(hidden) 처리합니다.
           { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: '프로 사과문', desc: '수습의 정석', input1: { label: '사고 내용', placeholder: '예: 파일 누락', type: 'text' }, input2: { label: '수습 대안', placeholder: '예: 즉시 재송부', type: 'textarea' }, input3: { type: 'hidden', value: '외부용' } },
         ],
       },
@@ -105,6 +103,8 @@ const translations = {
         subFeatures: [
           { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: '해시태그 생성기', desc: '조회수 터지는 태그', input1: { label: '주제/설명', placeholder: '카페 사진 등', type: 'text' }, input2: { label: '타겟', placeholder: '20대 커플 등', type: 'textarea' }, input3: { label: '분위기', type: 'text', placeholder: '감성적이고 힙하게' } },
           { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: '광고 카피라이팅', desc: '클릭을 부르는 문구', input1: { label: '제품/서비스', placeholder: '무선 청소기 등', type: 'text' }, input2: { label: '핵심 포인트', placeholder: '가벼운 흡입력 등', type: 'textarea' }, input3: { label: '매체', type: 'select', options: [{ value: '📘 인스타/페이스북', text: '📘 인스타/페이스북' }, { value: '🟢 네이버 배너', text: '🟢 네이버 배너' }] } },
+          // 새로 추가된 "사장님 리뷰 답글" 기능
+          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: '리뷰 답글 자동생성', desc: '고객 리뷰에 찰떡같은 답글을', input1: { label: '별점 (1~5점)', placeholder: '예: 5점', type: 'text' }, input2: { label: '고객 리뷰 내용', placeholder: '예: 음식이 너무 맛있어요!', type: 'textarea' }, input3: { label: '답글 어조', type: 'select', options: [{ value: '😊친절하고 따뜻하게', text: '😊친절하고 따뜻하게' }, { value: '👔정중하고 전문적으로', text: '👔정중하고 전문적으로' }, { value: '🙏진심 어린 사과', text: '🙏진심 어린 사과' }] } }
         ],
       },
     ],
@@ -129,16 +129,19 @@ const translations = {
         categoryId: 'business',
         categoryName: 'Business',
         subFeatures: [
-          // 영문 버전 메모 심폐소생기 input2의 안내 문구도 변경합니다.
           { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'e.g. (Paste voice transcriptions, meeting notes here)', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } },
           { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: 'Angry Email Filter', desc: 'Professional filtering', input1: { label: 'Recipient', placeholder: 'e.g. Sales Team', type: 'text' }, input2: { label: 'Core Message', placeholder: 'Where is the report?', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Polite', text: 'Polite' }, { value: 'Firm', text: 'Firm' }, { value: 'Direct', text: 'Direct' }] } },
-          // 프로 사과문 (영문 버전 적용 - 대상 고정)
           { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: 'Pro Apology', desc: 'Crisis management', input1: { label: 'Issue', placeholder: 'e.g. Missing file', type: 'text' }, input2: { label: 'Solution', placeholder: 'e.g. Resending now', type: 'textarea' }, input3: { type: 'hidden', value: 'Client' } },
         ],
       },
-      // Note: The rest of the English UI features (School, Excel, Dev, Marketing) 
-      // can be added here if the user wants the EN version fully built out.
-      // Currently matching the original implementation state.
+      // 영문 마케팅/SNS 탭 추가 및 리뷰 답글 기능 포함
+      {
+        categoryId: 'marketing',
+        categoryName: 'Marketing',
+        subFeatures: [
+          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: 'Review Reply', desc: 'Smart replies to reviews', input1: { label: 'Rating', placeholder: 'e.g. 5 Stars', type: 'text' }, input2: { label: 'Customer Review', placeholder: 'e.g. The food was great!', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Friendly', text: 'Friendly' }, { value: 'Professional', text: 'Professional' }, { value: 'Apologetic', text: 'Apologetic' }] } }
+        ]
+      }
     ],
   },
 };
