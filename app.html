@@ -38,20 +38,18 @@
   <!-- Google AdSense 자동 광고 스크립트 -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9190401038448278" crossorigin="anonymous"></script>
 
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     // Tailwind 다크모드 및 색상 초기화 설정
-    window.tailwind = {
-      config: {
-        darkMode: 'class',
-        theme: { 
-          extend: { 
-            colors: { primary: '#FF7A00' } // 브랜드 메인 컬러
-          } 
-        }
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { 
+        extend: { 
+          colors: { primary: '#FF7A00' } // 브랜드 메인 컬러
+        } 
       }
     }
   </script>
-  <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- 외부 라이브러리 로드 (아이콘, 마크다운 변환기) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
