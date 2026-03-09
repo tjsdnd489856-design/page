@@ -4,25 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- SEO 메타 태그 추가 -->
-  <title>채티폭스 Workspace - 실시간 AI 텍스트 비서</title>
-  <meta name="description" content="회원가입 없이 3초 만에 완성하는 업무용 이메일, 엑셀 수식, 카피라이팅! 채티폭스 작업 공간에서 지금 바로 AI 비서를 활용해보세요.">
+  <!-- SEO 메타 태그 추가 (15가지 정예 기능으로 수정) -->
+  <title>채티폭스(ChattyFox) | 15가지 AI 비즈니스 올인원 도구</title>
+  <meta name="description" content="분노조절 이메일, 엑셀 수식 생성, 인스타 해시태그 추천 등 직장인을 위한 15가지 필수 AI 도구. 프롬프트 고민 없이 채티폭스에서 바로 해결하세요.">
   <meta name="keywords" content="AI 비서, 이메일 작성 AI, 엑셀 수식 생성기, 마케팅 카피라이팅, 자소서 AI, 채티폭스, ChattyFox">
   <meta name="author" content="채티폭스">
   
   <!-- 오픈 그래프 (OG) 태그 - 카카오톡, 페이스북, 슬랙 공유용 -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chatty-fox.vercel.app/app.html">
-  <meta property="og:title" content="채티폭스 Workspace - 실시간 AI 텍스트 비서">
-  <meta property="og:description" content="회원가입 없이 3초 만에 완성하는 업무용 이메일, 엑셀 수식, 카피라이팅! 지금 바로 시작하세요.">
+  <meta property="og:title" content="채티폭스(ChattyFox) | 15가지 AI 비즈니스 올인원 도구">
+  <meta property="og:description" content="이메일, 엑셀, 카피라이팅을 단 3초 만에! 직장인을 위한 15가지 맞춤형 AI 비서 서비스를 무료로 경험해보세요.">
   <meta property="og:image" content="https://chatty-fox.vercel.app/og-image.png">
   <meta property="og:site_name" content="채티폭스">
   
   <!-- 트위터 카드 태그 -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://chatty-fox.vercel.app/app.html">
-  <meta name="twitter:title" content="채티폭스 Workspace - 스마트한 AI 텍스트 비서">
-  <meta name="twitter:description" content="이메일, 엑셀, 카피라이팅 고민 끝! 19가지 AI 기능으로 업무 효율을 극대화하세요.">
+  <meta name="twitter:title" content="채티폭스(ChattyFox) - 스마트한 AI 텍스트 비서">
+  <meta name="twitter:description" content="이메일, 엑셀, 카피라이팅 고민 끝! 15가지 AI 핵심 기능으로 업무 효율을 극대화하세요.">
   <meta name="twitter:image" content="https://chatty-fox.vercel.app/og-image.png">
 
   <!-- Google tag (gtag.js) GA4 연동 -->
@@ -179,12 +179,12 @@
   </div>
 
   <!-- ==================== 메인 앱 컨테이너 (작업 공간) ==================== -->
-  <!-- 포인트 테두리 추가: border-t-4 border-t-[#FF7A00] (다크모드에서도 자연스럽게 유지) -->
+  <!-- 포인트 테두리 추가: border-t-4 border-t-[#FF7A00] -->
   <div class="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-xl overflow-hidden mt-12 mb-8 transition-colors duration-300 border border-gray-200 dark:border-slate-800 border-t-4 border-t-[#FF7A00]">
     
     <!-- 헤더 (로고 및 타이틀) -->
     <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 text-center transition-colors relative overflow-hidden flex flex-col items-center">
-      <!-- SEO: h1은 페이지당 하나만 있는 것이 좋으므로, 페이지 제목으로 사용합니다. -->
+      <!-- SEO: h1 사용 -->
       <h1 class="text-3xl font-black mb-2 cursor-pointer transition-transform hover:scale-105 inline-flex items-center justify-center gap-2 relative z-10 group" onclick="location.href='index.html'">
         <svg width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300 group-hover:-rotate-6 drop-shadow-sm" aria-label="채티폭스 로고">
           <title>채티폭스 AI 비서 로고</title>
@@ -198,7 +198,7 @@
           <!-- app.js에서 동적으로 채워집니다 -->
         </span>
       </h1>
-      <!-- SEO: h2로 변경하여 부제목임을 명시 -->
+      <!-- SEO: h2 부제목 -->
       <h2 id="appSubtitle" class="text-slate-500 dark:text-slate-400 font-medium text-sm relative z-10"></h2>
     </header>
 
@@ -291,13 +291,13 @@
     </main>
   </div>
 
-  <!-- 푸터 (법적 고지) -->
+  <!-- 푸터 (법적 고지) - 15종 무상 제공 문구 적용 -->
   <footer class="text-center pb-8 pt-4 mt-auto w-full">
     <div class="flex justify-center space-x-4 mb-2">
       <button onclick="openModal('privacyModal')" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-xs font-medium">개인정보처리방침</button>
       <button onclick="openModal('termsModal')" class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-xs font-medium">이용약관</button>
     </div>
-    <p class="text-slate-400 dark:text-slate-500 text-xs">© 2026 ChattyFox. All rights reserved.</p>
+    <p class="text-slate-400 dark:text-slate-500 text-xs font-medium">© 2026 ChattyFox | 직장인 필수 AI 도구 15종 무상 제공</p>
   </footer>
 
   <!-- ==================== 모달 공통 영역 ==================== -->
