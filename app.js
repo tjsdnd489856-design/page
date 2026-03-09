@@ -24,6 +24,23 @@ const SYSTEM_PROMPTS = {
   en: {
     '분노조절 이메일': (i1, i2, i3) => `Act as a senior manager. [Recipient:${i1}], [Content:${i2}], [Tone:${i3}]. Now write.`,
     '메모 심폐소생기': (i1, i2, i3) => `Act as a consultant. [Type:${i1}], [Notes:${i2}], [Focus:${i3}]. Now write.`,
+    '프로 사과문': (i1, i2, i3) => `Act as PR manager. [Issue:${i1}], [Solution:${i2}], [Audience:${i3}]. Now write.`,
+    '리포트 심폐소생': (i1, i2, i3) => `Act as an academic tutor. [Audience:${i1}], [Draft:${i2}], [Tone:${i3}]. Now write.`,
+    '발표 대본 변환': (i1, i2, i3) => `Act as a speech coach. [Target:${i1}], [Slides:${i2}], [Tone:${i3}]. Now write.`,
+    '자소서 영혼 주입기': (i1, i2, i3) => `Act as a tech recruiter. [Role:${i1}], [Exp:${i2}], [Tone:${i3}]. Now write.`,
+    '철벽 방어 거절문': (i1, i2, i3) => `Act as an assertiveness coach. [Recipient:${i1}], [Reason:${i2}], [Tone:${i3}]. Now write.`,
+    '센스있는 인사/축하': (i1, i2, i3) => `Act as a greeting expert. [Situation:${i1}], [Details:${i2}], [Tone:${i3}]. Now write.`,
+    '진심 어린 사과문': (i1, i2, i3) => `Act as a counselor. [Recipient:${i1}], [Mistake:${i2}], [Tone:${i3}]. Now write.`,
+    '당근 진상 퇴치기': (i1, i2, i3) => `Act as an expert seller. [Situation:${i1}], [Facts:${i2}], [Tone:${i3}]. Now write.`,
+    '매력적인 판매글': (i1, i2, i3) => `Act as a copywriter. [Item:${i1}], [Features:${i2}], [Tone:${i3}]. Now write.`,
+    '사장님 리뷰 답글': (i1, i2, i3) => `Act as a CS Manager. [Rating:${i1}], [Review:${i2}], [Tone:${i3}]. Now write.`,
+    '함수 수식 뚝딱이': (i1, i2, i3) => `Act as a Data Analyst. [Context:${i1}], [Goal:${i2}], [Program:${i3}]. Now write.`,
+    '외계어 수식 해독기': (i1, i2, i3) => `Act as an Excel Instructor. [Formula:${i1}], [Question:${i2}], [Level:${i3}]. Now write.`,
+    '반복작업 매크로': (i1, i2, i3) => `Act as an Automation Engineer. [Env:${i1}], [Task:${i2}], [Style:${i3}]. Now write.`,
+    'SQL 쿼리 짜기': (i1, i2, i3) => `Act as a Senior DBA. [Table:${i1}], [Data Needed:${i2}], [DBMS:${i3}]. Now write.`,
+    '정규식(Regex) 설명': (i1, i2, i3) => `Act as a Developer. [Pattern:${i1}], [Request:${i2}], [Level:${i3}]. Now write.`,
+    '인스타그램 해시태그': (i1, i2, i3) => `Act as a Social Media Manager. [Topic:${i1}], [Target:${i2}], [Vibe:${i3}]. Now write.`,
+    '광고 카피라이팅': (i1, i2, i3) => `Act as an Ad Copywriter. [Product:${i1}], [Hook:${i2}], [Platform:${i3}]. Now write.`
   },
 };
 
@@ -104,6 +121,7 @@ const translations = {
       toastMsg: 'Copied!',
       alertEmpty: 'Fill all.',
       generating: 'Thinking...',
+      fetchError: 'Error fetching data.',
     },
     appData: [
       {
@@ -111,8 +129,14 @@ const translations = {
         categoryName: 'Business',
         subFeatures: [
           { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'Your notes', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } },
+          { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: 'Angry Email Filter', desc: 'Professional filtering', input1: { label: 'Recipient', placeholder: 'e.g. Sales Team', type: 'text' }, input2: { label: 'Core Message', placeholder: 'Where is the report?', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Polite', text: 'Polite' }, { value: 'Firm', text: 'Firm' }, { value: 'Direct', text: 'Direct' }] } },
+          // 프로 사과문 (영문 버전 적용 - 대상 고정)
+          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: 'Pro Apology', desc: 'Crisis management', input1: { label: 'Issue', placeholder: 'e.g. Missing file', type: 'text' }, input2: { label: 'Solution', placeholder: 'e.g. Resending now', type: 'textarea' }, input3: { type: 'hidden', value: 'Client' } },
         ],
       },
+      // Note: The rest of the English UI features (School, Excel, Dev, Marketing) 
+      // can be added here if the user wants the EN version fully built out.
+      // Currently matching the original implementation state.
     ],
   },
 };
@@ -329,6 +353,10 @@ const setLanguage = (lang) => {
   if (DOM.resultTitle) DOM.resultTitle.innerHTML = t.ui.resultTitle;
   if (DOM.copyBtn) DOM.copyBtn.innerHTML = t.ui.copyBtn;
   if (DOM.toastMsg) DOM.toastMsg.textContent = t.ui.toastMsg;
+  
+  // 변경된 카테고리에 맞게 탭을 리셋합니다.
+  currentCategoryIndex = 0;
+  currentFeatureIndex = 0;
   
   updateTabContent();
   renderHistory();
