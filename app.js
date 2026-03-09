@@ -184,15 +184,12 @@ const DOM = {
 
 // 5.1. 다크모드 초기화
 const initDarkMode = () => {
-  // 사용자가 수동으로 설정한 값이 있으면 그것을 최우선으로 따름
+  // 사용자가 수동으로 다크모드를 켰던 기록이 있을 때만 다크모드를 활성화 (기본값은 라이트 모드)
   if (localStorage.getItem('darkMode') === 'true') {
     DOM.htmlElement.classList.add('dark');
-  } else if (localStorage.getItem('darkMode') === 'false') {
+  } else {
+    // 그 외의 모든 경우(처음 방문, 라이트모드 설정 등)에는 강제로 라이트 모드 유지
     DOM.htmlElement.classList.remove('dark');
-  } 
-  // 설정값이 없다면 OS의 기본 다크모드 설정을 따라감
-  else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    DOM.htmlElement.classList.add('dark');
   }
 
   // 다크모드 토글 버튼 이벤트
