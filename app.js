@@ -177,20 +177,29 @@ const DOM = {
   toastMsg: document.getElementById('toastMsg'),
   openHistoryBtn: document.getElementById('openHistoryBtn'),
   closeHistoryBtn: document.getElementById('closeHistoryBtn'),
+  htmlElement: document.documentElement // HTML 요소 추가 캐싱
 };
 
 // --- 5. UI 및 로직 함수 ---
 
 // 5.1. 다크모드 초기화
 const initDarkMode = () => {
+  // 사용자가 수동으로 설정한 값이 있으면 그것을 최우선으로 따름
   if (localStorage.getItem('darkMode') === 'true') {
-    document.documentElement.classList.add('dark');
+    DOM.htmlElement.classList.add('dark');
+  } else if (localStorage.getItem('darkMode') === 'false') {
+    DOM.htmlElement.classList.remove('dark');
+  } 
+  // 설정값이 없다면 OS의 기본 다크모드 설정을 따라감
+  else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    DOM.htmlElement.classList.add('dark');
   }
-  
+
+  // 다크모드 토글 버튼 이벤트
   if (DOM.darkModeToggle) {
     DOM.darkModeToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+      DOM.htmlElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', DOM.htmlElement.classList.contains('dark'));
     });
   }
 };
