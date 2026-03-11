@@ -111,35 +111,63 @@ const translations = {
   en: {
     ui: {
       docTitle: '🦊 ChattyFox - AI Workspace',
-      logoText: 'ChattyFox',
+      logoText: '<span class="text-slate-800 dark:text-white tracking-tight">Chatty</span><span class="text-orange-500 tracking-tight">Fox</span>',
       subtitle: 'Professional AI assistant.',
-      historyTitle: 'History',
+      historyTitle: '<i class="fa-solid fa-history mr-2 text-primary"></i>History',
       historyEmpty: 'Empty.',
-      submitBtn: 'Generate',
-      resultTitle: 'Result',
-      copyBtn: 'Copy',
+      submitBtn: '<i class="fa-solid fa-bolt mr-2 text-yellow-300"></i> Generate in 3s',
+      resultTitle: '<i class="fa-solid fa-pen-to-square mr-1"></i>Result (Click to edit)',
+      copyBtn: '<i class="fa-regular fa-copy mr-2"></i> Copy to Clipboard',
       toastMsg: 'Copied!',
       alertEmpty: 'Fill all.',
-      generating: 'Thinking...',
+      generating: '🦊 Thinking...',
       fetchError: 'Error fetching data.',
     },
     appData: [
       {
         categoryId: 'business',
-        categoryName: 'Business',
+        categoryName: '🏢 Business/Email',
         subFeatures: [
-          { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Polisher', desc: 'Pro docs', input1: { label: 'Doc Type', placeholder: 'Report', type: 'text' }, input2: { label: 'Notes', placeholder: 'e.g. (Paste voice transcriptions, meeting notes here)', type: 'textarea' }, input3: { label: 'Focus', type: 'text', placeholder: 'Highlight' } },
-          { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: 'Angry Email Filter', desc: 'Professional filtering', input1: { label: 'Recipient', placeholder: 'e.g. Sales Team', type: 'text' }, input2: { label: 'Core Message', placeholder: 'Where is the report?', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Polite', text: 'Polite' }, { value: 'Firm', text: 'Firm' }, { value: 'Direct', text: 'Direct' }] } },
-          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: 'Pro Apology', desc: 'Crisis management', input1: { label: 'Issue', placeholder: 'e.g. Missing file', type: 'text' }, input2: { label: 'Solution', placeholder: 'e.g. Resending now', type: 'textarea' }, input3: { type: 'hidden', value: 'Client' } },
+          { id: 'memoRevive', apiId: '메모 심폐소생기', icon: '📝', title: 'Memo Reviver', desc: 'Messy notes to perfect doc', input1: { label: 'Doc Type', placeholder: 'e.g. Weekly report', type: 'text' }, input2: { label: 'Raw Notes', placeholder: 'Paste raw text here', type: 'textarea' }, input3: { label: 'Focus Points', type: 'text', placeholder: 'e.g. Emphasize delay reasons' } },
+          { id: 'angryEmail', apiId: '분노조절 이메일', icon: '✉️', title: 'Angry Email Filter', desc: 'Firm but polite', input1: { label: 'Recipient', placeholder: 'e.g. Sales Team', type: 'text' }, input2: { label: 'Real Message', placeholder: 'e.g. Where is the report?', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Polite', text: 'Polite' }, { value: 'Professional', text: 'Professional' }, { value: 'Direct', text: 'Direct' }] } },
+          { id: 'apology', apiId: '프로 사과문', icon: '🚨', title: 'Pro Apology', desc: 'Crisis management', input1: { label: 'Issue', placeholder: 'e.g. Missing file', type: 'text' }, input2: { label: 'Solution', placeholder: 'e.g. Resending now', type: 'textarea' }, input3: { type: 'hidden', value: 'External' } },
+        ],
+      },
+      {
+        categoryId: 'school',
+        categoryName: '🏫 Study/Summary',
+        subFeatures: [
+          { id: 'reportReview', apiId: '리포트 심폐소생', icon: '📄', title: 'Report Polisher', desc: 'Draft to perfect report', input1: { label: 'Target Audience', placeholder: 'e.g. Professor', type: 'text' }, input2: { label: 'Draft', placeholder: 'Paste draft here...', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Academic', text: 'Academic' }, { value: 'Bullet points', text: 'Bullet points' }] } },
+          { id: 'speechConvert', apiId: '발표 대본 변환', icon: '🗣️', title: 'Script Converter', desc: 'PPT to natural script', input1: { label: 'Time/Audience', placeholder: 'e.g. 5 min, Students', type: 'text' }, input2: { label: 'Materials', placeholder: 'Paste PPT content', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Professional', text: 'Professional' }, { value: 'Engaging', text: 'Engaging' }] } },
+          { id: 'coverLetter', apiId: '자소서 영혼 주입기', icon: '✍️', title: 'Cover Letter', desc: 'Experience to achievement', input1: { label: 'Role', placeholder: 'e.g. Marketing', type: 'text' }, input2: { label: 'Experience', placeholder: 'Cafe part-time...', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Passionate', text: 'Passionate' }, { value: 'Data-driven', text: 'Data-driven' }] } },
         ],
       },
       {
         categoryId: 'marketing',
-        categoryName: 'Marketing',
+        categoryName: '📱 Marketing/SNS',
         subFeatures: [
-          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: 'Review Reply', desc: 'Smart replies to reviews', input1: { type: 'hidden', value: 'NoRating' }, input2: { label: 'Customer Review', placeholder: 'e.g. The food was great!', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Friendly', text: 'Friendly' }, { value: 'Professional', text: 'Professional' }, { value: 'Apologetic', text: 'Apologetic' }] } }
-        ]
-      }
+          { id: 'hashGen', apiId: '인스타그램 해시태그', icon: '🏷️', title: 'Hashtag Generator', desc: 'Viral hashtags', input1: { label: 'Topic/Desc', placeholder: 'Cafe photo, etc.', type: 'text' }, input2: { label: 'Target', placeholder: 'Couples in 20s', type: 'textarea' }, input3: { label: 'Vibe', type: 'text', placeholder: 'Aesthetic and hip' } },
+          { id: 'adCopy', apiId: '광고 카피라이팅', icon: '🎯', title: 'Ad Copywriting', desc: 'Click-worthy copy', input1: { label: 'Product/Service', placeholder: 'Wireless vacuum', type: 'text' }, input2: { label: 'Key Point', placeholder: 'Lightweight suction', type: 'textarea' }, input3: { label: 'Platform', type: 'select', options: [{ value: 'Instagram/FB', text: 'Instagram/FB' }, { value: 'Banner Ad', text: 'Banner Ad' }] } },
+          { id: 'reviewReply', apiId: '사장님 리뷰 답글', icon: '💬', title: 'Review Reply', desc: 'Perfect replies to reviews', input1: { type: 'hidden', value: 'NoRating' }, input2: { label: 'Customer Review', placeholder: 'e.g. The food was great!', type: 'textarea' }, input3: { label: 'Tone', type: 'select', options: [{ value: 'Friendly', text: 'Friendly' }, { value: 'Professional', text: 'Professional' }, { value: 'Apologetic', text: 'Apologetic' }] } }
+        ],
+      },
+      {
+        categoryId: 'excel',
+        categoryName: '📊 Excel/Sheets',
+        subFeatures: [
+          { id: 'excelFormula', apiId: '함수 수식 뚝딱이', icon: '🧮', title: 'Formula Maker', desc: 'Words to formulas', input1: { label: 'Data Context', placeholder: 'e.g. Col A is Name', type: 'text' }, input2: { label: 'Desired Result', placeholder: 'e.g. Count score > 80', type: 'textarea' }, input3: { label: 'Program', type: 'select', options: [{ value: 'MS Excel', text: 'MS Excel' }, { value: 'Google Sheets', text: 'Google Sheets' }] } },
+          { id: 'excelDecode', apiId: '외계어 수식 해독기', icon: '🔍', title: 'Formula Decoder', desc: 'Analyze formulas', input1: { label: 'Formula/Error', placeholder: '=VLOOKUP...', type: 'text' }, input2: { label: 'Question', placeholder: 'What does this mean?', type: 'textarea' }, input3: { label: 'Level', type: 'select', options: [{ value: 'Beginner', text: 'Beginner' }, { value: 'Professional', text: 'Professional' }] } },
+          { id: 'excelMacro', apiId: '반복작업 매크로', icon: '🤖', title: 'Macro Generator', desc: 'Generate VBA', input1: { label: 'Environment', placeholder: 'e.g. Excel VBA', type: 'text' }, input2: { label: 'Task Desc', placeholder: 'Split sheets, etc.', type: 'textarea' }, input3: { label: 'Style', type: 'select', options: [{ value: 'With Comments', text: 'With Comments' }, { value: 'Clean Code Only', text: 'Clean Code Only' }] } },
+        ],
+      },
+      {
+        categoryId: 'dev',
+        categoryName: '💻 Dev/Coding',
+        subFeatures: [
+          { id: 'sqlGen', apiId: 'SQL 쿼리 짜기', icon: '🗄️', title: 'SQL Generator', desc: 'Data to queries', input1: { label: 'Table Schema', placeholder: 'e.g. users(id, age)', type: 'text' }, input2: { label: 'Needed Data', placeholder: 'Age over 30', type: 'textarea' }, input3: { label: 'DBMS', type: 'select', options: [{ value: 'MySQL', text: 'MySQL' }, { value: 'PostgreSQL', text: 'PostgreSQL' }] } },
+          { id: 'regexGen', apiId: '정규식(Regex) 설명', icon: '🧩', title: 'Regex Helper', desc: 'Easy Regex', input1: { label: 'Pattern', placeholder: 'Extract email, etc.', type: 'text' }, input2: { label: 'Request', placeholder: 'Explain this', type: 'textarea' }, input3: { label: 'Level', type: 'select', options: [{ value: 'Beginner', text: 'Beginner' }, { value: 'Senior', text: 'Senior' }] } },
+        ],
+      },
     ],
   },
 };
